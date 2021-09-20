@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 @Mixin(TranslationStorage.class)
@@ -22,7 +22,7 @@ public class MixinTranslationStorage {
     private void langPatchHooks(String key, CallbackInfoReturnable<String> cir) {
 
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
-                               BiFunction<ImmutableMap<String, String>, String, String> valueMapping) -> {
+                               EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
                 cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
                 return true;

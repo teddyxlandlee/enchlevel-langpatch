@@ -11,6 +11,18 @@ version = project.mod_version
 group = project.maven_group
 
 dependencies {
+    repositories {
+        mavenLocal()
+        maven {
+            name = 'COVID-Trump'
+            url = 'https://covid-trump.github.io/mvn/'
+        }
+        maven {
+            name = "TerraformersMC"
+            url  = 'https://maven.terraformersmc.com/releases/'
+        }
+    }
+
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -19,38 +31,50 @@ dependencies {
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+
+    //modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
     inputs.property "version", project.version
 
-    from(sourceSets.main.resources.srcDirs) {
+    /*from(sourceSets.main.resources.srcDirs) {
         include "fabric.mod.json"
         expand "version": project.version
     }
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
+    }*/
+    filesMatching('fabric.mod.json') {
+        expand 'version' : project.version
     }
 }
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
 // this fixes some edge cases with special characters not displaying correctly
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+tasks.withType(JavaCompile.class).configureEach {
+    it.options.encoding = "UTF-8"
+
+    def targetVersion = 8
+    if (JavaVersion.current().isJava9Compatible())
+        it.options.release = targetVersion
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 // if it is present.
 // If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
-    from sourceSets.main.allSource
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 jar {
-    from "LICENSE"
+    from ("LICENSE") {
+        rename {  "${it}_${project.archivesBaseName}"  }
+    }
 }
 
 // configure the maven publication
@@ -64,12 +88,15 @@ publishing {
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
+            artifact(javadocJar) {
+                builtBy javadoc
+            }
         }
     }
 
     // select the repositories you want to publish to
     repositories {
         // uncomment to publish to the local maven
-        // mavenLocal()
+        mavenLocal()
     }
 }
