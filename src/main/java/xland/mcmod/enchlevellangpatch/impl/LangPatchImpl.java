@@ -22,7 +22,9 @@ import java.util.function.Predicate;
 public final class LangPatchImpl {
     private LangPatchImpl() {}
 
-    @Deprecated static final Logger LOGGER = LogManager.getLogger("Enchantment Level Language Patcher");
+    private static final List<ImmutablePair<Predicate<String>,
+            EnchantmentLevelLangPatch>> PREDICATES
+            = Collections.synchronizedList(Lists.newArrayList());
 
     private static final EnchantmentLevelLangPatch
         DEFAULT_ENCHANTMENT_HOOKS = (ImmutableMap<String, String> translationStorage, String key) -> {
@@ -82,10 +84,6 @@ public final class LangPatchImpl {
             Registry.register(POTION_HOOK, id, hooks);
         }
     }
-
-    private static final List<ImmutablePair<Predicate<String>,
-                EnchantmentLevelLangPatch>> PREDICATES
-            = Collections.synchronizedList(Lists.newArrayList());
 
     public static void register(Predicate<String> keyPredicate,
                                 EnchantmentLevelLangPatch edition) {
