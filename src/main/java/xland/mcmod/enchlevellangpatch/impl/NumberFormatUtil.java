@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.chars.Char2IntArrayMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Scanner;
+
 public class NumberFormatUtil {
     static boolean isDigit(@NotNull String s) {
         try {
@@ -52,5 +54,12 @@ public class NumberFormatUtil {
             }
         }
         return res;
+    }
+
+    static @NotNull String intToRomanImpl(int i) {
+        String ret = intToRoman(i);
+        if (ret == null)
+            return Integer.toString(i);
+        return ret;
     }
 }
