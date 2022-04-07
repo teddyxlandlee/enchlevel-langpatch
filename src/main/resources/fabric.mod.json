@@ -23,7 +23,9 @@
     "enchlevel-langpatch.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.0",
+    "fabricloader": ">=0.13.0"
+  },
+  "recommends": {
     "fabric-resource-loader-v0": "*"
   }
 }

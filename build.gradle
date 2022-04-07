@@ -31,7 +31,7 @@ dependencies {
     // The maximum version which is compatible with Java 8.
     // Use it to load mod translations.
     //include
-    modRuntime("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.4.7+f74f7c7d7d")
+    modRuntime("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.4.8+3cc0f0907d")
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
