@@ -55,8 +55,8 @@ public final class LangPatchImpl {
 
 
     static final RegistryKey<Registry<EnchantmentLevelLangPatch>>
-        ENCHANTMENT_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "enchantment_hook")),
-        POTION_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "potion_hook"));
+        ENCHANTMENT_HOOK_KEY = RegistryKey.ofRegistry(EnchantmentLevelLangPatch.ENCHANTMENT_HOOK_REGISTRY_ID),
+        POTION_HOOK_KEY = RegistryKey.ofRegistry(EnchantmentLevelLangPatch.POTION_HOOK_REGISTRY_ID);
     static public final DefaultedRegistry<EnchantmentLevelLangPatch>
         ENCHANTMENT_HOOK = new DefaultedRegistry<>(
                 "enchlevel-langpatch:default",

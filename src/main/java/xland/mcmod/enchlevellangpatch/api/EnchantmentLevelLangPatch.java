@@ -10,6 +10,7 @@ import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil;
 
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
@@ -92,6 +93,18 @@ public interface EnchantmentLevelLangPatch {
         LangPatchImpl.hookPatch(Objects.requireNonNull(id),
                 Objects.requireNonNull(edition), false);
     }
+
+    /**
+     * Registry identifier of enchantment hooks.
+     * @since 0.3.1
+     */
+    Identifier ENCHANTMENT_HOOK_REGISTRY_ID = new Identifier("enchlevel-langpatch", "enchantment_hook");
+
+    /**
+     * Registry identifier of potion hooks.
+     * @since 0.3.1
+     */
+    Identifier POTION_HOOK_REGISTRY_ID = new Identifier("enchlevel-langpatch", "potion_hook");
 
     /**
      * The function for {@link EnchantmentLevelLangPatch}
