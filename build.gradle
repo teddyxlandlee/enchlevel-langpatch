@@ -77,7 +77,7 @@ tasks.withType(JavaCompile.class).configureEach {
 
 java {
     withSourcesJar()
-    withJavadocJar()
+    //withJavadocJar()
 }
 
 jar {
@@ -97,9 +97,9 @@ publishing {
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
-            artifact(javadocJar) {
-                builtBy javadoc
-            }
+            //artifact(javadocJar) {
+            //    builtBy javadoc
+            //}
         }
     }
 
