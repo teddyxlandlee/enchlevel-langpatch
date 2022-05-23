@@ -5,6 +5,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil;
 
@@ -107,5 +108,5 @@ public interface EnchantmentLevelLangPatch {
      * We use aggressive way to prevent memory issues, which may cause
      * compatibility issues with 1.0-mods.
      */
-    String apply(Map<String, String> translationStorage, String key);
+    String apply(@Unmodifiable Map<String, String> translationStorage, String key);
 }

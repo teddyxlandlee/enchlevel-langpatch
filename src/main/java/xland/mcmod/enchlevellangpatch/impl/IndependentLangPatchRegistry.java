@@ -2,6 +2,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.util.Identifier;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -12,7 +13,7 @@ import java.util.Objects;
 
 /** @see net.minecraft.util.registry.DefaultedRegistry */
 @API(status = API.Status.INTERNAL)
-public class IndependentLangPatchRegistry {
+public final class IndependentLangPatchRegistry {
     private final BiMap<Identifier, EnchantmentLevelLangPatch> map
             = HashBiMap.create();
     private final Identifier defaultId;
@@ -70,5 +71,9 @@ public class IndependentLangPatchRegistry {
                 "map=" + map +
                 ", defaultId=" + defaultId +
                 '}';
+    }
+
+    public ImmutableBiMap<Identifier, EnchantmentLevelLangPatch> asImmutableBiMap() {
+        return ImmutableBiMap.copyOf(this.map);
     }
 }

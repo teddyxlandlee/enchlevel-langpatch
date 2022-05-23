@@ -1,9 +1,11 @@
 package xland.mcmod.enchlevellangpatch.api;
 
+import com.google.common.collect.BiMap;
 import net.minecraft.util.Identifier;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 
 /**
@@ -62,4 +64,24 @@ public class EnchantmentLevelLangPatchConfig {
     }
 
     private EnchantmentLevelLangPatchConfig() {}
+
+    /**
+     * @return registered ID-LangPatch context of potion hooks.
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    @Unmodifiable
+    @SuppressWarnings("unused")
+    public static BiMap<Identifier, EnchantmentLevelLangPatch> getPotionHooksContext() {
+        return LangPatchImpl.POTION_HOOK.asImmutableBiMap();
+    }
+
+    /**
+     * @return registered ID-LangPatch context of enchantment hooks.
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    @Unmodifiable
+    @SuppressWarnings("unused")
+    public static BiMap<Identifier, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
+        return LangPatchImpl.ENCHANTMENT_HOOK.asImmutableBiMap();
+    }
 }

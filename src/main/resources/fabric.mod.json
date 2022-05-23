@@ -28,7 +28,7 @@
   "recommends": {
     "fabric-resource-loader-v0": "*"
   },
-  "conflicts": {
+  "breaks": {
     "enchlevel-langpatch-config": "<2"
   }
 }
