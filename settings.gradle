@@ -1,6 +1,10 @@
 pluginManagement {
     repositories {
-        jcenter()
+        //jcenter()
+        maven {
+            name = 'Aliyun Mirror'
+            url  = 'https://maven.aliyun.com/repository/public'
+        }
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'

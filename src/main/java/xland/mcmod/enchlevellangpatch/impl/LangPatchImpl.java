@@ -2,9 +2,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.DefaultedRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -14,6 +12,7 @@ import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -27,12 +26,12 @@ public final class LangPatchImpl {
             = Collections.synchronizedList(Lists.newArrayList());
 
     private static final EnchantmentLevelLangPatch
-        DEFAULT_ENCHANTMENT_HOOKS = (ImmutableMap<String, String> translationStorage, String key) -> {
+        DEFAULT_ENCHANTMENT_HOOKS = (Map<String, String> translationStorage, String key) -> {
             if (translationStorage.containsKey(key)) return translationStorage.get(key);
             int lvl = Integer.parseInt(key.substring(18));
             return String.format(translationStorage.getOrDefault("enchantment.level.x", "%s"), lvl);
         },
-        DEFAULT_POTION_HOOKS = (ImmutableMap<String, String> translationStorage, String key) -> {
+        DEFAULT_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
             if (translationStorage.containsKey(key)) return translationStorage.get(key);
             int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
             return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"), lvl);
@@ -44,7 +43,7 @@ public final class LangPatchImpl {
             return String.format(translationStorage.getOrDefault("enchantment.level.x", "%s"),
                     intToRomanImpl(lvl));
         },
-        ROMAN_POTION_HOOKS = (ImmutableMap<String, String> translationStorage, String key) -> {
+        ROMAN_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
             if (translationStorage.containsKey(key)) return translationStorage.get(key);
             int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
             return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"),
@@ -55,23 +54,17 @@ public final class LangPatchImpl {
 
 
     static final RegistryKey<Registry<EnchantmentLevelLangPatch>>
-        ENCHANTMENT_HOOK_KEY = RegistryKey.ofRegistry(EnchantmentLevelLangPatch.ENCHANTMENT_HOOK_REGISTRY_ID),
-        POTION_HOOK_KEY = RegistryKey.ofRegistry(EnchantmentLevelLangPatch.POTION_HOOK_REGISTRY_ID);
-    static public final DefaultedRegistry<EnchantmentLevelLangPatch>
-        ENCHANTMENT_HOOK = new DefaultedRegistry<>(
-                "enchlevel-langpatch:default",
-                ENCHANTMENT_HOOK_KEY,
-                Lifecycle.stable()),
-        POTION_HOOK = new DefaultedRegistry<>(
-                "enchlevel-langpatch:default",
-                POTION_HOOK_KEY,
-                Lifecycle.stable());
+        ENCHANTMENT_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "enchantment_hook")),
+        POTION_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "potion_hook"));
+    static public final IndependentLangPatchRegistry
+        ENCHANTMENT_HOOK = IndependentLangPatchRegistry.of(),
+        POTION_HOOK = IndependentLangPatchRegistry.of();
 
     static {
-        Registry.register(ENCHANTMENT_HOOK, "enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
-        Registry.register(POTION_HOOK, "enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
-        Registry.register(ENCHANTMENT_HOOK, "enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
-        Registry.register(POTION_HOOK, "enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
+        ENCHANTMENT_HOOK.add("enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
+        POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
+        ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
+        POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
 
         EnchantmentLevelLangPatch.registerPatch(
                 s -> s.startsWith("enchantment.level.") && NumberFormatUtil.isDigit(s.substring(18)),
@@ -94,9 +87,9 @@ public final class LangPatchImpl {
             boolean enchantmentOrPotion /*1: enchantment
                                           0: potion*/) {
         if (enchantmentOrPotion) { // enchantment
-            Registry.register(ENCHANTMENT_HOOK, id, hooks);
+            ENCHANTMENT_HOOK.add(id, hooks);
         } else {                  // potion
-            Registry.register(POTION_HOOK, id, hooks);
+            POTION_HOOK.add(id, hooks);
         }
     }
 

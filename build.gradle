@@ -14,6 +14,10 @@ dependencies {
     repositories {
         mavenLocal()
         maven {
+            name = 'Aliyun Mirror'
+            url  = 'https://maven.aliyun.com/repository/public'
+        }
+        maven {
             name = 'COVID-Trump'
             url = 'https://covid-trump.github.io/mvn/'
         }

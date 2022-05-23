@@ -1,6 +1,5 @@
 package xland.mcmod.enchlevellangpatch.api;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.Identifier;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -9,14 +8,14 @@ import org.jetbrains.annotations.Range;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil;
 
+import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * An API to patch the language file of Minecraft, resource packs and mods.
  *
- * @see #apply(ImmutableMap, String)
+ * @see #apply(Map, String)
  */
 @API(status = API.Status.STABLE)
 @FunctionalInterface
@@ -95,25 +94,18 @@ public interface EnchantmentLevelLangPatch {
     }
 
     /**
-     * Registry identifier of enchantment hooks.
-     * @since 0.3.1
-     */
-    Identifier ENCHANTMENT_HOOK_REGISTRY_ID = new Identifier("enchlevel-langpatch", "enchantment_hook");
-
-    /**
-     * Registry identifier of potion hooks.
-     * @since 0.3.1
-     */
-    Identifier POTION_HOOK_REGISTRY_ID = new Identifier("enchlevel-langpatch", "potion_hook");
-
-    /**
      * The function for {@link EnchantmentLevelLangPatch}
      *
-     * @param translationStorage a copy of the current key-translation map
+     * @param translationStorage an unmodifiable wrapping of
+     *                          the current key-translation map
      * @param key the provided translation key when this
      * {@link EnchantmentLevelLangPatch patch} is applied.
      *
      * @return the translation (value) you modify.
+     * @apiNote param 1 is {@link Map}, not
+     * {@link com.google.common.collect.ImmutableMap}.
+     * We use aggressive way to prevent memory issues, which may cause
+     * compatibility issues with 1.0-mods.
      */
-    String apply(ImmutableMap<String, String> translationStorage, String key);
+    String apply(Map<String, String> translationStorage, String key);
 }
