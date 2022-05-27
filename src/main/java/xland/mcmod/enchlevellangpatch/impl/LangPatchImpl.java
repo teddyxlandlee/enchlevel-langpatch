@@ -1,10 +1,7 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -53,9 +50,6 @@ public final class LangPatchImpl {
     public static void init() {}
 
 
-    static final RegistryKey<Registry<EnchantmentLevelLangPatch>>
-        ENCHANTMENT_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "enchantment_hook")),
-        POTION_HOOK_KEY = RegistryKey.ofRegistry(new Identifier("enchlevel-langpatch", "potion_hook"));
     static public final IndependentLangPatchRegistry
         ENCHANTMENT_HOOK = IndependentLangPatchRegistry.of(),
         POTION_HOOK = IndependentLangPatchRegistry.of();
