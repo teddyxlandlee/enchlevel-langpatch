@@ -1,7 +1,7 @@
 package xland.mcmod.enchlevellangpatch.api;
 
 import com.google.common.collect.BiMap;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,9 +21,9 @@ public class EnchantmentLevelLangPatchConfig {
      * A thread-safe storage for the ID of the current enchantment level and potion
      * potency patches.
      */
-    static volatile @NotNull Identifier
-            currentEnchantmentHooksId = new Identifier("enchlevel-langpatch:default"),
-            currentPotionHooksId = new Identifier("enchlevel-langpatch:default");
+    static volatile @NotNull ResourceLocation
+            currentEnchantmentHooksId = new ResourceLocation("enchlevel-langpatch:default"),
+            currentPotionHooksId = new ResourceLocation("enchlevel-langpatch:default");
 
     /**
      * The setter for the current enchantment level patch. Will be set to default if
@@ -71,7 +71,7 @@ public class EnchantmentLevelLangPatchConfig {
     @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable
     @SuppressWarnings("unused")
-    public static BiMap<Identifier, EnchantmentLevelLangPatch> getPotionHooksContext() {
+    public static BiMap<ResourceLocation, EnchantmentLevelLangPatch> getPotionHooksContext() {
         return LangPatchImpl.POTION_HOOK.asImmutableBiMap();
     }
 
@@ -81,7 +81,7 @@ public class EnchantmentLevelLangPatchConfig {
     @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable
     @SuppressWarnings("unused")
-    public static BiMap<Identifier, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
+    public static BiMap<ResourceLocation, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
         return LangPatchImpl.ENCHANTMENT_HOOK.asImmutableBiMap();
     }
 }

@@ -3,7 +3,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -11,24 +11,24 @@ import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.util.Objects;
 
-/** @see net.minecraft.util.registry.DefaultedRegistry */
+/** @see net.minecraft.core.DefaultedRegistry */
 @API(status = API.Status.INTERNAL)
 public final class IndependentLangPatchRegistry {
-    private final BiMap<Identifier, EnchantmentLevelLangPatch> map
+    private final BiMap<ResourceLocation, EnchantmentLevelLangPatch> map
             = HashBiMap.create();
-    private final Identifier defaultId;
+    private final ResourceLocation defaultId;
     private EnchantmentLevelLangPatch defaultValue;
 
-    IndependentLangPatchRegistry(Identifier defaultId) {
+    IndependentLangPatchRegistry(ResourceLocation defaultId) {
         this.defaultId = defaultId;
     }
 
     @Contract(" -> new")
     static @NotNull IndependentLangPatchRegistry of() {
-        return new IndependentLangPatchRegistry(new Identifier("enchlevel-langpatch:default"));
+        return new IndependentLangPatchRegistry(new ResourceLocation("enchlevel-langpatch:default"));
     }
 
-    public void add(Identifier id, EnchantmentLevelLangPatch e) {
+    public void add(ResourceLocation id, EnchantmentLevelLangPatch e) {
         map.put(id, e);
         if (Objects.equals(defaultId, id)) {
             this.defaultValue = e;
@@ -36,18 +36,18 @@ public final class IndependentLangPatchRegistry {
     }
 
     public void add(String id, EnchantmentLevelLangPatch e) {
-        this.add(new Identifier(id), e);
+        this.add(new ResourceLocation(id), e);
     }
 
-    public EnchantmentLevelLangPatch get(Identifier id) {
+    public EnchantmentLevelLangPatch get(ResourceLocation id) {
         return map.getOrDefault(id, defaultValue);
     }
 
-    public Identifier getId(EnchantmentLevelLangPatch e) {
+    public ResourceLocation getId(EnchantmentLevelLangPatch e) {
         return map.inverse().getOrDefault(e, defaultId);
     }
 
-    public Identifier getDefaultId() {
+    public ResourceLocation getDefaultId() {
         return defaultId;
     }
 
@@ -73,7 +73,7 @@ public final class IndependentLangPatchRegistry {
                 '}';
     }
 
-    public ImmutableBiMap<Identifier, EnchantmentLevelLangPatch> asImmutableBiMap() {
+    public ImmutableBiMap<ResourceLocation, EnchantmentLevelLangPatch> asImmutableBiMap() {
         return ImmutableBiMap.copyOf(this.map);
     }
 }

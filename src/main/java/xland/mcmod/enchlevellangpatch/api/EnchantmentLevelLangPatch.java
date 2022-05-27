@@ -1,6 +1,6 @@
 package xland.mcmod.enchlevellangpatch.api;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +29,8 @@ public interface EnchantmentLevelLangPatch {
      *                    language item.
      * @param edition The patch for the corresponding language item
      *
-     * @see #registerEnchantmentPatch(Identifier, EnchantmentLevelLangPatch)
-     * @see #registerPotionPatch(Identifier, EnchantmentLevelLangPatch)
+     * @see #registerEnchantmentPatch(ResourceLocation, EnchantmentLevelLangPatch)
+     * @see #registerPotionPatch(ResourceLocation, EnchantmentLevelLangPatch)
      */
     static void registerPatch(@NotNull Predicate<String> keyPredicate,
                               @NotNull EnchantmentLevelLangPatch edition) {
@@ -69,7 +69,7 @@ public interface EnchantmentLevelLangPatch {
      */
     @SuppressWarnings("unused")
     static void registerEnchantmentPatch(
-            @NotNull Identifier id,
+            @NotNull ResourceLocation id,
             @NotNull EnchantmentLevelLangPatch edition) {
         LangPatchImpl.hookPatch(Objects.requireNonNull(id),
                 Objects.requireNonNull(edition), true);
@@ -88,7 +88,7 @@ public interface EnchantmentLevelLangPatch {
      */
     @SuppressWarnings("unused")
     static void registerPotionPatch(
-            @NotNull Identifier id,
+            @NotNull ResourceLocation id,
             @NotNull EnchantmentLevelLangPatch edition) {
         LangPatchImpl.hookPatch(Objects.requireNonNull(id),
                 Objects.requireNonNull(edition), false);
