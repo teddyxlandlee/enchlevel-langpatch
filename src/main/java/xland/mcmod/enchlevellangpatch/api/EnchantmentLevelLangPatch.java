@@ -62,6 +62,24 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
      * which modifies current enchantment level patch.
      *
+     * @deprecated use {@link #registerEnchantmentPatch(String, EnchantmentLevelLangPatch)}
+     * for better compatibility across versions.
+     */
+    @SuppressWarnings("unused")
+    @Deprecated//forRemoval=false
+    static void registerEnchantmentPatch(
+            @NotNull ResourceLocation id,
+            @NotNull EnchantmentLevelLangPatch edition) {
+        LangPatchImpl.hookPatch(Objects.requireNonNull(id),
+                Objects.requireNonNull(edition), true);
+    }
+    
+    /**
+     * Register an extra rendering syntax for enchantment levels. <br />
+     * Won't be applied without an extension library that invokes
+     * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
+     * which modifies current enchantment level patch.
+     *
      * @see EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks
      *
      * @see #registerPatch
@@ -69,12 +87,30 @@ public interface EnchantmentLevelLangPatch {
      */
     @SuppressWarnings("unused")
     static void registerEnchantmentPatch(
+            @NotNull String id,
+            @NotNull EnchantmentLevelLangPatch edition) {
+        Objects.requireNonNull(id);
+        registerEnchantmentPatch(new ResourceLocation(id), edition);
+    }
+
+    /**
+     * Register an extra rendering syntax for potion potency. <br />
+     * Won't be applied without an extension library that invokes
+     * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks}
+     * which modifies current potion potency patch.
+     *
+     * @deprecated use {@link registerPotionPatch(String, EnchantmentLevelLangPatch)}
+     * for better compatibility across versions.
+     */
+    @SuppressWarnings("unused")
+    @Deprecated//forRemoval=false
+    static void registerPotionPatch(
             @NotNull ResourceLocation id,
             @NotNull EnchantmentLevelLangPatch edition) {
         LangPatchImpl.hookPatch(Objects.requireNonNull(id),
-                Objects.requireNonNull(edition), true);
+                Objects.requireNonNull(edition), false);
     }
-
+    
     /**
      * Register an extra rendering syntax for potion potency. <br />
      * Won't be applied without an extension library that invokes
@@ -88,10 +124,10 @@ public interface EnchantmentLevelLangPatch {
      */
     @SuppressWarnings("unused")
     static void registerPotionPatch(
-            @NotNull ResourceLocation id,
+            @NotNull String id,
             @NotNull EnchantmentLevelLangPatch edition) {
-        LangPatchImpl.hookPatch(Objects.requireNonNull(id),
-                Objects.requireNonNull(edition), false);
+        Objects.requireNonNull(id);
+        registerPotionPatch(new ResourceLocation(id), edition);
     }
 
     /**
