@@ -52,6 +52,7 @@ public interface EnchantmentLevelLangPatch {
      * Provides an algorithm for roman-to-int translation.
      */
     @SuppressWarnings("unused")
+    @Deprecated
     static int romanToInt(@NotNull String s) {
         return NumberFormatUtil.romanToInt(Objects.requireNonNull(s));
     }
@@ -99,7 +100,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks}
      * which modifies current potion potency patch.
      *
-     * @deprecated use {@link registerPotionPatch(String, EnchantmentLevelLangPatch)}
+     * @deprecated use {@link #registerPotionPatch(String, EnchantmentLevelLangPatch)}
      * for better compatibility across versions.
      */
     @SuppressWarnings("unused")

@@ -37,14 +37,18 @@ public final class LangPatchImpl {
         ROMAN_ENCHANTMENT_HOOKS = (translationStorage, key) -> {
             if (translationStorage.containsKey(key)) return translationStorage.get(key);
             int lvl = Integer.parseInt(key.substring(18));
+            boolean chinese = "yes".equalsIgnoreCase(
+                    /*@Nullable*/translationStorage.get("langpatch.enchantment.conf.hanzi"));
             return String.format(translationStorage.getOrDefault("enchantment.level.x", "%s"),
-                    intToRomanImpl(lvl));
+                    intToRomanImpl(lvl, chinese));
         },
         ROMAN_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
             if (translationStorage.containsKey(key)) return translationStorage.get(key);
             int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
+            boolean chinese = "yes".equalsIgnoreCase(
+                    /*@Nullable*/translationStorage.get("langpatch.potion.conf.hanzi"));
             return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"),
-                    intToRomanImpl(lvl));
+                    intToRomanImpl(lvl, chinese));
         };
 
     public static void init() {}
