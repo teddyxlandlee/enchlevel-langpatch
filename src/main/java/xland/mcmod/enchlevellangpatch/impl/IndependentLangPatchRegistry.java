@@ -28,6 +28,7 @@ public final class IndependentLangPatchRegistry {
         return new IndependentLangPatchRegistry(new ResourceLocation("enchlevel-langpatch:default"));
     }
 
+    synchronized
     public void add(ResourceLocation id, EnchantmentLevelLangPatch e) {
         map.put(id, e);
         if (Objects.equals(defaultId, id)) {
@@ -39,10 +40,12 @@ public final class IndependentLangPatchRegistry {
         this.add(new ResourceLocation(id), e);
     }
 
+    synchronized
     public EnchantmentLevelLangPatch get(ResourceLocation id) {
         return map.getOrDefault(id, defaultValue);
     }
 
+    synchronized
     public ResourceLocation getId(EnchantmentLevelLangPatch e) {
         return map.inverse().getOrDefault(e, defaultId);
     }
