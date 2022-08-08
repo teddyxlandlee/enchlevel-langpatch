@@ -190,7 +190,8 @@ jar {
                 "Implementation-Version"  : project.version,
                 "Implementation-Vendor"   : "teddyxlandlee",
                 "Implementation-Timestamp": Instant.now(),
-                "MixinConfigs" : "enchlevel-langpatch.mixins.json"
+                //"MixinConfigs" : "enchlevel-langpatch.mixins.json"
+                "Fa2Fo-MultiPlatform"     : "true"
         ])
     }
 }
