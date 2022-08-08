@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "enchlevel-langpatch-fa2fo",
+  "license": "WTFPL",
+  "version": "${version}",
+  "custom": {
+    "modmenu": {
+      "parent": "enchlevel-langpatch",
+      "badges": [ "library" ]
+    }
+  }
+}

@@ -1,0 +1,131 @@
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
+
+import java.time.Instant
+
+buildscript {
+    repositories {
+        maven {
+            name = 'Aliyun Mirror'
+            url  = 'https://maven.aliyun.com/repository/public'
+        }
+    }
+    dependencies {
+        classpath("org.ow2.asm:asm:9.3")
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+version = rootProject.version
+group = rootProject.group
+
+dependencies {
+    compileOnly 'com.google.guava:guava:21.0'
+    compileOnly 'org.ow2.asm:asm:7.2'
+    compileOnly 'org.apache.logging.log4j:log4j-api:2.17.1'
+    compileOnly 'org.apache.commons:commons-lang3:3.5'
+    compileOnly 'xland.mcmodbridge:fa2fomapper:3.0.0'
+    compileOnly 'org.jetbrains:annotations:19.0.0'
+    compileOnly 'cpw.mods:modlauncher:8.1.3'
+}
+
+tasks.withType(JavaCompile.class).configureEach {
+    it.options.encoding = "UTF-8"
+
+    def targetVersion = 8
+    if (JavaVersion.current().isJava9Compatible())
+        it.options.release = targetVersion
+}
+java.withSourcesJar()
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "Enchantment Level Language Patch",
+                "Specification-Vendor"    : "teddyxlandlee",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.version,
+                "Implementation-Vendor"   : "teddyxlandlee",
+                "Implementation-Timestamp": Instant.now()
+        ])
+    }
+}
+
+task generateMappingClass {
+    def className = "xland/mcmod/enchlevellangpatch/impl/f2f/\$Mapping"
+    afterEvaluate {
+        def mapping = project.file("mapping.tiny").readLines('utf-8')
+
+        def cw = new ClassWriter(3)
+        cw.visit(Opcodes.V1_6, Opcodes.ACC_SUPER, className, null, "java/lang/Object", null)
+        cw.visitSource(null, "ASM Generated")
+
+        def sb = new StringBuilder(65535)
+        List<String> strings = []
+        for (String line in mapping) {
+            int len = line.length()
+            if (sb.length() + len < 65500)
+                sb.append(line).append('\n')
+            else {
+                strings.add(sb.toString())
+                if (len > 65535) {
+                    char[] c = new char[65535]
+                    for (int i = 0; i < len; i += 65536) {
+                        int len2 = len - i;
+                        if (len2 > 65535) len2 = 65535
+                        line.getChars(i, i+len2+1, c, 0)
+                        strings.add(String.valueOf(c, 0, len2))
+                    }
+                } else strings.add(line)
+            }
+        }
+        strings.add(sb.toString())
+        String constVal
+        switch (strings.size()) {
+            case 0:
+                constVal = ""
+                break;
+            case 1:
+                constVal = strings[0]
+                break;
+            default:
+                constVal = null;
+        }
+
+        cw.visitField(Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
+                "instance", "Ljava/lang/String;", null, constVal)
+        if (constVal == null) {
+            cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null).with {m ->
+                m.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder")
+                m.visitInsn(Opcodes.DUP)
+                m.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false)
+                for (final String s in strings) {
+                    m.visitLdcInsn(s)
+                    m.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+                            "(Ljava/lang/String;)Ljava/lang/StringBuilder;")
+                }
+                m.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString",
+                        "()Ljava/lang/String;", false)
+                m.visitFieldInsn(Opcodes.PUTSTATIC, className, "instance", "Ljava/lang/String;")
+                m.visitInsn(Opcodes.RETURN)
+                m.visitMaxs(-1, -1)
+                m.visitEnd()
+            }
+        }
+        cw.visitEnd()
+
+        def dir = processResources.destinationDir
+        File file = new File(dir, "${className}.class")
+        file.parentFile.mkdirs()
+        file.newOutputStream().with { os ->
+            os.write(cw.toByteArray())
+            os.close()
+        }
+    }
+}
+
+processResources.dependsOn(generateMappingClass)

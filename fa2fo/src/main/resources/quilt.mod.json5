@@ -1,0 +1,17 @@
+{
+  schema_version: 1,
+  quilt_loader: {
+    group_id: "xland.mcmod",
+    mod_id: "enchlevel-langpatch-fa2fo",
+    version: "${version}",
+  },
+  metadata: {
+    license: "WTFPL",
+    custom: {
+      modmenu: {
+        parent: "enchlevel-langpatch",
+        badges: [ "library" ],
+      },
+    },
+  },
+}

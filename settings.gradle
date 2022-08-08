@@ -12,3 +12,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+include 'fa2fo'

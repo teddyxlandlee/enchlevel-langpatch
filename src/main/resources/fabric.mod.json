@@ -28,6 +28,9 @@
   "recommends": {
     "fabric-resource-loader-v0": "*"
   },
+  "suggests": {
+    "fa2fomapper": "1.x"
+  },
   "breaks": {
     "enchlevel-langpatch-config": "<2"
   }
