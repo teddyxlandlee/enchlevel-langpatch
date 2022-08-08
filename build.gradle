@@ -127,7 +127,7 @@ task generateModClass {
         m.visitMaxs(-1, -1)
         writer.visitSource(null, "ASM Generated")
         def ann = writer.visitAnnotation("Lnet/minecraftforge/fml/common/Mod\$EventBusSubscriber;", true)
-        ann.visit("modid", "enchlevellangpatch")
+        ann.visit("modid", modId)
         ann.visitEnum("bus", "Lnet/minecraftforge/fml/common/Mod\$EventBusSubscriber\$Bus;",
                 "MOD")
         def ann2 = ann.visitArray("value")
