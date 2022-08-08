@@ -1,14 +1,21 @@
 package xland.mcmod.enchlevellangpatch.impl.f2f;
 
 import cpw.mods.modlauncher.api.*;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
 import xland.mcmodbridge.fa2fomapper.SupportedPlatform;
 import xland.mcmodbridge.fa2fomapper.api.Mapping;
 import xland.mcmodbridge.fa2fomapper.api.tiny.TinyUtils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -73,6 +80,24 @@ public class ClientLanguageTransformationService implements ITransformationServi
                     list.add(new LineNumberNode(114514, start));
                     m.instructions.insert(list);
                 });
+                if ("true".equals(System.getProperty("fa2fomapper.export"))) {
+                    new Thread(() -> {
+                        LogManager.getLogger().info("CLTransform Args: type={}, storage={}, getDefault={}", type, nodeStorage, nodeGetOrDefault);
+                        ClassWriter writer = new ClassWriter(3);
+                        cn.accept(writer);
+                        Path p = Paths.get(".fa2fomapper", cn.name + ".class");
+                        try {
+                            Files.createDirectories(p.getParent());
+                            try (OutputStream os = Files.newOutputStream(p)) {
+                                os.write(writer.toByteArray());
+                            }
+                            LogManager.getLogger().warn("CLTransform: Dumped ClientLanguage into {}",
+                                    p.toAbsolutePath());
+                        } catch (IOException e) {
+                            LogManager.getLogger().error("Can't dump " + cn.name, e);
+                        }
+                    }, "CL-Transform-Dump-8").start();
+                }
                 return cn;
             }
 
