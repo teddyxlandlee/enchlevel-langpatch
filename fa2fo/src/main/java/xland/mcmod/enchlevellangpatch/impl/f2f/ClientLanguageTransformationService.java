@@ -83,7 +83,7 @@ public class ClientLanguageTransformationService implements ITransformationServi
                 if ("true".equals(System.getProperty("fa2fomapper.export"))) {
                     new Thread(() -> {
                         LogManager.getLogger().info("CLTransform Args: type={}, storage={}, getDefault={}", type, nodeStorage, nodeGetOrDefault);
-                        ClassWriter writer = new ClassWriter(3);
+                        ClassWriter writer = new ClassWriter(1);
                         cn.accept(writer);
                         Path p = Paths.get(".fa2fomapper", cn.name + ".class");
                         try {
