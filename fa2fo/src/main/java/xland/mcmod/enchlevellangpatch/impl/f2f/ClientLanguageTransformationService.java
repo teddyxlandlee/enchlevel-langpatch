@@ -40,9 +40,9 @@ public class ClientLanguageTransformationService implements ITransformationServi
                 SupportedPlatform.current().getId());
         type = mapping.mapClass("net/minecraft/class_1078");
         nodeStorage = mapping.mapField(Mapping.NodeElement.of(
-                type, /*storage*/"field_5330", "Ljava/util/Map;"));
+                "net/minecraft/class_1078", /*storage*/"field_5330", "Ljava/util/Map;"));
         nodeGetOrDefault = mapping.mapMethod(Mapping.NodeElement.of(
-                type, /*getOrDefault*/"method_4679", "(Ljava/lang/String;)Ljava/lang/String;"));
+                "net/minecraft/class_1078", /*getOrDefault*/"method_4679", "(Ljava/lang/String;)Ljava/lang/String;"));
     }
 
     @Override
