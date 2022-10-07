@@ -9,5 +9,6 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "enchlevel-langpatch-refmap.json"
+  "plugin": "xland.mcmod.enchlevellangpatch.mixin.ForgeMixinPlugin",
+  "refmap": null
 }

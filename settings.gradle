@@ -12,4 +12,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include 'fa2fo'
+include 'api'
+include 'compile-lib'

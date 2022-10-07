@@ -2,12 +2,8 @@ package xland.mcmod.enchlevellangpatch.api;
 
 import com.google.common.collect.BiMap;
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
-import xland.mcmod.enchlevellangpatch.impl.IndependentLangPatchRegistry;
-import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
-import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
 
 /**
  * An API to modify the current enchantment level patch and the current
@@ -19,22 +15,16 @@ import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
 @API(status = API.Status.STABLE)
 public class EnchantmentLevelLangPatchConfig {
     /**
-     * A thread-safe storage for the ID of the current enchantment level and potion
-     * potency patches.
-     */
-    static volatile @NotNull NamespacedKey
-            currentEnchantmentHooksId = IndependentLangPatchRegistry.LP_DEFAULT,
-            currentPotionHooksId = IndependentLangPatchRegistry.LP_DEFAULT;
-
-    /**
      * The setter for the current enchantment level patch. Will be set to default if
      * {@code hooks} is not registered.
      *
      * @see EnchantmentLevelLangPatch#registerEnchantmentPatch
+     * @param hooks the patch you want to set. It should be registered with
+     *              {@link EnchantmentLevelLangPatch#registerEnchantmentPatch}.
      */
     @SuppressWarnings("unused")
     public static void setCurrentEnchantmentHooks(@Nullable EnchantmentLevelLangPatch hooks) {
-        currentEnchantmentHooksId = LangPatchImpl.ENCHANTMENT_HOOK.getId(hooks);
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 
     /**
@@ -42,26 +32,32 @@ public class EnchantmentLevelLangPatchConfig {
      * {@code hooks} is not registered.
      *
      * @see EnchantmentLevelLangPatch#registerPotionPatch
+     * @param hooks the patch you want to set. It should be registered with
+     *              {@link EnchantmentLevelLangPatch#registerPotionPatch}
      */
     @SuppressWarnings("unused")
     public static void setCurrentPotionHooks(@Nullable EnchantmentLevelLangPatch hooks) {
-        currentPotionHooksId = LangPatchImpl.POTION_HOOK.getId(hooks);
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 
     /**
      * The getter for the current enchantment level patch. Will return default if
      * the corresponding ID is not registered.
+     * @return the current enchantment patch
      */
+    @SuppressWarnings("unused")
     public static EnchantmentLevelLangPatch getCurrentEnchantmentHooks() {
-        return LangPatchImpl.ENCHANTMENT_HOOK.get(currentEnchantmentHooksId);
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 
     /**
      * The getter for the current potion potency patch. Will return default if
      * the corresponding ID is not registered.
+     * @return the current potion patch
      */
+    @SuppressWarnings("unused")
     public static EnchantmentLevelLangPatch getCurrentPotionHooks() {
-        return LangPatchImpl.POTION_HOOK.get(currentPotionHooksId);
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 
     private EnchantmentLevelLangPatchConfig() {}
@@ -73,7 +69,7 @@ public class EnchantmentLevelLangPatchConfig {
     @Unmodifiable
     @SuppressWarnings("unused")
     public static BiMap<String, EnchantmentLevelLangPatch> getPotionHooksContext() {
-        return LangPatchImpl.POTION_HOOK.asImmutableBiMap();
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 
     /**
@@ -83,6 +79,6 @@ public class EnchantmentLevelLangPatchConfig {
     @Unmodifiable
     @SuppressWarnings("unused")
     public static BiMap<String, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
-        return LangPatchImpl.ENCHANTMENT_HOOK.asImmutableBiMap();
+        throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
 }

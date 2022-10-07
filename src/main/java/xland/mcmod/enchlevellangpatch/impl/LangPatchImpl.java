@@ -1,7 +1,6 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -80,7 +79,7 @@ public final class LangPatchImpl {
     }
 
     public static void hookPatch(
-            @NotNull ResourceLocation id,
+            @NotNull NamespacedKey id,
             @NotNull EnchantmentLevelLangPatch hooks,
             boolean enchantmentOrPotion /*1: enchantment
                                           0: potion*/) {

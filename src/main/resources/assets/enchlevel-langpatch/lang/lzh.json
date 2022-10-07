@@ -1,4 +1,5 @@
 {
   "enchantment.level.x": "%s\u968e",
-  "potion.potency.x": "%s\u968e"
+  "potion.potency.x": "%s\u968e",
+  "langpatch.enchantment.conf.hanzi": "yes"
 }

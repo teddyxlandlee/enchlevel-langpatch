@@ -1,7 +1,0 @@
-v1	base	forge16	forge17
-CLASS	net/minecraft/class_2960	net/minecraft/util/ResourceLocation	net/minecraft/resources/ResourceLocation
-METHOD	net/minecraft/class_2960	()Ljava/lang/String;	method_12836	func_110624_b	m_135827_
-METHOD	net/minecraft/class_2960	()Ljava/lang/String;	method_12832	func_110623_a	m_135815_
-CLASS	net/minecraft/class_1078	net/minecraft/client/resources/ClientLanguageMap	net/minecraft/client/resources/language/ClientLanguage
-FIELD	net/minecraft/class_1078	Ljava/util/Map;	field_5330	field_239495_c_	f_118910_
-METHOD	net/minecraft/class_1078	(Ljava/lang/String;)Ljava/lang/String;	method_4679	func_230503_a_	m_6834_

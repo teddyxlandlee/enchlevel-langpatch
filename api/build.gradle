@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+setArchivesBaseName rootProject.archives_base_name
+setVersion rootProject.mod_version
+setGroup rootProject.maven_group
+
+dependencies {
+    compileOnly("org.apiguardian:apiguardian-api:1.1.2")
+    compileOnly("org.jetbrains:annotations:19.0.0")
+    implementation("com.google.guava:guava:21.0")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact("jar") {
+                builtBy("jar")
+            }
+            artifact("sourcesJar") {
+                builtBy("sourcesJar")
+            }
+            artifact("javadocJar") {
+                builtBy("javadocJar")
+            }
+        }
+    }
+
+    // select the repositories you want to publish to
+    repositories {
+        // uncomment to publish to the local maven
+        mavenLocal()
+    }
+}
+
+javadoc {
+    setFailOnError false
+    options { opt ->
+        opt.setLocale 'en_US'
+        opt.setEncoding 'UTF-8'
+    }
+}
+
+jar {
+    archiveClassifier.set 'api'
+}
+
+sourcesJar {
+    archiveClassifier.set 'api-sources'
+}
+
+javadocJar {
+    archiveClassifier.set 'api-javadoc'
+}

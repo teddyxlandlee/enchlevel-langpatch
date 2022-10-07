@@ -14,16 +14,14 @@ buildscript {
 }
 
 plugins {
-    id 'fabric-loom' version '0.7.34'
+    //id 'fabric-loom' version '0.7.34'
     id 'maven-publish'
+    id 'java'
+    id 'idea'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
-
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
 
 allprojects {
     repositories {
@@ -52,17 +50,17 @@ allprojects {
 }
 
 dependencies {
-    //to change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation 'com.google.guava:guava:21.0'
+    implementation 'org.apache.commons:commons-lang3:3.5'
+    implementation 'it.unimi.dsi:fastutil:8.2.1'
+    implementation 'net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5'
     // The maximum version which is compatible with Java 8.
     // Use it to load mod translations.
-    //include
-    modRuntime("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.4.8+3cc0f0907d")
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
+    compileOnly project(':compile-lib')
+    compileOnly 'org.jetbrains:annotations:19.0.0'
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
@@ -179,7 +177,7 @@ java {
 
 jar {
     from ("LICENSE") {
-        rename {  "${it}_${project.archivesBaseName}"  }
+        rename {  "META-INF/${it}_${project.archivesBaseName}"  }
     }
     manifest {
         attributes([
@@ -190,8 +188,7 @@ jar {
                 "Implementation-Version"  : project.version,
                 "Implementation-Vendor"   : "teddyxlandlee",
                 "Implementation-Timestamp": Instant.now(),
-                //"MixinConfigs" : "enchlevel-langpatch.mixins.json"
-                "Fa2Fo-MultiPlatform"     : "true"
+                "MixinConfigs" : "ellp.mixins-forge.json",  // for FML
         ])
     }
 }
@@ -201,15 +198,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
+            artifact(jar) {
+                builtBy jar
             }
             artifact(sourcesJar) {
-                builtBy remapSourcesJar
+                builtBy sourcesJar
             }
-            //artifact(javadocJar) {
-            //    builtBy javadoc
-            //}
         }
     }
 

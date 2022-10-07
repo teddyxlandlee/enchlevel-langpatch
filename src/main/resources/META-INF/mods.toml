@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion='(0,)'
-license='LGPL-3.0'
+license='WTFPL'
 
 [[mods]]
 modId='enchlevellangpatch'
