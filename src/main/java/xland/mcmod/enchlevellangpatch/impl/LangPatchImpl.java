@@ -65,7 +65,6 @@ public final class LangPatchImpl {
 
         EnchantmentLevelLangPatch.registerPatch(
                 s -> s.startsWith("enchantment.level.") && NumberFormatUtil.isDigit(s.substring(18)),
-                //(translationStorage, key) ->
                 (translationStorage, key) -> EnchantmentLevelLangPatchConfig
                         .getCurrentEnchantmentHooks()
                         .apply(translationStorage, key)

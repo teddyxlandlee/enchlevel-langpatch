@@ -7,7 +7,7 @@
     }
   },
   "data": {
-    "named:intermediary": {
+    "searge": {
       "xland/mcmod/enchlevellangpatch/mixin/MixinTranslationStorage": {
         "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/client/resources/ClientLanguageMap",
         "storage": "field_239495_c_:Ljava/util/Map;",

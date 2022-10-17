@@ -1,10 +1,7 @@
 package xland.mcmod.enchlevellangpatch.api;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.*;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
 import xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil;
@@ -51,8 +48,9 @@ public interface EnchantmentLevelLangPatch {
     /**
      * Provides an algorithm for roman-to-int translation.
      */
-    @SuppressWarnings("unused")
-    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.2")
+    @Deprecated//forRemoval=true
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static int romanToInt(@NotNull String s) {
         return NumberFormatUtil.romanToInt(Objects.requireNonNull(s));
     }
@@ -67,9 +65,9 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static void registerEnchantmentPatch(@NotNull net.minecraft.class_2960 id, @NotNull EnchantmentLevelLangPatch edition) {
         registerPotionPatch(id.toString(), edition);
     }
@@ -84,9 +82,9 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static void registerEnchantmentPatch(@NotNull net.minecraft.util.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
         registerPotionPatch(id.toString(), edition);
     }
@@ -101,9 +99,9 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static void registerEnchantmentPatch(@NotNull net.minecraft.resources.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
         registerPotionPatch(id.toString(), edition);
     }
@@ -138,9 +136,9 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static void registerPotionPatch(@NotNull net.minecraft.util.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
         registerPotionPatch(id.toString(), edition);
     }
@@ -155,7 +153,7 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
     static void registerPotionPatch(@NotNull net.minecraft.resources.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
@@ -172,7 +170,7 @@ public interface EnchantmentLevelLangPatch {
      * for better compatibility across versions.
      * This method will be removed in 1.3.0.
      */
-    @SuppressWarnings("unused")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     @Deprecated//forRemoval=true
     @API(status = API.Status.DEPRECATED, since = "1")
     static void registerPotionPatch(@NotNull net.minecraft.class_2960 id, @NotNull EnchantmentLevelLangPatch edition) {

@@ -124,6 +124,8 @@ task generateModClass {
         m.visitInsn(Opcodes.RETURN)
         m.visitMaxs(-1, -1)
         writer.visitSource(null, "ASM Generated")
+        writer.visitAnnotation("Lnet/minecraftforge/api/distmarker/OnlyIn;", true)
+                .visitEnum("value", "Lnet/minecraftforge/api/distmarker/Dist;", "CLIENT")
         def ann = writer.visitAnnotation("Lnet/minecraftforge/fml/common/Mod\$EventBusSubscriber;", true)
         ann.visit("modid", modId)
         ann.visitEnum("bus", "Lnet/minecraftforge/fml/common/Mod\$EventBusSubscriber\$Bus;",

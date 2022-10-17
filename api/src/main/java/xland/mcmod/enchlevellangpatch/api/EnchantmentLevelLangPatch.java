@@ -2,10 +2,7 @@ package xland.mcmod.enchlevellangpatch.api;
 
 import org.apiguardian.api.API;
 import org.intellij.lang.annotations.Pattern;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.*;
 
 import java.util.Map;
 import java.util.function.Predicate;
@@ -43,7 +40,7 @@ public interface EnchantmentLevelLangPatch {
      *
      * @return {@code null} if {@code num} is out of range.
      */
-    @Nullable @SuppressWarnings("unused")
+    @Nullable
     static String intToRoman(@Range(from = 1, to = 3998) int num) {
         throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
@@ -61,6 +58,8 @@ public interface EnchantmentLevelLangPatch {
      */
     @SuppressWarnings("unused")
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.2")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
     static int romanToInt(@NotNull String s) {
         throw new AssertionError("This is the API. See implementations in https://github.com/teddyxlandlee/enchlevel-langpatch.");
     }
@@ -81,7 +80,6 @@ public interface EnchantmentLevelLangPatch {
      *           {@code ^([0-9a-z_\-]+:)?[0-9a-z_\-/]+$}
      * @param edition the patch
      */
-    @SuppressWarnings("unused")
     static void registerEnchantmentPatch(
             @NotNull @Pattern("^([0-9a-z_\\-]+:)?[0-9a-z_\\-/]+$") String id,
             @NotNull EnchantmentLevelLangPatch edition) {
@@ -104,7 +102,6 @@ public interface EnchantmentLevelLangPatch {
      *           {@code ^([0-9a-z_\-]+:)?[0-9a-z_\-/]+$}
      * @param edition the patch
      */
-    @SuppressWarnings("unused")
     static void registerPotionPatch(
             @NotNull String id,
             @NotNull EnchantmentLevelLangPatch edition) {
