@@ -51,9 +51,9 @@ class ChineseExchange {
                 }
             } else {
                 zero = false;
-                ret.append(NUM[end]).append(POS[i]);
+                ret.append(POS[i]).append(NUM[end]);
             }
-            num = num / 10;
+            num /= 10;
         }
         return ret.reverse();
     }
