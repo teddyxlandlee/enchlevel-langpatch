@@ -6,8 +6,16 @@ pluginManagement {
             url  = 'https://maven.aliyun.com/repository/public'
         }
         maven {
+            name = 'Aliyun Gradle Plugins'
+            url  = 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        maven {
+            name = 'COVID-Trump'
+            url  = 'https://covid-trump.github.io/mvn/'
+        }
+        maven {
             name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
+            url  = 'https://maven.fabricmc.net/'
         }
         gradlePluginPortal()
     }
