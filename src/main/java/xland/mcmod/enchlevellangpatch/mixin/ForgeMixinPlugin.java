@@ -32,7 +32,7 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
     private static @NotNull String getForgeVersion() {
         try {
             Class<?> clazz = Class.forName("net.minecraftforge.fml.loading.StringSubstitutor");
-            MethodHandle mh = MethodHandles.lookup().findStatic(clazz, "replace", MethodType.fromMethodDescriptorString("(Ljava/lang/String;Lnet/minecraftforge/fml/loading/moddiscovery/ModFile;)Ljava/lang/String;", ForgeMixinPlugin.class.getClassLoader()));
+            MethodHandle mh = MethodHandles.lookup().findStatic(clazz, "replace", MethodType.fromMethodDescriptorString("(Ljava/lang/String;Lnet/minecraftforge/fml/loading/moddiscovery/ModFile;)Ljava/lang/String;", clazz.getClassLoader()));
             return (String) mh.invoke("${global.forgeVersion}", (Void)null);
         } catch (Throwable e) {
             throw new IllegalStateException("Not in Forge environment", e);

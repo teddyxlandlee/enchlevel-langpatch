@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 class ChineseExchange {
+    private static final NumResultCacheMap CACHE = new NumResultCacheMap();
+
     // Chinese position
     private static final String[] POS = new String[]{"", "十", "百", "千"};
     // Chinese number
@@ -12,6 +14,10 @@ class ChineseExchange {
     private static final String[] SEC = new String[]{"", "万", "亿", "万亿"};
 
     public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num) {
+        return CACHE.computeOrStop(num, ChineseExchange::numberToChinese0);
+    }
+
+    private static @NotNull String numberToChinese0(int num) {
         if (num == 0) {
             return "零";
         }

@@ -23,32 +23,44 @@ public final class LangPatchImpl {
 
     private static final EnchantmentLevelLangPatch
         DEFAULT_ENCHANTMENT_HOOKS = (Map<String, String> translationStorage, String key) -> {
-            if (translationStorage.containsKey(key)) return translationStorage.get(key);
+            String t = translationStorage.get(key);
+            if (t != null) return t;
+
             int lvl = Integer.parseInt(key.substring(18));
-            return String.format(translationStorage.getOrDefault("enchantment.level.x", "%s"), lvl);
+            return ofDefault(translationStorage, lvl);
         },
         DEFAULT_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
-            if (translationStorage.containsKey(key)) return translationStorage.get(key);
+            String t = translationStorage.get(key);
+            if (t != null) return t;
+
             int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
-            return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"), lvl);
+            return ofDefault(translationStorage, lvl);
         };
+    private static String ofDefault(Map<String, String> translationStorage, int lvl) {
+        return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"), lvl);
+    }
+
     private static final EnchantmentLevelLangPatch
         ROMAN_ENCHANTMENT_HOOKS = (translationStorage, key) -> {
-            if (translationStorage.containsKey(key)) return translationStorage.get(key);
+            String t = translationStorage.get(key);
+            if (t != null) return t;
+
             int lvl = Integer.parseInt(key.substring(18));
-            boolean chinese = "yes".equalsIgnoreCase(
-                    /*@Nullable*/translationStorage.get("langpatch.enchantment.conf.hanzi"));
-            return String.format(translationStorage.getOrDefault("enchantment.level.x", "%s"),
-                    intToRomanImpl(lvl, chinese));
+            return ofRoman(translationStorage, lvl);
         },
         ROMAN_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
-            if (translationStorage.containsKey(key)) return translationStorage.get(key);
+            String t = translationStorage.get(key);
+            if (t != null) return t;
+
             int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
-            boolean chinese = "yes".equalsIgnoreCase(
-                    /*@Nullable*/translationStorage.get("langpatch.potion.conf.hanzi"));
-            return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"),
-                    intToRomanImpl(lvl, chinese));
+            return ofRoman(translationStorage, lvl);
         };
+    private static String ofRoman(Map<String, String> translationStorage, int lvl) {
+        boolean chinese = "yes".equalsIgnoreCase(
+                /*@Nullable*/translationStorage.get("langpatch.potion.conf.hanzi"));
+        return String.format(translationStorage.getOrDefault("potion.potency.x", "%s"),
+                intToRomanImpl(lvl, chinese));
+    }
 
     public static void init() {}
 
@@ -64,13 +76,13 @@ public final class LangPatchImpl {
         POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
 
         EnchantmentLevelLangPatch.registerPatch(
-                s -> s.startsWith("enchantment.level.") && NumberFormatUtil.isDigit(s.substring(18)),
+                s -> s.startsWith("enchantment.level.") && NumberFormatUtil.isDigit(s, 18),
                 (translationStorage, key) -> EnchantmentLevelLangPatchConfig
                         .getCurrentEnchantmentHooks()
                         .apply(translationStorage, key)
         );
         EnchantmentLevelLangPatch.registerPatch(
-                s -> s.startsWith("potion.potency.") && NumberFormatUtil.isDigit(s.substring(15)),
+                s -> s.startsWith("potion.potency.") && NumberFormatUtil.isDigit(s, 15),
                 (translationStorage, key) -> EnchantmentLevelLangPatchConfig
                         .getCurrentPotionHooks()
                         .apply(translationStorage, key)
