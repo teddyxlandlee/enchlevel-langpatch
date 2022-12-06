@@ -15,7 +15,7 @@ plugins {
     id 'maven-publish'
     id 'java'
     id 'idea'
-    id 'xland.gradle.forge-init-injector' version '1.0.6'
+    id 'xland.gradle.forge-init-injector' version '1.0.7'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -87,7 +87,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
     }*/
-    filesMatching(['fabric.mod.json', 'mods.toml']) {
+    filesMatching(['fabric.mod.json', 'META-INF/mods.toml']) {
         expand 'version' : project.version
     }
 }

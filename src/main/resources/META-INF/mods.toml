@@ -4,6 +4,6 @@ license='WTFPL'
 
 [[mods]]
 modId='enchlevellangpatch'
-version='${file.jarVersion}'
+version='${version}'
 displayName='Enchantment Level Language Patch'
 description='`enchantment.level.1000`, get off!'

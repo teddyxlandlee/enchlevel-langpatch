@@ -30,7 +30,7 @@
   },
   "breaks": {
     "enchlevel-langpatch-config": "<2",
-    "enchlevel-langpatch-config2": "<2.1",
+    "enchlevel-langpatch-config2": "<3",
     "enchlevel-langpatch-fa2fo": "<1.1.6"
   }
 }

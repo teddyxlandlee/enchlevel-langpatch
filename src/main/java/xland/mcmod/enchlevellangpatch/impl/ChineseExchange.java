@@ -23,31 +23,38 @@ class ChineseExchange {
         }
         int sectionPosition = 0;
         StringBuilder ret = new StringBuilder();
-        StringBuilder oneSection; // each section
+        //StringBuilder oneSection; // each section
         while (num > 0) {
             int section = num % 10000; // get the last section first (from low to high)
-            oneSection = eachSection(section);
             if (section != 0) {
-                oneSection.append(SEC[sectionPosition]);
+                ret.append(SEC[sectionPosition]);
             }
+            eachSection(section, ret);
             num /= 10000;
-            ret.insert(0, oneSection);
+            //ret.append(oneSection);
             sectionPosition++;
         }
-        if ('零' == ret.charAt(0)) {
-            ret.deleteCharAt(0);
+        
+        int i;
+        if ('零' == ret.charAt(i = ret.length() - 1)) {
+            ret.setLength(i);
         }
-        if ("一十".equals(ret.substring(0, 2)))
-            ret.deleteCharAt(0);    // fix: 一十 -> 十
-        return ret.toString();
+        
+        i = ret.length() - 2;
+        if (i < 0)  // ret.length() < 2
+            return ret.toString();
+        
+        if ("十一".equals(ret.substring(i)))
+            ret.setLength(++i);    // fix: 一十 -> 十
+        return ret.reverse().toString();
     }
 
     /**
      * Each section
      */
-    private static StringBuilder eachSection(int num) {
-        StringBuilder ret = new StringBuilder();
-        boolean zero = true;
+    private static void eachSection(int num, StringBuilder ret) {
+        //StringBuilder ret = new StringBuilder();
+        boolean zero = true;    // if num == 0: ""
         for (int i = 0; i < 4; i++) { // 4 in 1 section, from low to high
             int end = num % 10;
             if (end == 0) {
@@ -61,7 +68,7 @@ class ChineseExchange {
             }
             num /= 10;
         }
-        return ret.reverse();
+        //return ret.reverse();
     }
 
 }
