@@ -31,7 +31,7 @@
   "breaks": {
     "enchlevel-langpatch-config": "<2",
     "enchlevel-langpatch-config2": "<3",
-    "langpatch-conf3": "<4",
+    "enchlevel-langpatch-conf3": "<4",
     "enchlevel-langpatch-fa2fo": "<2"
   },
   "suggests": {
