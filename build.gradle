@@ -133,10 +133,10 @@ publishing {
     publications {
         create('mavenJava', MavenPublication.class) {
             // add all the jars that should be included when publishing to maven
-            artifact('jar') {
+            artifact(jar) {
                 builtBy jar
             }
-            artifact('sourcesJar') {
+            artifact(sourcesJar) {
                 builtBy sourcesJar
             }
         }
