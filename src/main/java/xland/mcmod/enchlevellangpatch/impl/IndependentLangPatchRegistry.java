@@ -18,6 +18,8 @@ public final class IndependentLangPatchRegistry {
             = HashBiMap.create();
     private final NamespacedKey defaultId;
     private EnchantmentLevelLangPatch defaultValue;
+    private volatile ImmutableBiMap<String, EnchantmentLevelLangPatch> asImmutableBiMap;
+    private boolean isFrozen;
     public static final NamespacedKey LP_DEFAULT = NamespacedKey.of("enchlevel-langpatch:default");
 
     IndependentLangPatchRegistry(NamespacedKey defaultId) {
@@ -31,10 +33,12 @@ public final class IndependentLangPatchRegistry {
 
     synchronized
     public void add(NamespacedKey id, EnchantmentLevelLangPatch e) {
+        checkFreeze();
         map.put(id, e);
         if (Objects.equals(defaultId, id)) {
             this.defaultValue = e;
         }
+        asImmutableBiMap = null;
     }
 
     public void add(String id, EnchantmentLevelLangPatch e) {
@@ -77,9 +81,40 @@ public final class IndependentLangPatchRegistry {
                 '}';
     }
 
-    public ImmutableBiMap<String, EnchantmentLevelLangPatch> asImmutableBiMap() {
-        //return ImmutableBiMap.copyOf(this.map)
+    private void checkFreeze() {
+        if (isFrozen)
+            throw new IllegalStateException("Registry is locked");
+    }
+
+    @SuppressWarnings("unused")
+    synchronized
+    public boolean isFrozen() {
+        return isFrozen;
+    }
+
+    synchronized
+    public void freeze() {
+        this.isFrozen = true;
+    }
+
+    @SuppressWarnings("unused")
+    synchronized
+    public void unfreeze() {
+        this.isFrozen = false;
+    }
+
+    @SuppressWarnings("all")
+    private ImmutableBiMap<String, EnchantmentLevelLangPatch> computeMap() {
         return this.map.entrySet().parallelStream()
                 .collect(ImmutableBiMap.toImmutableBiMap(e -> e.getKey().toString(), Map.Entry::getValue));
+    }
+
+    synchronized
+    public ImmutableBiMap<String, EnchantmentLevelLangPatch> asImmutableBiMap() {
+        ImmutableBiMap<String, EnchantmentLevelLangPatch> m;
+        if ((m = this.asImmutableBiMap) == null) {
+            this.asImmutableBiMap = m = computeMap();
+        }
+        return m;
     }
 }

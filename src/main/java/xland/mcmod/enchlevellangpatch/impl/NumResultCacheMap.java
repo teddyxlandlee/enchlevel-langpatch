@@ -16,18 +16,6 @@ final class NumResultCacheMap extends Int2ObjectLinkedOpenHashMap<String> {
             removeFirst();
     }
 
-    String computeOrStop(int k, IntFunction<? extends String> fun) {
-        String s;
-        if ((s = get(k)) == null) {
-            String t;
-            if ((t = fun.apply(k)) != null) {
-                put(k, t);
-                checkOutOfBounds();
-            }
-        }
-        return s;
-    }
-
     @Override
     public String computeIfAbsent(int k, IntFunction<? extends String> mappingFunction) {
         String t = super.computeIfAbsent(k, mappingFunction);

@@ -1,7 +1,5 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import it.unimi.dsi.fastutil.chars.Char2IntArrayMap;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,34 +43,10 @@ public class NumberFormatUtil {
         return res.toString();
     }
 
-    @Deprecated
-    private static final Char2IntArrayMap R2I = new Char2IntArrayMap(
-            new char[] {'I', 'V', 'X', 'L', 'C', 'D', 'M'},
-            new int [] {1,   5,   10,  50,  100, 500, 1000}
-    );
-
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    public static int romanToInt(@NotNull String s) {
-        if(s.isEmpty()){
-            return 0;
-        }
-        int res = R2I.get(s.charAt(s.length() - 1)); // Strings ends with '\0'
-        for(int i = s.length() - 2;i >= 0;i--){   // start from zero
-            int p;
-            if((p = R2I.get(s.charAt(i))) >= R2I.get(s.charAt(i + 1))){
-                res += p;
-            }else{
-                res -= p;
-            }
-        }
-        return res;
-    }
-
-    static @NotNull String intToRomanImpl(int i, boolean chinese) {
+    static @NotNull String intToRomanImpl(int i, int type) {
         if (i < 0) return Integer.toString(i);
-        if (chinese) {
-            return ChineseExchange.numberToChinese(i);
+        if (type >= 0) {
+            return ChineseExchange.numberToChinese(i, type);
         } else {
             String ret = intToRoman(i);
             return ret == null ? Integer.toString(i) : ret;

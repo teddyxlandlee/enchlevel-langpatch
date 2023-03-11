@@ -57,12 +57,14 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.5'
     implementation 'it.unimi.dsi:fastutil:8.2.1'
     implementation 'net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5'
+    implementation 'org.apache.logging.log4j:log4j-api:2.8.1'
     // The maximum version which is compatible with Java 8.
     // Use it to load mod translations.
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
-    compileOnly project(':compile-lib')
+    //compileOnly project(':compile-lib')
     compileOnly 'org.jetbrains:annotations:19.0.0'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 

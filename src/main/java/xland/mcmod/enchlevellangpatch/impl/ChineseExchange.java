@@ -4,22 +4,47 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 class ChineseExchange {
-    private static final NumResultCacheMap CACHE = new NumResultCacheMap();
+    private final NumResultCacheMap cacheMap = new NumResultCacheMap();
+    private final String[] pos;
+    private final char[] num;
+    private final String[] sec;
+    private final char zeroC;
+    private final String zeroS;
+    private final String tenOne;
+    private static final ChineseExchange[] EXCHANGES = {
+            new ChineseExchange(
+                    new String[]{"", "十", "百", "千"},
+                    new char[]{'零', '一', '二', '三', '四', '五', '六', '七', '八', '九'},
+                    new String[]{"", "万", "亿", "万亿"}
+            ),
+            new ChineseExchange(
+                    new String[]{"", "拾", "佰", "仟"},
+                    new char[]{'零', '壹', '貳', '叄', '肆', '伍', '陸', '柒', '捌', '玖'},
+                    new String[]{"", "萬", "億", "萬億"}
+            )
+    };
+    static final int NORMAL = 0, UPPER = 1;
 
-    // Chinese position
-    private static final String[] POS = new String[]{"", "十", "百", "千"};
-    // Chinese number
-    private static final String[] NUM = new String[]{"零", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
-    // Chinese section position
-    private static final String[] SEC = new String[]{"", "万", "亿", "万亿"};
-
-    public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num) {
-        return CACHE.computeOrStop(num, ChineseExchange::numberToChinese0);
+    ChineseExchange(String[] pos, char[] num, String[] sec) {
+        this.pos = pos;
+        this.num = num;
+        this.sec = sec;
+        zeroC = num[0];
+        zeroS = String.valueOf(zeroC);
+        tenOne = pos[1] + num[1];
     }
 
-    private static @NotNull String numberToChinese0(int num) {
+    public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num, int type) {
+        return EXCHANGES[type].numberToChinese(num);
+    }
+
+    String numberToChinese(int num) {
+        return cacheMap.computeIfAbsent(num, this::numberToChinese0);
+    }
+
+    private @NotNull String numberToChinese0(int num) {
         if (num == 0) {
-            return "零";
+            return zeroS;
         }
         int sectionPosition = 0;
         StringBuilder ret = new StringBuilder();
@@ -27,7 +52,7 @@ class ChineseExchange {
         while (num > 0) {
             int section = num % 10000; // get the last section first (from low to high)
             if (section != 0) {
-                ret.append(SEC[sectionPosition]);
+                ret.append(this.sec[sectionPosition]);
             }
             eachSection(section, ret);
             num /= 10000;
@@ -36,7 +61,7 @@ class ChineseExchange {
         }
         
         int i;
-        if ('零' == ret.charAt(i = ret.length() - 1)) {
+        if (zeroC == ret.charAt(i = ret.length() - 1)) {
             ret.setLength(i);
         }
         
@@ -44,7 +69,7 @@ class ChineseExchange {
         if (i < 0)  // ret.length() < 2
             return ret.toString();
         
-        if ("十一".equals(ret.substring(i)))
+        if (tenOne.equals(ret.substring(i)))
             ret.setLength(++i);    // fix: 一十 -> 十
         return ret.reverse().toString();
     }
@@ -52,7 +77,7 @@ class ChineseExchange {
     /**
      * Each section
      */
-    private static void eachSection(int num, StringBuilder ret) {
+    private void eachSection(int num, StringBuilder ret) {
         //StringBuilder ret = new StringBuilder();
         boolean zero = true;    // if num == 0: ""
         for (int i = 0; i < 4; i++) { // 4 in 1 section, from low to high
@@ -60,11 +85,11 @@ class ChineseExchange {
             if (end == 0) {
                 if (!zero) {
                     zero = true;
-                    ret.append(NUM[0]);
+                    ret.append(zeroC);
                 }
             } else {
                 zero = false;
-                ret.append(POS[i]).append(NUM[end]);
+                ret.append(this.pos[i]).append(this.num[end]);
             }
             num /= 10;
         }

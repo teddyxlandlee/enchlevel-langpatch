@@ -44,67 +44,6 @@ public interface EnchantmentLevelLangPatch {
     static String intToRoman(@Range(from = 1, to = 3998) int num) {
         return NumberFormatUtil.intToRoman(num);
     }
-
-    /**
-     * Provides an algorithm for roman-to-int translation.
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.2")
-    @Deprecated//forRemoval=true
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    static int romanToInt(@NotNull String s) {
-        return NumberFormatUtil.romanToInt(Objects.requireNonNull(s));
-    }
-
-    /**
-     * Register an extra rendering syntax for enchantment levels. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
-     * which modifies current enchantment level patch.
-     *
-     * @deprecated use {@link #registerEnchantmentPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    static void registerEnchantmentPatch(@NotNull net.minecraft.class_2960 id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
-
-    /**
-     * Register an extra rendering syntax for enchantment levels. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
-     * which modifies current enchantment level patch.
-     *
-     * @deprecated use {@link #registerEnchantmentPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    static void registerEnchantmentPatch(@NotNull net.minecraft.util.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
-
-    /**
-     * Register an extra rendering syntax for enchantment levels. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
-     * which modifies current enchantment level patch.
-     *
-     * @deprecated use {@link #registerEnchantmentPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    static void registerEnchantmentPatch(@NotNull net.minecraft.resources.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
     
     /**
      * Register an extra rendering syntax for enchantment levels. <br />
@@ -126,57 +65,6 @@ public interface EnchantmentLevelLangPatch {
         LangPatchImpl.hookPatch(NamespacedKey.of(id), edition, true);
     }
 
-    /**
-     * Register an extra rendering syntax for potion potency. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks}
-     * which modifies current potion potency patch.
-     *
-     * @deprecated use {@link #registerPotionPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    static void registerPotionPatch(@NotNull net.minecraft.util.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
-
-    /**
-     * Register an extra rendering syntax for potion potency. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks}
-     * which modifies current potion potency patch.
-     *
-     * @deprecated use {@link #registerPotionPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    static void registerPotionPatch(@NotNull net.minecraft.resources.ResourceLocation id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
-
-    /**
-     * Register an extra rendering syntax for potion potency. <br />
-     * Won't be applied without an extension library that invokes
-     * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks}
-     * which modifies current potion potency patch.
-     *
-     * @deprecated use {@link #registerPotionPatch(String, EnchantmentLevelLangPatch)}
-     * for better compatibility across versions.
-     * This method will be removed in 1.3.0.
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.3")
-    @Deprecated//forRemoval=true
-    @API(status = API.Status.DEPRECATED, since = "1")
-    static void registerPotionPatch(@NotNull net.minecraft.class_2960 id, @NotNull EnchantmentLevelLangPatch edition) {
-        registerPotionPatch(id.toString(), edition);
-    }
-    
     /**
      * Register an extra rendering syntax for potion potency. <br />
      * Won't be applied without an extension library that invokes

@@ -1,6 +1,10 @@
 package xland.mcmod.enchlevellangpatch.api;
 
 import com.google.common.collect.BiMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +22,9 @@ import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
  */
 @API(status = API.Status.STABLE)
 public class EnchantmentLevelLangPatchConfig {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Marker MARKER = MarkerManager.getMarker("LangPatch/Config");
+
     /**
      * A thread-safe storage for the ID of the current enchantment level and potion
      * potency patches.
@@ -34,6 +41,10 @@ public class EnchantmentLevelLangPatchConfig {
      */
     @SuppressWarnings("unused")
     public static void setCurrentEnchantmentHooks(@Nullable EnchantmentLevelLangPatch hooks) {
+        if (LangPatchImpl.ENCHANTMENT_HOOK.isFrozen()) {
+            LOGGER.warn(MARKER, "Enchantment Hooks is frozen. Changes may not be applied.");
+            return;
+        }
         currentEnchantmentHooksId = LangPatchImpl.ENCHANTMENT_HOOK.getId(hooks);
     }
 
@@ -45,6 +56,10 @@ public class EnchantmentLevelLangPatchConfig {
      */
     @SuppressWarnings("unused")
     public static void setCurrentPotionHooks(@Nullable EnchantmentLevelLangPatch hooks) {
+        if (LangPatchImpl.ENCHANTMENT_HOOK.isFrozen()) {
+            LOGGER.warn(MARKER, "Potion Hooks is frozen. Changes may not be applied.");
+            return;
+        }
         currentPotionHooksId = LangPatchImpl.POTION_HOOK.getId(hooks);
     }
 
