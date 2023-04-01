@@ -110,6 +110,12 @@ java {
     //withJavadocJar()
 }
 
+javadoc {
+    failOnError false
+    options.locale 'en_US'
+    options.encoding 'UTF-8'
+}
+
 jar {
     from ("LICENSE") {
         rename {  "META-INF/${it}_${project.archivesBaseName}"  }

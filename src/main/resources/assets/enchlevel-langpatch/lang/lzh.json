@@ -1,5 +1,7 @@
 {
   "enchantment.level.x": "%s\u968e",
   "potion.potency.x": "%s\u968e",
+  "langpatch.conf.enchantment.default.type": "simplified",
+  "langpatch.conf.enchantment.roman.type": "simplified",
   "langpatch.enchantment.conf.hanzi": "yes"
 }

@@ -5,8 +5,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class NumberFormatUtil {
     static boolean isDigit(@NotNull String s, final int offset) {
-        int c = s.charAt(offset);
         int li = s.length() - 1;
+        if (li < offset) return false;
+        int c = s.charAt(offset);
         if (c == '0') return li == offset;
 
         for (int idx = li; idx >= offset; idx--) {
