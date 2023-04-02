@@ -13,17 +13,17 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 public class ForgeMixinPlugin implements IMixinConfigPlugin {
-    private volatile Boolean is117orLater;
+    private volatile Integer forgeVersion;
+    private static final int V117 = 36, V1194 = 45;
 
     @Override
     public void onLoad(String mixinPackage) {
-        if (is117orLater == null) {
+        if (forgeVersion == null) {
             synchronized (this) {
-                if (is117orLater == null) {
+                if (forgeVersion == null) {
                     String forgeVersion = getForgeVersion();
 
-                    int version = Integer.parseInt(forgeVersion.split("\\.", 2)[0]);
-                    is117orLater = version >= 36;
+                    this.forgeVersion = Integer.parseInt(forgeVersion.split("\\.", 2)[0]);
                 }
             }
         }
@@ -41,12 +41,13 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public String getRefMapperConfig() {
-        return is117orLater ? "ellp.refmap-117.json" : "ellp.refmap-116.json";
+        return forgeVersion >= V117 ? "ellp.refmap-117.json" : "ellp.refmap-116.json";
     }
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return true;
+        final boolean b = mixinClassName.endsWith("1194");
+        return (forgeVersion >= V1194) == b;
     }
 
     @Override

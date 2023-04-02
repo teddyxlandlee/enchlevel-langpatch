@@ -100,4 +100,9 @@ public interface EnchantmentLevelLangPatch {
      * compatibility issues with 1.0-mods.
      */
     String apply(@Unmodifiable Map<String, String> translationStorage, String key);
+
+    @ApiStatus.Experimental
+    default String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback) {
+        return apply(translationStorage, key);
+    }
 }
