@@ -21,7 +21,7 @@ public class AsmHook {
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
                 //cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
-                ms.setValue(valueMapping.apply(Collections.unmodifiableMap(translations), key));
+                ms.setValue(valueMapping.apply(Collections.unmodifiableMap(translations), key, fallback));
                 return true;
             } return false;
         });
