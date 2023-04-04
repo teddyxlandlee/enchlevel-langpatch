@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -15,9 +16,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class FabricMixinPlugin implements IMixinConfigPlugin {
-    private static final Supplier<Version> V23w03a = Suppliers.memoize(() -> {
+    private static final Supplier<VersionPredicate> V1194_ABOVE = Suppliers.memoize(() -> {
         try {
-            return Version.parse("1.19.4-alpha.23.a.3");
+            return VersionPredicate.parse(">=1.19.4-");
         } catch (VersionParsingException e) {
             throw new RuntimeException(e);
         }
@@ -27,7 +28,7 @@ public class FabricMixinPlugin implements IMixinConfigPlugin {
 
     private void initVersion() {
         final ModContainer minecraft = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new NoSuchElementException("minecraft"));
-        is1194OrLater = minecraft.getMetadata().getVersion().compareTo(V23w03a.get()) >= 0;
+        is1194OrLater = V1194_ABOVE.get().test(minecraft.getMetadata().getVersion());
     }
 
     @Override
