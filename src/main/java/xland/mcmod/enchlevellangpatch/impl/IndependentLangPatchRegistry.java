@@ -86,7 +86,6 @@ public final class IndependentLangPatchRegistry {
             throw new IllegalStateException("Registry is locked");
     }
 
-    @SuppressWarnings("unused")
     synchronized
     public boolean isFrozen() {
         return isFrozen;

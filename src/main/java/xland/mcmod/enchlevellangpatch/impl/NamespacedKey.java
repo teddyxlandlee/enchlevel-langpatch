@@ -24,10 +24,12 @@ public class NamespacedKey implements Comparable<NamespacedKey> {
         return new NamespacedKey(s.substring(0, i), s.substring(i+1));
     }
 
+    @SuppressWarnings("unused")
     public String getNamespace() {
         return namespace;
     }
 
+    @SuppressWarnings("unused")
     public String getPath() {
         return path;
     }

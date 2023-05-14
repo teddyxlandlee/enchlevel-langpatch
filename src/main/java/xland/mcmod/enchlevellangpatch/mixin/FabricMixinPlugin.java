@@ -3,7 +3,6 @@ package xland.mcmod.enchlevellangpatch.mixin;
 import com.google.common.base.Suppliers;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import org.objectweb.asm.tree.ClassNode;

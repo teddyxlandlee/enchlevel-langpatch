@@ -34,9 +34,11 @@ public class EnchantmentLevelLangPatchConfig {
             currentPotionHooksId = IndependentLangPatchRegistry.LP_DEFAULT;
 
     /**
-     * The setter for the current enchantment level patch. Will be set to default if
-     * {@code hooks} is not registered.
+     * <p>The setter for the current enchantment level patch. Will be set to default if
+     * {@code hooks} is not registered.</p>
      *
+     * <p>You should {@linkplain EnchantmentLevelLangPatch#registerEnchantmentPatch
+     * register} the {@code hooks} before setting it here.</p>
      * @see EnchantmentLevelLangPatch#registerEnchantmentPatch
      */
     @SuppressWarnings("unused")
@@ -49,9 +51,11 @@ public class EnchantmentLevelLangPatchConfig {
     }
 
     /**
-     * The setter for the current potion potency patch. Will be set to default if
-     * {@code hooks} is not registered.
+     * <p>The setter for the current potion potency patch. Will be set to default if
+     * {@code hooks} is not registered.</p>
      *
+     * <p>You should {@linkplain EnchantmentLevelLangPatch#registerPotionPatch register}
+     * the {@code hooks} before setting it here.</p>
      * @see EnchantmentLevelLangPatch#registerPotionPatch
      */
     @SuppressWarnings("unused")
@@ -64,16 +68,16 @@ public class EnchantmentLevelLangPatchConfig {
     }
 
     /**
-     * The getter for the current enchantment level patch. Will return default if
-     * the corresponding ID is not registered.
+     * The current enchantment level patch.
+     * @return The current enchantment level patch.
      */
     public static EnchantmentLevelLangPatch getCurrentEnchantmentHooks() {
         return LangPatchImpl.ENCHANTMENT_HOOK.get(currentEnchantmentHooksId);
     }
 
     /**
-     * The getter for the current potion potency patch. Will return default if
-     * the corresponding ID is not registered.
+     * The current potion potency patch.
+     * @return The current potion potency patch.
      */
     public static EnchantmentLevelLangPatch getCurrentPotionHooks() {
         return LangPatchImpl.POTION_HOOK.get(currentPotionHooksId);
@@ -82,7 +86,8 @@ public class EnchantmentLevelLangPatchConfig {
     private EnchantmentLevelLangPatchConfig() {}
 
     /**
-     * @return registered ID-LangPatch context of potion hooks.
+     * Registered ID-LangPatch context of potion hooks.
+     * @return Registered ID-LangPatch context of potion hooks.
      */
     @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable
@@ -92,7 +97,8 @@ public class EnchantmentLevelLangPatchConfig {
     }
 
     /**
-     * @return registered ID-LangPatch context of enchantment hooks.
+     * Registered ID-LangPatch context of enchantment hooks.
+     * @return Registered ID-LangPatch context of enchantment hooks.
      */
     @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable

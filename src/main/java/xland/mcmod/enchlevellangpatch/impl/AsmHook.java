@@ -17,11 +17,12 @@ public class AsmHook {
             String fallback
     ) {
         Mutable<@Nullable String> ms = new MutableObject<>();
+        Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
                 //cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
-                ms.setValue(valueMapping.apply(Collections.unmodifiableMap(translations), key, fallback));
+                ms.setValue(valueMapping.apply(unmodifiable, key, fallback));
                 return true;
             } return false;
         });
@@ -32,11 +33,12 @@ public class AsmHook {
             String key,
             Map<String, String> translations) {
         Mutable<@Nullable String> ms = new MutableObject<>();
+        Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
                 //cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
-                ms.setValue(valueMapping.apply(Collections.unmodifiableMap(translations), key));
+                ms.setValue(valueMapping.apply(unmodifiable, key));
                 return true;
             } return false;
         });
