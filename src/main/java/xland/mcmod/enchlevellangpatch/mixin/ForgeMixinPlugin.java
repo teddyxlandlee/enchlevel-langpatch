@@ -13,6 +13,8 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 public class ForgeMixinPlugin implements IMixinConfigPlugin {
+	// If in Neo environment: -1
+	// Otherwise: Forge major version
     private volatile Integer forgeVersion;
     private static final int V117 = 36, V1194 = 45;
 
@@ -30,6 +32,13 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
     }
 
     private static @NotNull String getForgeVersion() {
+		try {
+			// Check Neo environment
+			Class<?> clazz = Class.forName("net.neoforged.api.distmarker.Dist");
+			return "-1";
+		} catch (ClassNotFoundException ignored) {
+		}
+    
         try {
             Class<?> clazz = Class.forName("net.minecraftforge.fml.loading.StringSubstitutor");
             MethodHandle mh = MethodHandles.lookup().findStatic(clazz, "replace", MethodType.fromMethodDescriptorString("(Ljava/lang/String;Lnet/minecraftforge/fml/loading/moddiscovery/ModFile;)Ljava/lang/String;", clazz.getClassLoader()));
@@ -41,13 +50,16 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public String getRefMapperConfig() {
+    	if (forgeVersion < 0)
+    		// Neo uses pure MojMaps
+    		return null;
         return forgeVersion >= V117 ? "ellp.refmap-117.json" : "ellp.refmap-116.json";
     }
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         final boolean b = mixinClassName.endsWith("1194");
-        return (forgeVersion >= V1194) == b;
+        return (forgeVersion < 0 || forgeVersion >= V1194) == b;
     }
 
     @Override
