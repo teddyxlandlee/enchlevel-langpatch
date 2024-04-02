@@ -15,7 +15,7 @@ plugins {
     id 'maven-publish'
     id 'java'
     id 'idea'
-    id 'xland.gradle.forge-init-injector' version '1.0.7'
+    id 'xland.gradle.forge-init-injector' version '1.1.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -41,8 +41,9 @@ allprojects {
             url  = 'https://lss233.littleservice.cn/repositories/minecraft'
         }
         maven {
-            name = 'COVID-Trump'
-            url = 'https://covid-trump.github.io/mvn/'
+            name = '7c7maven'
+            // Formerly COVID-Trump
+            url = 'https://mvn.7c7.icu'
         }
         maven {
             name = "TerraformersMC"
@@ -75,6 +76,7 @@ forgeInitInjector {
     modId = 'enchlevellangpatch'
     stubPackage = 'g4QNAmBS\$BFhdWlbozC0\$'
     setClientEntrypoint 'xland/mcmod/enchlevellangpatch/impl/LangPatchImpl'
+    supportNeo = true
 
 }
 

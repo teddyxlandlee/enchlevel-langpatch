@@ -10,8 +10,8 @@ pluginManagement {
             url  = 'https://maven.aliyun.com/repository/gradle-plugin'
         }
         maven {
-            name = 'COVID-Trump'
-            url  = 'https://covid-trump.github.io/mvn/'
+            name = '7c7maven'
+            url  = 'https://mvn.7c7.icu'
         }
         maven {
             name = 'Fabric'
