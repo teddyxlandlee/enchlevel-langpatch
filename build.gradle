@@ -90,7 +90,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
     }*/
-    filesMatching(['fabric.mod.json', 'META-INF/mods.toml']) {
+    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand 'version' : project.version
     }
 }
