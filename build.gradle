@@ -15,7 +15,7 @@ plugins {
     id 'maven-publish'
     id 'java'
     id 'idea'
-    id 'xland.gradle.forge-init-injector' version '1.1.0'
+    id 'xland.gradle.forge-init-injector' version '1.1.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -76,8 +76,7 @@ forgeInitInjector {
     modId = 'enchlevellangpatch'
     stubPackage = 'g4QNAmBS\$BFhdWlbozC0\$'
     setClientEntrypoint 'xland/mcmod/enchlevellangpatch/impl/LangPatchImpl'
-    supportNeo = true
-
+    neoFlag 'pre_20_5', 'post_20_5'
 }
 
 processResources {

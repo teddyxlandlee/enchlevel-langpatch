@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion='(0,)'
+license='WTFPL'
+
+[[mods]]
+namespace='xland.mcmod.enchlevel-langpatch'
+modId='enchlevellangpatch'
+version='${version}'
+displayName='Enchantment Level Language Patch'
+description='`enchantment.level.1000`, get off!'
+modUrl='https://modrinth.com/mod/enchlevel-langpatch'
+displayURL='https://modrinth.com/mod/enchlevel-langpatch'
+authors='teddyxlandlee'
