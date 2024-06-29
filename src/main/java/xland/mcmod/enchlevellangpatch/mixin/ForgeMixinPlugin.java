@@ -16,7 +16,7 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
 	// If in Neo environment: -1
 	// Otherwise: Forge major version
     private volatile Integer forgeVersion;
-    private static final int V117 = 36, V1194 = 45;
+    private static final int V117 = 36, V1194 = 45, V1206 = 50;
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -50,8 +50,8 @@ public class ForgeMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public String getRefMapperConfig() {
-    	if (forgeVersion < 0)
-    		// Neo uses pure MojMaps
+    	if (forgeVersion < 0 || forgeVersion >= V1206)
+    		// Neo & MCF 1.20.6+ uses pure MojMaps
     		return null;
         return forgeVersion >= V117 ? "ellp.refmap-117.json" : "ellp.refmap-116.json";
     }
