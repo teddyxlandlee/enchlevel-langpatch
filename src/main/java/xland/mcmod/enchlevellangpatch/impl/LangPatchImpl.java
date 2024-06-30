@@ -168,7 +168,12 @@ public final class LangPatchImpl {
                                           0: potion*/) {
         IndependentLangPatchRegistry reg = enchantmentOrPotion ? ENCHANTMENT_HOOK : POTION_HOOK;
         if (reg.isFrozen()) {
-            LOGGER.warn(MARKER, "The registry is frozen. Changes may not be applied");
+            LOGGER.warn(
+                MARKER,
+                "Registry for {} is frozen. Patch `{}` may not be applied",
+                enchantmentOrPotion ? "enchantments" : "potions",
+                id
+            );
             return;
         }
         reg.add(id, hooks);

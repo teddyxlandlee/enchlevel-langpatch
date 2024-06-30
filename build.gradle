@@ -15,6 +15,7 @@ plugins {
     id 'maven-publish'
     id 'java'
     id 'idea'
+    id "me.modmuss50.mod-publish-plugin" version "0.5.1"
     id 'xland.gradle.forge-init-injector' version '1.1.1'
 }
 
@@ -142,6 +143,46 @@ jar {
                 "MixinConfigs" : "ellp.mixins-forge.json",  // for FML
         ])
     }
+}
+
+import me.modmuss50.mpp.ReleaseType
+
+def javaVersions(int from, int to) {
+	List<JavaVersion> list = []
+	for (int i = from; i <= to; i++) {
+		list.add(JavaVersion.toVersion(i))
+	}
+	return list
+}
+
+publishMods {
+	file = jar.archiveFile
+	modLoaders += ["fabric", "forge", "neoforge", "quilt"] as List
+	type = ReleaseType.of(project.release_type)
+	changelog = project.changelog
+	displayName = "[1.16+/ALL] LangPatch ${project.version}"
+
+	curseforge {
+		projectId = "529854"
+		minecraftVersionRange {
+			start = "1.16"
+			end = "latest"
+		}
+		javaVersions += javaVersions(8, 22)
+		clientRequired = true
+		serverRequired = false
+		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+	}
+
+	modrinth {
+		projectId = "Lf4kDKU9"
+		minecraftVersionRange {
+			start = "1.16"
+			end = "latest"
+			includeSnapshots = true
+		}
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+	}
 }
 
 // configure the maven publication

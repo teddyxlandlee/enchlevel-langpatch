@@ -14,11 +14,11 @@ import java.util.Map;
 public abstract class MixinTranslationStorage {
     //@Shadow @Final private Map<String, String> storage;
     @Accessor("storage")
-    abstract Map<String, String> getStorage();
+    abstract Map<String, String> ellp$getStorage();
 
     @Inject(at = @At("RETURN"), cancellable = true, method = "getOrDefault(Ljava/lang/String;)Ljava/lang/String;")
     private void langPatchHooks(String key, CallbackInfoReturnable<String> cir) {
-        @Nullable String s = AsmHook.langPatchHook(key, getStorage());
+        @Nullable String s = AsmHook.langPatchHook(key, ellp$getStorage());
         if (s != null) cir.setReturnValue(s);
     }
 }

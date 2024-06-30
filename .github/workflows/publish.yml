@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+ 
+permissions:
+  contents: write
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.head_commit.message, '[ci publish]')
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+      - uses: actions/setup-java@v4
+        name: Setup Java 21
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - run: ./gradlew build publishMods
+        name: Build and publish
+        env:
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      - name: Upload publish artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-artifacts
+          path: 'build/libs/*'
+          if-no-files-found: ignore
