@@ -157,7 +157,7 @@ def javaVersions(int from, int to) {
 
 publishMods {
 	file = jar.archiveFile
-	modLoaders += ["fabric", "forge", "neoforge", "quilt"] as List
+	modLoaders.addAll ["fabric", "forge", "neoforge", "quilt"] as List
 	type = ReleaseType.of(project.release_type)
 	changelog = project.changelog
 	displayName = "[1.16+/ALL] LangPatch ${project.version}"
