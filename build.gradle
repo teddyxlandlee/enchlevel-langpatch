@@ -4,6 +4,7 @@ buildscript {
             name = 'Aliyun Mirror'
             url  = 'https://maven.aliyun.com/repository/public'
         }
+        gradlePluginPortal()
     }
     dependencies {
         classpath("org.ow2.asm:asm:9.3")
@@ -157,7 +158,9 @@ def javaVersions(int from, int to) {
 
 publishMods {
 	file = jar.archiveFile
-	modLoaders.addAll ["fabric", "forge", "neoforge", "quilt"] as List
+	["fabric", "forge", "neoforge", "quilt"].each { ml ->
+		modLoaders.add(ml)
+	}
 	type = ReleaseType.of(project.release_type)
 	changelog = project.changelog
 	displayName = "[1.16+/ALL] LangPatch ${project.version}"
@@ -168,7 +171,9 @@ publishMods {
 			start = "1.16"
 			end = "latest"
 		}
-		javaVersions += javaVersions(8, 22)
+		javaVersions(8, 22).each { jv ->
+			javaVersions.add(jv)
+		}
 		clientRequired = true
 		serverRequired = false
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
