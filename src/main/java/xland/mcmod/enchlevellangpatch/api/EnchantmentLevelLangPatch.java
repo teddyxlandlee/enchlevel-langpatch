@@ -53,7 +53,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
      * which switches the enchantment level patch to whichever you want.</p>
      *
-     * @param id <a href="https://minecraft.fandom.com/wiki/Resource_location">
+     * @param id <a href="https://minecraft.wiki/w/Resource_location">
      *           Namespaced key</a> for your patch. Please follow the naming rule
      *           of namespaced keys.
      * @param edition Your patch for enchantment levels.
@@ -77,7 +77,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks},
      * which switches the potion potency patch to whichever you want.</p>
      *
-     * @param id <a href="https://minecraft.fandom.com/wiki/Resource_location">
+     * @param id <a href="https://minecraft.wiki/w/Resource_location">
      *           Namespaced key</a> for your patch. Please follow the naming rule
      *           of namespaced keys.
      * @param edition Your patch for potion potencies.
