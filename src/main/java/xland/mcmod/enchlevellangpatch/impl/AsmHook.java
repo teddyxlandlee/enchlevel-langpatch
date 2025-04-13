@@ -21,8 +21,9 @@ public class AsmHook {
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
-                //cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
-                ms.setValue(valueMapping.apply(unmodifiable, key, fallback));
+                String candidate = valueMapping.apply(unmodifiable, key, fallback);
+                if (candidate == null) return false;
+                ms.setValue(candidate);
                 return true;
             } return false;
         });
@@ -37,8 +38,9 @@ public class AsmHook {
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
-                //cir.setReturnValue(valueMapping.apply(ImmutableMap.copyOf(translations), key));
-                ms.setValue(valueMapping.apply(unmodifiable, key));
+                String candidate = valueMapping.apply(unmodifiable, key);
+                if (candidate == null) return false;
+                ms.setValue(candidate);
                 return true;
             } return false;
         });

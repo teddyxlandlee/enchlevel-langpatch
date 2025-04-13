@@ -185,12 +185,11 @@ public final class LangPatchImpl {
     }
 
     public static void forEach(BiFunction<? super Predicate<String>,
-                ? super EnchantmentLevelLangPatch, Boolean> biConsumer) {
-        //PREDICATES.forEach(pair -> biConsumer.accept(pair.getLeft(), pair.getRight()));
+                ? super EnchantmentLevelLangPatch, Boolean> function) {
         synchronized (PREDICATES) {
             for (ImmutablePair<Predicate<String>, EnchantmentLevelLangPatch>
                     pair : PREDICATES) {
-                if (biConsumer.apply(pair.getLeft(), pair.getRight())) return;
+                if (function.apply(pair.getLeft(), pair.getRight())) return;
             }
         }
     }

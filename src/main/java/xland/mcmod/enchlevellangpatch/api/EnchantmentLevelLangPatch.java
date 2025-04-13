@@ -103,10 +103,10 @@ public interface EnchantmentLevelLangPatch {
      * @param key the provided translation key when this
      * {@link EnchantmentLevelLangPatch patch} is applied.
      *
-     * @return the translation (value) you modify.
+     * @return the translation (value) you modify. Returning null indicates remaining unchanged.
      * @see #apply(Map, String, String)
      */
-    String apply(@Unmodifiable Map<String, String> translationStorage, String key);
+    @Nullable String apply(@Unmodifiable Map<String, String> translationStorage, String key);
 
     /**
      * The entrypoint for {@link EnchantmentLevelLangPatch}, with fallback string given.
@@ -117,7 +117,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatch patch} is applied.
      * @param fallback the fallback translation provided.
      *
-     * @return the translation (value) you modify.
+     * @return the translation (value) you modify. Returning null indicates remaining unchanged.
      *
      * @implNote <p>This method is invoked by Minecraft 1.19.4 or above, which always
      * gives a fallback that is defaulted to {@code key}. So if you want to override
@@ -129,7 +129,7 @@ public interface EnchantmentLevelLangPatch {
      */
     @ApiStatus.Experimental
     @SuppressWarnings("unused")
-    default String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback) {
+    default @Nullable String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback) {
         return apply(translationStorage, key);
     }
 }
