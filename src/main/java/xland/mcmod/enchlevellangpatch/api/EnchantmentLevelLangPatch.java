@@ -39,6 +39,7 @@ public interface EnchantmentLevelLangPatch {
      * Provides an algorithm for int-to-roman translation.
      * Thanks youdiaodaxue16.
      *
+     * @param num the integer
      * @return The number in roman format, or {@code null} if
      * {@code num} is out of range ({@code 1..3998}).
      */
@@ -132,6 +133,18 @@ public interface EnchantmentLevelLangPatch {
         return apply(translationStorage, key);
     }
 
+    /**
+     * <p>An {@link EnchantmentLevelLangPatch} that receives a fallback string.</p>
+     * <p>This should be used when your patch is <b>only</b> applied in Minecraft 1.19.4+,
+     * as the patch will be <b>ignored</b> when the fallback string is absent.</p>
+     *
+     * Example: <blockquote><pre>
+     *     EnchantmentLevelLangPatch.registerPatch(
+     *         key -> key.startsWith("example.prefix."),
+     *         EnchantmentLevelLangPatch.withFallback((storage, key, fallback) -> Example.hook(key, fallback))
+     *     )
+     * </pre></blockquote>
+     */
     @FunctionalInterface
     interface WithFallback extends EnchantmentLevelLangPatch {
         @Nullable
@@ -155,8 +168,12 @@ public interface EnchantmentLevelLangPatch {
      *         EnchantmentLevelLangPatch.withFallback((storage, key, fallback) -> Example.hook(key, fallback))
      *     )
      * </pre></blockquote>
+     *
+     * @param patch the patch, recommended to be a lambda
+     * @return the patch itself
      */
     @SuppressWarnings("unused")
+    @Contract(pure = true, value = "_ -> param1")
     static EnchantmentLevelLangPatch withFallback(WithFallback patch) {
         return patch;
     }

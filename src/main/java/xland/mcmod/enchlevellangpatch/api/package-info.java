@@ -1,6 +1,5 @@
 /**
  * <p>The API of Enchantment Level Language Patch.</p>
- * <p></p>
  *
  * <h2>What is it for?</h2>
  * <p>It is an API to patch the language file of Minecraft,
@@ -8,7 +7,6 @@
  * you can make changes to these translations in bulk.</p>
  * <p>In particular, you can register your own style for enchantment
  * levels as well as potion potency.</p>
- * <p></p>
  *
  * <h2>How can I register a patch?</h2>
  * <p>Here's an example:</p><blockquote><pre>

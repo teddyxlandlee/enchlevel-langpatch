@@ -40,6 +40,8 @@ public class EnchantmentLevelLangPatchConfig {
      * <p>You should {@linkplain EnchantmentLevelLangPatch#registerEnchantmentPatch
      * register} the {@code hooks} before setting it here.</p>
      * @see EnchantmentLevelLangPatch#registerEnchantmentPatch
+     *
+     * @param hooks A registered patch.
      */
     @SuppressWarnings("unused")
     public static void setCurrentEnchantmentHooks(@Nullable EnchantmentLevelLangPatch hooks) {
@@ -57,6 +59,8 @@ public class EnchantmentLevelLangPatchConfig {
      * <p>You should {@linkplain EnchantmentLevelLangPatch#registerPotionPatch register}
      * the {@code hooks} before setting it here.</p>
      * @see EnchantmentLevelLangPatch#registerPotionPatch
+     *
+     * @param hooks A registered patch.
      */
     @SuppressWarnings("unused")
     public static void setCurrentPotionHooks(@Nullable EnchantmentLevelLangPatch hooks) {

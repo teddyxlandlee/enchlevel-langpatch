@@ -123,6 +123,7 @@ javadoc {
                 'https://javadoc.io/doc/org.jetbrains/annotations/19.0.0/',
                 'https://javadoc.io/doc/org.apiguardian/apiguardian-api/1.1.2/',
         )
+        include 'xland/mcmod/enchlevellangpatch/api/**'
     }
 }
 
