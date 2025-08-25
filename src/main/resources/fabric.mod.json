@@ -3,7 +3,7 @@
   "id": "enchlevel-langpatch",
   "version": "${version}",
   "name": "Enchantment Level Language Patch",
-  "description": "`enchantment.level.1000`, get off!",
+  "description": "Sharpness enchantment.level.255 => Sharpness 255/CCLV",
   "authors": [
     "teddyxlandlee"
   ],

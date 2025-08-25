@@ -12,7 +12,6 @@ buildscript {
 }
 
 plugins {
-    //id 'fabric-loom' version '0.7.34'
     id 'maven-publish'
     id 'java'
     id 'idea'
@@ -29,7 +28,6 @@ version = project.mod_version
 
 allprojects {
     repositories {
-        mavenLocal()
         maven {
             name = 'Aliyun Mirror'
             url  = 'https://maven.aliyun.com/repository/public'

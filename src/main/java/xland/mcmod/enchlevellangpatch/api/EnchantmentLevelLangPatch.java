@@ -68,7 +68,7 @@ public interface EnchantmentLevelLangPatch {
             @NotNull EnchantmentLevelLangPatch edition) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(edition, "patch");
-        LangPatchImpl.hookPatch(NamespacedKey.of(id), edition, true);
+        LangPatchImpl.hookEnchantmentPatch(NamespacedKey.of(id), edition);
     }
 
     /**
@@ -92,7 +92,7 @@ public interface EnchantmentLevelLangPatch {
             @NotNull EnchantmentLevelLangPatch edition) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(edition, "patch");
-        LangPatchImpl.hookPatch(NamespacedKey.of(id), edition, false);
+        LangPatchImpl.hookPotionPatch(NamespacedKey.of(id), edition);
     }
 
     /**
@@ -127,9 +127,37 @@ public interface EnchantmentLevelLangPatch {
      *
      * @see #apply(Map, String)
      */
-    @ApiStatus.Experimental
     @SuppressWarnings("unused")
     default @Nullable String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback) {
         return apply(translationStorage, key);
+    }
+
+    @FunctionalInterface
+    interface WithFallback extends EnchantmentLevelLangPatch {
+        @Nullable
+        default String apply(@Unmodifiable Map<String, String> translationStorage, String key) {
+            return null;
+        }
+
+        @Override
+        @Nullable
+        String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback);
+    }
+
+    /**
+     * <p>Creates an {@link EnchantmentLevelLangPatch} that receives a fallback string.</p>
+     * <p>This should be used when your patch is <b>only</b> applied in Minecraft 1.19.4+,
+     * as the patch will be <b>ignored</b> when the fallback string is absent.</p>
+     *
+     * Example: <blockquote><pre>
+     *     EnchantmentLevelLangPatch.registerPatch(
+     *         key -> key.startsWith("example.prefix."),
+     *         EnchantmentLevelLangPatch.withFallback((storage, key, fallback) -> Example.hook(key, fallback))
+     *     )
+     * </pre></blockquote>
+     */
+    @SuppressWarnings("unused")
+    static EnchantmentLevelLangPatch withFallback(WithFallback patch) {
+        return patch;
     }
 }

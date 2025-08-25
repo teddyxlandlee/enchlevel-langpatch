@@ -13,11 +13,7 @@ import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil.intToRomanImpl;
@@ -27,34 +23,62 @@ public final class LangPatchImpl {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("LangPatch/Impl");
 
+    public static final String KEY_ENCHANTMENT_TYPE = "langpatch.conf.enchantment.default.type";
+    public static final String KEY_ENCHANTMENT_OVERRIDE = "langpatch.conf.enchantment.override";
+    public static final String KEY_ENCHANTMENT_FORMAT = "enchantment.level.x";
+
+    public static final String KEY_POTION_TYPE = "langpatch.conf.potion.default.type";
+    public static final String KEY_POTION_OVERRIDE = "langpatch.conf.potion.override";
+    public static final String KEY_POTION_FORMAT = "potion.potency.x";
+
+    // *** BUILT-IN REGISTRIES & HOOKS *** //
+
     private static final List<ImmutablePair<Predicate<String>,
             EnchantmentLevelLangPatch>> PREDICATES
             = Collections.synchronizedList(Lists.newArrayList());
 
-    private static final EnchantmentLevelLangPatch
-        DEFAULT_ENCHANTMENT_HOOKS = (Map<String, String> translationStorage, String key) -> {
-            String t = translationStorage.get(key);
-            if (t != null) return t;
+    private static final EnchantmentLevelLangPatch DEFAULT_ENCHANTMENT_HOOKS =
+            (Map<String, String> translationStorage, String key) -> {
+                if (!Boolean.parseBoolean(translationStorage.get(KEY_ENCHANTMENT_OVERRIDE))) {
+                    // Do not override given translation
+                    String t = translationStorage.get(key);
+                    if (t != null) return t;
+                }
 
-            int lvl = Integer.parseInt(key.substring(18));
-            return ofRoman(translationStorage, lvl, "langpatch.conf.enchantment.default.type", "enchantment.level.x");
-        },
-        DEFAULT_POTION_HOOKS = (Map<String, String> translationStorage, String key) -> {
-            String t = translationStorage.get(key);
-            if (t != null) return t;
+                int lvl = Integer.parseInt(key.substring(18));
+                return configuredFormat(translationStorage, lvl, KEY_ENCHANTMENT_TYPE, KEY_ENCHANTMENT_FORMAT);
+            };
 
-            int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
-            return ofRoman(translationStorage, lvl, "langpatch.conf.potion.default.type", "potion.potency.x");
-        };
-    private static String ofDefault(Map<String, String> translationStorage, int lvl, String key) {
-        return String.format(translationStorage.getOrDefault(key, "%s"), lvl);
+    private static final EnchantmentLevelLangPatch DEFAULT_POTION_HOOKS =
+            (Map<String, String> translationStorage, String key) -> {
+                if (!Boolean.parseBoolean(translationStorage.get(KEY_POTION_OVERRIDE))) {
+                    // Do not override given translation
+                    String t = translationStorage.get(key);
+                    if (t != null) return t;
+                }
+
+                int lvl = Integer.parseInt(key.substring(15)) + 1;  // Level 2 is III
+                return configuredFormat(translationStorage, lvl, KEY_POTION_TYPE, KEY_POTION_FORMAT);
+            };
+
+    private static @NotNull String safeFormat(Map<String, String> translationStorage, String key, @NotNull Object arg) {
+        try {
+            return String.format(translationStorage.getOrDefault(key, "%s"), arg);
+        } catch (IllegalFormatException e) {
+            // Invalid format
+            LOGGER.warn(MARKER, "Invalid format string for translation key {}. Using as-is format.", key, e);
+            return arg.toString();
+        }
     }
 
     // To avoid same-check
-    private static final EnchantmentLevelLangPatch
-        ROMAN_ENCHANTMENT_HOOKS = DEFAULT_ENCHANTMENT_HOOKS::apply,
-        ROMAN_POTION_HOOKS = DEFAULT_POTION_HOOKS::apply;
-    private static String ofRoman(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {
+    @SuppressWarnings("FunctionalExpressionCanBeFolded")
+    private static final EnchantmentLevelLangPatch ROMAN_ENCHANTMENT_HOOKS = DEFAULT_ENCHANTMENT_HOOKS::apply;
+
+    @SuppressWarnings("FunctionalExpressionCanBeFolded")
+    private static final EnchantmentLevelLangPatch ROMAN_POTION_HOOKS = DEFAULT_POTION_HOOKS::apply;
+
+    private static @NotNull String configuredFormat(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {
         int cnMode;
         switch (translationStorage.getOrDefault(configKey, "").toLowerCase(Locale.ROOT)) {
             case "simplified":
@@ -75,7 +99,7 @@ public final class LangPatchImpl {
             case "":        // Community Voted: NUMERAL
             case "null":    // Community Voted: NUMERAL
             case "default": // Community Voted: NUMERAL
-                return ofDefault(translationStorage, lvl, formatKey);
+                return safeFormat(translationStorage, formatKey, lvl);
 
             case "no":
             case "roman":
@@ -83,9 +107,60 @@ public final class LangPatchImpl {
                 cnMode = -1;
         }
 
-        return String.format(translationStorage.getOrDefault(formatKey, "%s"),
-                intToRomanImpl(lvl, cnMode));
+        return safeFormat(translationStorage, formatKey, intToRomanImpl(lvl, cnMode));
     }
+
+    static public final IndependentLangPatchRegistry
+        ENCHANTMENT_HOOK = IndependentLangPatchRegistry.of("enchantments"),
+        POTION_HOOK = IndependentLangPatchRegistry.of("potions");
+
+    static {
+        ENCHANTMENT_HOOK.add("enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
+        POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
+        ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
+        POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
+    }
+
+    // *** REGISTRY *** //
+
+    public static void hookEnchantmentPatch(
+            @NotNull NamespacedKey id,
+            @NotNull EnchantmentLevelLangPatch hooks
+    ) {
+        hookPatch(ENCHANTMENT_HOOK, id, hooks);
+    }
+
+    public static void hookPotionPatch(
+            @NotNull NamespacedKey id,
+            @NotNull EnchantmentLevelLangPatch hooks
+    ) {
+        hookPatch(POTION_HOOK, id, hooks);
+    }
+
+    private static void hookPatch(
+            IndependentLangPatchRegistry reg,
+            NamespacedKey id,
+            EnchantmentLevelLangPatch hooks
+    ) {
+        if (reg.isFrozen()) {
+            LOGGER.warn(MARKER, "{} is frozen. Patch {} may not be applied", reg, id);
+            return;
+        }
+        reg.add(id, hooks);
+    }
+
+    public static void register(Predicate<String> keyPredicate,
+                                EnchantmentLevelLangPatch edition) {
+        PREDICATES.add(ImmutablePair.of(keyPredicate, edition));
+    }
+
+    private static void lockAll() {
+        ENCHANTMENT_HOOK.freeze();
+        POTION_HOOK.freeze();
+        LOGGER.debug(MARKER, "Registries are locked");
+    }
+
+    // *** ENTRYPOINT *** //
 
     public static void init() {
         applyConf4();
@@ -102,18 +177,6 @@ public final class LangPatchImpl {
                         .getCurrentPotionHooks()
                         .apply(translationStorage, key)
         );
-    }
-
-
-    static public final IndependentLangPatchRegistry
-        ENCHANTMENT_HOOK = IndependentLangPatchRegistry.of(),
-        POTION_HOOK = IndependentLangPatchRegistry.of();
-
-    static {
-        ENCHANTMENT_HOOK.add("enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
-        POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
-        ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
-        POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
     }
 
     private static void applyConf4() {
@@ -155,43 +218,19 @@ public final class LangPatchImpl {
         }
     }
 
-    private static void lockAll() {
-        ENCHANTMENT_HOOK.freeze();
-        POTION_HOOK.freeze();
-        LOGGER.debug(MARKER, "Registries are locked");
-    }
+    // *** MINECRAFT HOOK *** //
 
-    public static void hookPatch(
-            @NotNull NamespacedKey id,
-            @NotNull EnchantmentLevelLangPatch hooks,
-            boolean enchantmentOrPotion /*1: enchantment
-                                          0: potion*/) {
-        IndependentLangPatchRegistry reg = enchantmentOrPotion ? ENCHANTMENT_HOOK : POTION_HOOK;
-        if (reg.isFrozen()) {
-            LOGGER.warn(
-                MARKER,
-                "Registry for {} is frozen. Patch `{}` may not be applied",
-                enchantmentOrPotion ? "enchantments" : "potions",
-                id
-            );
-            return;
-        }
-        reg.add(id, hooks);
-    }
-
-    public static void register(Predicate<String> keyPredicate,
-                                EnchantmentLevelLangPatch edition) {
-        PREDICATES.add(ImmutablePair.of(keyPredicate, edition));
-    }
-
-    public static void forEach(BiFunction<? super Predicate<String>,
-                ? super EnchantmentLevelLangPatch, Boolean> function) {
+    static void forEach(InterruptablePatchConsumer consumer) {
         synchronized (PREDICATES) {
             for (ImmutablePair<Predicate<String>, EnchantmentLevelLangPatch>
                     pair : PREDICATES) {
-                if (function.apply(pair.getLeft(), pair.getRight())) return;
+                if (consumer.interrupt(pair.getLeft(), pair.getRight())) return;
             }
         }
     }
 
+    @FunctionalInterface
+    interface InterruptablePatchConsumer {
+        boolean interrupt(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch);
+    }
 }

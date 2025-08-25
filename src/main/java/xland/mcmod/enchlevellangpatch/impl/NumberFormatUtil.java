@@ -20,8 +20,8 @@ public class NumberFormatUtil {
 
     private static final NumResultCacheMap CACHE = new NumResultCacheMap();
 
-    private static final int[] I_ARR = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
-    private static final String[] S_ARR = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+    private static final int[] I_ARR = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] S_ARR = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
     @Nullable
     public static String intToRoman(int num) {
@@ -30,12 +30,12 @@ public class NumberFormatUtil {
 
     private static String intToRoman0(int num) { // thanks youdiaodaxue16
         StringBuilder res = new StringBuilder();
-        if(num <= 0 || num >= 3999){
+        if (num <= 0 || num >= 3999) {
             return null;
         }
-        for(int i = 0;i < I_ARR.length;i++){
-            int temp=num/I_ARR[i];
-            while(temp > 0){
+        for (int i = 0; i < I_ARR.length; i++) {
+            int temp = num / I_ARR[i];
+            while (temp > 0) {
                 res.append(S_ARR[i]);
                 temp--;
             }

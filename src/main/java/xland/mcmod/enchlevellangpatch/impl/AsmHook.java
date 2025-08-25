@@ -16,33 +16,36 @@ public class AsmHook {
             String key, Map<String, String> translations,
             String fallback
     ) {
-        Mutable<@Nullable String> ms = new MutableObject<>();
-        Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
-        LangPatchImpl.forEach((Predicate<String> keyPredicate,
-                               EnchantmentLevelLangPatch valueMapping) -> {
-            if (keyPredicate.test(key)) {
-                String candidate = valueMapping.apply(unmodifiable, key, fallback);
-                if (candidate == null) return false;
-                ms.setValue(candidate);
-                return true;
-            } return false;
-        });
-        return ms.getValue();
+        return langPatchHook(key, translations, fallback, true);
     }
 
     public static @Nullable String langPatchHook(
             String key,
             Map<String, String> translations) {
+        return langPatchHook(key, translations, null, false);
+    }
+
+    private static @Nullable String langPatchHook(
+            String key, Map<String, String> translations,
+            String fallback, boolean useFallback
+    ) {
         Mutable<@Nullable String> ms = new MutableObject<>();
-        Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
+        final Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
             if (keyPredicate.test(key)) {
-                String candidate = valueMapping.apply(unmodifiable, key);
-                if (candidate == null) return false;
+                String candidate;
+                if (useFallback) {
+                    candidate = valueMapping.apply(unmodifiable, key, fallback);
+                } else {
+                    candidate = valueMapping.apply(unmodifiable, key);
+                }
+                if (candidate == null) return false;    // user skip
+
                 ms.setValue(candidate);
-                return true;
-            } return false;
+                return true;    // interrupt
+            }
+            return false;   // predicate fail, skip
         });
         return ms.getValue();
     }

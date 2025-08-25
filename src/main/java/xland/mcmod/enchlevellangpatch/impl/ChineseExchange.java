@@ -3,7 +3,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-class ChineseExchange {
+final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
     private final String[] pos;
     private final char[] num;
@@ -74,9 +74,6 @@ class ChineseExchange {
         return ret.reverse().toString();
     }
 
-    /**
-     * Each section
-     */
     private void eachSection(int num, StringBuilder ret) {
         //StringBuilder ret = new StringBuilder();
         boolean zero = true;    // if num == 0: ""
@@ -93,7 +90,5 @@ class ChineseExchange {
             }
             num /= 10;
         }
-        //return ret.reverse();
     }
-
 }

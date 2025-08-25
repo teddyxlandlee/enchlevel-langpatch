@@ -14,21 +14,25 @@ import java.util.Objects;
 //** @see net.minecraft.core.DefaultedRegistry */
 @API(status = API.Status.INTERNAL)
 public final class IndependentLangPatchRegistry {
-    private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map
-            = HashBiMap.create();
+    private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map = HashBiMap.create();
+
     private final NamespacedKey defaultId;
     private EnchantmentLevelLangPatch defaultValue;
+
     private volatile ImmutableBiMap<String, EnchantmentLevelLangPatch> asImmutableBiMap;
     private boolean isFrozen;
+    private final @NotNull String registryName;
+
     public static final NamespacedKey LP_DEFAULT = NamespacedKey.of("enchlevel-langpatch:default");
 
-    IndependentLangPatchRegistry(NamespacedKey defaultId) {
+    IndependentLangPatchRegistry(@NotNull String registryName, NamespacedKey defaultId) {
+        this.registryName = registryName;
         this.defaultId = defaultId;
     }
 
-    @Contract(" -> new")
-    static @NotNull IndependentLangPatchRegistry of() {
-        return new IndependentLangPatchRegistry(LP_DEFAULT);
+    @Contract("_ -> new")
+    static @NotNull IndependentLangPatchRegistry of(String registryName) {
+        return new IndependentLangPatchRegistry(registryName, LP_DEFAULT);
     }
 
     synchronized
@@ -75,10 +79,7 @@ public final class IndependentLangPatchRegistry {
 
     @Override
     public String toString() {
-        return "IndependentLangPatchRegistry{" +
-                "map=" + map +
-                ", defaultId=" + defaultId +
-                '}';
+        return "Registry for ".concat(registryName);
     }
 
     private void checkFreeze() {
