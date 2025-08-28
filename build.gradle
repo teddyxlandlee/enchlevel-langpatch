@@ -19,10 +19,12 @@ plugins {
     id 'xland.gradle.forge-init-injector' version '1.1.1'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+base {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    archivesName = project.archives_base_name
+}
 
-archivesBaseName = project.archives_base_name
 group = project.maven_group
 version = project.mod_version
 
