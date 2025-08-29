@@ -131,7 +131,7 @@ javadoc {
 
 jar {
     from ("LICENSE") {
-        rename {  "META-INF/${it}_${project.archivesBaseName}"  }
+        rename {  "META-INF/${it}_${project.archives_base_name}"  }
     }
     manifest {
         attributes([
