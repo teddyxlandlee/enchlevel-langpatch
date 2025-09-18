@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
 
@@ -78,7 +79,7 @@ public final class LangPatchImpl {
     @SuppressWarnings("FunctionalExpressionCanBeFolded")
     private static final EnchantmentLevelLangPatch ROMAN_POTION_HOOKS = DEFAULT_POTION_HOOKS::apply;
 
-    private static @NotNull String configuredFormat(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {
+    private static @Nullable String configuredFormat(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {
         int cnMode;
         switch (translationStorage.getOrDefault(configKey, "").toLowerCase(Locale.ROOT)) {
             case "simplified":
@@ -100,6 +101,12 @@ public final class LangPatchImpl {
             case "null":    // Community Voted: NUMERAL
             case "default": // Community Voted: NUMERAL
                 return safeFormat(translationStorage, formatKey, lvl);
+
+            case "skip":
+            case "skipped":
+            case "ignore":
+            case "ignored":
+                return null;    // Return `null` to skip
 
             case "no":
             case "roman":
