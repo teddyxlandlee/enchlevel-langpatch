@@ -35,6 +35,9 @@
     "enchlevel-langpatch-conf3": "<4",
     "enchlevel-langpatch-fa2fo": "<2"
   },
+  "conflicts": {
+    "minecraft": ">=1.21.11-beta"
+  },
   "suggests": {
     "langpatch-conf4": ">=4"
   }
