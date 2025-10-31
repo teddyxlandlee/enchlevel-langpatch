@@ -30,9 +30,14 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         initVersion();
     }
 
+    public static boolean isMojMapped() {
+        // TODO: so far
+        return false;
+    }
+
     @Override
     public String getRefMapperConfig() {
-        return null;
+        return isMojMapped() ? null : "enchlevel-langpatch-refmap.json";
     }
 
     @Override
