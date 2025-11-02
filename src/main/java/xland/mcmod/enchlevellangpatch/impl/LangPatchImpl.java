@@ -1,8 +1,6 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -34,10 +32,7 @@ public final class LangPatchImpl {
     public static final String KEY_POTION_FORMAT = "potion.potency.x";
 
     // *** BUILT-IN REGISTRIES & HOOKS *** //
-
-    private static final List<ImmutablePair<Predicate<String>,
-            EnchantmentLevelLangPatch>> PREDICATES
-            = Collections.synchronizedList(Lists.newArrayList());
+    private static final List<PredicatedPatch> PREDICATES = Collections.synchronizedList(new ArrayList<>());
 
     private static final EnchantmentLevelLangPatch DEFAULT_ENCHANTMENT_HOOKS =
             (Map<String, String> translationStorage, String key) -> {
@@ -162,7 +157,7 @@ public final class LangPatchImpl {
 
     public static void register(Predicate<String> keyPredicate,
                                 EnchantmentLevelLangPatch edition) {
-        PREDICATES.add(ImmutablePair.of(keyPredicate, edition));
+        PREDICATES.add(new PredicatedPatch(keyPredicate, edition));
     }
 
     private static void lockAll() {
@@ -233,9 +228,8 @@ public final class LangPatchImpl {
 
     static void forEach(InterruptablePatchConsumer consumer) {
         synchronized (PREDICATES) {
-            for (ImmutablePair<Predicate<String>, EnchantmentLevelLangPatch>
-                    pair : PREDICATES) {
-                if (consumer.interrupt(pair.getLeft(), pair.getRight())) return;
+            for (PredicatedPatch patch : PREDICATES) {
+                if (consumer.interrupt(patch)) return;
             }
         }
     }
@@ -243,5 +237,9 @@ public final class LangPatchImpl {
     @FunctionalInterface
     interface InterruptablePatchConsumer {
         boolean interrupt(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch);
+
+        default boolean interrupt(PredicatedPatch patch) {
+            return interrupt(patch.getKeyPredicate(), patch.getLangPatch());
+        }
     }
 }

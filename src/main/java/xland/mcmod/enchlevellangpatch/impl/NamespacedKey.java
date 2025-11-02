@@ -6,7 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.regex.Pattern;
 
 @ApiStatus.Internal
-public class NamespacedKey implements Comparable<NamespacedKey> {
+public final class NamespacedKey implements Comparable<NamespacedKey> {
     private static final Pattern NS_PATTERN, PATH_PATTERN;
     private final String namespace, path;
     private String toString;
