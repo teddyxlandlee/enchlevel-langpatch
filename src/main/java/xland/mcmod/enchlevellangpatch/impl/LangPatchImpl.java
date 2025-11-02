@@ -128,7 +128,7 @@ public final class LangPatchImpl {
         ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
         POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
 
-        // preload roman map
+        // preload roman/chinese map
         Validate.isTrue("I".equals(EnchantmentLevelLangPatch.intToRoman(1)));
     }
 

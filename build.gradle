@@ -7,6 +7,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath("com.google.guava:guava:33.5.0-jre")
         classpath("org.ow2.asm:asm:9.3")
     }
 }
@@ -84,18 +85,28 @@ forgeInitInjector {
 processResources {
     inputs.property "version", project.version
 
-    /*from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
-    }*/
     filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand 'version' : project.version
     }
 }
+
+import com.google.common.hash.Hashing
+import com.google.common.hash.HashCode
+
+tasks.register("checkValueTableSum") {
+    def valueTableFile = file("src/main/resources/xland/mcmod/enchlevellangpatch/impl/ValueTable.txt")
+    def expectedHash = '3c09cc78904fc47fd583b680ecfa9e2ad7370787ea149d843a56fb8f8c15c8d4'
+
+    doLast {
+        def hasher = Hashing.sha256().newHasher()
+        valueTableFile.withInputStream {input ->
+            input.eachByte { b -> hasher.putByte(b) }
+        }
+        assert hasher.hash() == HashCode.fromString(expectedHash)
+    }
+}
+
+processResources.finalizedBy 'checkValueTableSum'
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
 // this fixes some edge cases with special characters not displaying correctly
@@ -149,7 +160,7 @@ jar {
 
 import me.modmuss50.mpp.ReleaseType
 
-def javaVersions(int from, int to) {
+static def javaVersions(int from, int to) {
 	List<JavaVersion> list = []
 	for (int i = from; i <= to; i++) {
 		list.add(JavaVersion.toVersion(i))
