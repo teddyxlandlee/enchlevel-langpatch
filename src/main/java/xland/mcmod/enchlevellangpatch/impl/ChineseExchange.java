@@ -1,9 +1,11 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-final class ChineseExchange {
+@VisibleForTesting
+public final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
     private final String[] pos;
     private final char[] num;
@@ -11,18 +13,22 @@ final class ChineseExchange {
     private final char zeroC;
     private final String zeroS;
     private final String tenOne;
-    private static final ChineseExchange[] EXCHANGES = {
-            new ChineseExchange(
-                    new String[]{"", "十", "百", "千"},
-                    new char[]{'零', '一', '二', '三', '四', '五', '六', '七', '八', '九'},
-                    new String[]{"", "万", "亿", "万亿"}
-            ),
-            new ChineseExchange(
-                    new String[]{"", "拾", "佰", "仟"},
-                    new char[]{'零', '壹', '貳', '叄', '肆', '伍', '陸', '柒', '捌', '玖'},
-                    new String[]{"", "萬", "億", "萬億"}
-            )
-    };
+
+    private static final class Lazy {
+        static final ChineseExchange[] EXCHANGES = {
+                new ChineseExchange(
+                        new String[]{"", "十", "百", "千"},
+                        new char[]{'零', '一', '二', '三', '四', '五', '六', '七', '八', '九'},
+                        new String[]{"", "万", "亿", "万亿"}
+                ),
+                new ChineseExchange(
+                        new String[]{"", "拾", "佰", "仟"},
+                        new char[]{'零', '壹', '貳', '叄', '肆', '伍', '陸', '柒', '捌', '玖'},
+                        new String[]{"", "萬", "億", "萬億"}
+                )
+        };
+    }
+
     static final int NORMAL = 0, UPPER = 1;
 
     ChineseExchange(String[] pos, char[] num, String[] sec) {
@@ -35,7 +41,15 @@ final class ChineseExchange {
     }
 
     public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num, int type) {
-        return EXCHANGES[type].numberToChinese(num);
+        if (num < 256) {
+            return ValueTableHolder.CHINESE[type][num];
+        }
+        return Lazy.EXCHANGES[type].numberToChinese(num);
+    }
+
+    @VisibleForTesting
+    public static String numberToChineseCacheless(int num, int type) {
+        return Lazy.EXCHANGES[type].numberToChinese0(num);
     }
 
     String numberToChinese(int num) {

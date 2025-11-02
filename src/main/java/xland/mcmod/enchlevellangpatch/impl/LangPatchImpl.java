@@ -1,6 +1,7 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -126,6 +127,9 @@ public final class LangPatchImpl {
         POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
         ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
         POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
+
+        // preload roman map
+        Validate.isTrue("I".equals(EnchantmentLevelLangPatch.intToRoman(1)));
     }
 
     // *** REGISTRY *** //

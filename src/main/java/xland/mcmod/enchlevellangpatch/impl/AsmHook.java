@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 @API(status = API.Status.EXPERIMENTAL)
-public class AsmHook {
+public final class AsmHook {
     public static @Nullable String langPatchHookWithFallback(
             String key, Map<String, String> translations,
             String fallback
@@ -49,4 +49,6 @@ public class AsmHook {
         });
         return ms.getValue();
     }
+
+    private AsmHook() {}
 }
