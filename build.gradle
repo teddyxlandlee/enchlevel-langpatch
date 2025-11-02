@@ -69,6 +69,7 @@ dependencies {
     //compileOnly project(':compile-lib')
     compileOnly 'org.jetbrains:annotations:19.0.0'
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+    testRuntimeOnly 'net.fabricmc:fabric-loader:0.17.3'
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
