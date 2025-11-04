@@ -14,7 +14,8 @@ final class ValueTableHolder {
     static {
         // sha256 3c09cc78904fc47fd583b680ecfa9e2ad7370787ea149d843a56fb8f8c15c8d4
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
-                ValueTableHolder.class.getResourceAsStream("ValueTable.txt")
+                ValueTableHolder.class.getResourceAsStream("ValueTable.txt"),
+                "ValueTable.txt not found. This should not happen."
         ), StandardCharsets.UTF_8))) {
             for (int x = 0; x < 3999; x++) ROMAN[x] = reader.readLine();
             for (int x = 0; x < 256; x++) CHINESE[0][x] = reader.readLine();
