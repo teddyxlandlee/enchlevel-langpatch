@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 public final class NumberFormatUtil {
     private NumberFormatUtil() {}
 
-    static boolean isDigit(@NotNull String s, final int offset) {
+    static boolean isDigit(@NotNull CharSequence s, final int offset) {
         int li = s.length() - 1;
         if (li < offset) return false;
         int c = s.charAt(offset);

@@ -1,13 +1,11 @@
 package xland.mcmod.enchlevellangpatch.mixin;
 
 import com.google.common.base.Suppliers;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.Version;
-import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.*;
 import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import org.apiguardian.api.API;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -25,7 +23,8 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     private static final Supplier<VersionPredicate> V12112_ABOVE = parseVersionPredicate(">=1.21.12-");
     /** Definitely not moj-named. */
     private static final Supplier<VersionPredicate> PRE_25W44A = parseVersionPredicate("<=1.21.11-alpha.25.44.a");
-    private static final String UNOBFUSCATED_SUFFIX = "_unobfuscated";
+    /** SemVer support for <code>&lt;snapshot&gt;[ _][uU]nobfuscated</code> since Fabric Loader 0.18.0 */
+    private static final String UNOBFUSCATED_BUILD = "unobfuscated";
 
     private Version minecraftVersion;
     private boolean is1194OrLater;
@@ -51,7 +50,11 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         if (laterThanMountsOfMayhem) return true;   // definitely moj-named, according to Mojang's declaration
 
         // (25w44a, 1.21.11], likely dual-versioned
-        return FabricLoader.getInstance().getRawGameVersion().endsWith(UNOBFUSCATED_SUFFIX);
+        return minecraftVersion instanceof SemanticVersion &&
+                ((SemanticVersion) minecraftVersion).getBuildKey()
+                        .orElse("")
+                        .toLowerCase(Locale.ROOT)
+                        .contains(UNOBFUSCATED_BUILD);
 
         // An alternative option (still unclear of its availability)
         // return "official".equals(FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace());
