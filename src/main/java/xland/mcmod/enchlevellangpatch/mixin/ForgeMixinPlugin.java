@@ -39,7 +39,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
         try {
             // 1.13.1+
             Class<?> c = Class.forName("net.minecraftforge.versions.forge.ForgeVersion");
-            MethodHandle mh = MethodHandles.lookup().findStatic(c, "getSpec", MethodType.methodType(String.class));
+            MethodHandle mh = MethodHandles.lookup().findStatic(c, "getVersion", MethodType.methodType(String.class));
             return (String) mh.invokeExact();
         } catch (ClassNotFoundException ignored) {
             // probably 1.12.2
