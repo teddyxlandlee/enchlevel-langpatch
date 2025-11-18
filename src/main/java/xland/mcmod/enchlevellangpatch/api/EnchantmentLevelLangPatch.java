@@ -43,7 +43,7 @@ public interface EnchantmentLevelLangPatch {
      * @return The number in roman format, or {@code null} if
      * {@code num} is out of range ({@code 1..3998}).
      */
-    @Nullable @SuppressWarnings("unused")
+    @Nullable
     static String intToRoman(@Range(from = 1, to = 3998) int num) {
         return NumberFormatUtil.intToRoman(num);
     }
@@ -128,7 +128,6 @@ public interface EnchantmentLevelLangPatch {
      *
      * @see #apply(Map, String)
      */
-    @SuppressWarnings("unused")
     default @Nullable String apply(@Unmodifiable Map<String, String> translationStorage, String key, String fallback) {
         return apply(translationStorage, key);
     }
