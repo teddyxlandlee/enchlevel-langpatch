@@ -21,7 +21,7 @@ import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
  * @see EnchantmentLevelLangPatch#registerPotionPatch
  */
 @API(status = API.Status.STABLE)
-public class EnchantmentLevelLangPatchConfig {
+public final class EnchantmentLevelLangPatchConfig {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("LangPatch/Config");
 
@@ -45,7 +45,7 @@ public class EnchantmentLevelLangPatchConfig {
      */
     @SuppressWarnings("unused")
     public static void setCurrentEnchantmentHooks(@Nullable EnchantmentLevelLangPatch hooks) {
-        if (LangPatchImpl.ENCHANTMENT_HOOK.isFrozen()) {
+        if (isEnchantmentHooksFrozen()) {
             LOGGER.warn(MARKER, "Enchantment Hooks is frozen. Changes may not be applied.");
             return;
         }
@@ -64,11 +64,37 @@ public class EnchantmentLevelLangPatchConfig {
      */
     @SuppressWarnings("unused")
     public static void setCurrentPotionHooks(@Nullable EnchantmentLevelLangPatch hooks) {
-        if (LangPatchImpl.ENCHANTMENT_HOOK.isFrozen()) {
+        if (isPotionHooksFrozen()) {
             LOGGER.warn(MARKER, "Potion Hooks is frozen. Changes may not be applied.");
             return;
         }
         currentPotionHooksId = LangPatchImpl.POTION_HOOK.getId(hooks);
+    }
+
+    /**
+     * <p>Returns whether the enchantment level patch registry is frozen. If frozen,
+     * hooks can neither be registered nor set active.</p>
+     *
+     * @return whether the enchantment level patch registry is frozen
+     * @see #setCurrentEnchantmentHooks
+     */
+    @SuppressWarnings("unused")
+    @API(status = API.Status.EXPERIMENTAL)
+    public static boolean isEnchantmentHooksFrozen() {
+        return LangPatchImpl.ENCHANTMENT_HOOK.isFrozen();
+    }
+
+    /**
+     * <p>Returns whether the potion potency patch registry is frozen. If frozen,
+     * hooks can neither be registered nor set active.</p>
+     *
+     * @return whether the potion potency patch registry is frozen
+     * @see #setCurrentPotionHooks
+     */
+    @SuppressWarnings("unused")
+    @API(status = API.Status.EXPERIMENTAL)
+    public static boolean isPotionHooksFrozen() {
+        return LangPatchImpl.POTION_HOOK.isFrozen();
     }
 
     /**

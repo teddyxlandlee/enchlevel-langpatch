@@ -11,7 +11,6 @@ import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import java.util.Map;
 import java.util.Objects;
 
-//** @see net.minecraft.core.DefaultedRegistry */
 @API(status = API.Status.INTERNAL)
 public final class IndependentLangPatchRegistry {
     private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map = HashBiMap.create();

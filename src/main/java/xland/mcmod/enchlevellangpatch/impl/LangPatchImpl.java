@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -70,9 +71,13 @@ public final class LangPatchImpl {
 
     // To avoid same-check
     @SuppressWarnings("FunctionalExpressionCanBeFolded")
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.5")
+    @Deprecated
     private static final EnchantmentLevelLangPatch ROMAN_ENCHANTMENT_HOOKS = DEFAULT_ENCHANTMENT_HOOKS::apply;
 
     @SuppressWarnings("FunctionalExpressionCanBeFolded")
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.5")
     private static final EnchantmentLevelLangPatch ROMAN_POTION_HOOKS = DEFAULT_POTION_HOOKS::apply;
 
     private static @Nullable String configuredFormat(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {

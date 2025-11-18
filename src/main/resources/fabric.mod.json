@@ -26,9 +26,6 @@
   "depends": {
     "fabricloader": ">=0.18.0"
   },
-  "recommends": {
-    "fabric-resource-loader-v0": "*"
-  },
   "breaks": {
     "enchlevel-langpatch-config": "<2",
     "enchlevel-langpatch-config2": "<3",
@@ -36,6 +33,7 @@
     "enchlevel-langpatch-fa2fo": "<2"
   },
   "suggests": {
+    "fabric-resource-loader-v1": "*",
     "langpatch-conf4": ">=4"
   }
 }
