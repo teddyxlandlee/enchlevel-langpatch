@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"xland.mcmod.enchlevellangpatch.api"},{"l":"xland.mcmod.enchlevellangpatch.impl"},{"l":"xland.mcmod.enchlevellangpatch.mixin"},{"l":"所有程序包","u":"allpackages-index.html"}];updateSearchResults();
+packageSearchIndex = [{"l":"xland.mcmod.enchlevellangpatch.api"},{"l":"所有程序包","u":"allpackages-index.html"}];updateSearchResults();
