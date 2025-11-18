@@ -70,12 +70,12 @@ loadScripts(document, 'script');</script>
 <section class="package-description" id="package-description">
 <div class="block"><p>The API of Enchantment Level Language Patch.</p>
  <p></p>
- <h2>这是做什么用的？</h2>
+ <h2 id="what-is-it-for--heading">这是做什么用的？</h2>
  <p>这套 API 用于在不修改语言文件的情况下，对 MC 本身、模组和资源包中的翻译进行动态修改。</p>
  <p>也就是说，你可以写一个附属模组，批量修改一些翻译。</p>
  <p>特别地，你可以为附魔等级和药水等级定义新的格式。</p>
  <p></p>
- <h2>如何注册一个补丁？</h2>
+ <h2 id="how-can-i-register-a-patch--heading">如何注册一个补丁？</h2>
  <p>示例如下：</p><blockquote><pre>
      final int prefixLen = "item.minecraft.".length();
      <a href="EnchantmentLevelLangPatch.html#registerPatch(java.util.function.Predicate,xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch)"><code>EnchantmentLevelLangPatch.registerPatch(java.util.function.Predicate&lt;java.lang.String&gt;, xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch)</code></a>(
@@ -104,7 +104,14 @@ loadScripts(document, 'script');</script>
      // 立即应用该补丁：
      <a href="EnchantmentLevelLangPatchConfig.html#setCurrentEnchantmentHooks(xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch)"><code>setCurrentEnchantmentHooks(xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch)</code></a>(patch);
  </pre></blockquote>
- <h3>附属模组入口 (entrypoint)</h3>
+
+    <h3 id="note-1-19-4-implementation-heading">注意: 1.19.4+ 下的实现</h3>
+    <p>自 Minecraft 1.19.4 起，游戏本体调用 <a href="EnchantmentLevelLangPatch.html#apply(java.util.Map,java.lang.String,java.lang.String)"><code><b>有翻译默认值</b>的补丁</code></a> （而非<a href="EnchantmentLevelLangPatch.html#apply(java.util.Map,java.lang.String)"><code><b>没有</b>默认值的</code></a>)。</p>
+    <p>若想创建<b>仅</b>用于 Minecraft 1.19.4+ 的补丁，可以调用<a href="EnchantmentLevelLangPatch.html#withFallback(xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch.WithFallback)"><code>EnchantmentLevelLangPatch.withFallback(xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch.WithFallback)</code></a>。
+        </p>
+
+
+    <h3 id="mod-entrypoint-heading">附属模组入口 (entrypoint)</h3>
  <p>Fabric/Quilt：附属模组入口应当定义为 <code>"enchlevel-langpatch.init"</code> 而非 <code>"client"</code>。入口类的类型为
  <code>ClientModInitializer</code>。</p>
  <p>Forge：在模组的构造方法中调用，而非 <code>FMLClientSetupEvent</code>。</p></div>
