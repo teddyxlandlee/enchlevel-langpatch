@@ -24,22 +24,22 @@
  */
 "use strict";
 const messages = {
-    enterTerm: "输入搜索词",
-    noResult: "未找到结果",
-    oneResult: "找到一个结果",
-    manyResults: "找到 {0} 个结果",
-    loading: "正在加载搜索索引...",
-    searching: "正在搜索...",
-    redirecting: "正在重定向到第一个结果...",
-    linkIcon: "链接图标",
-    linkToSection: "链接到此节"
+    enterTerm: "Enter a search term",
+    noResult: "No results found",
+    oneResult: "Found one result",
+    manyResults: "Found {0} results",
+    loading: "Loading search index...",
+    searching: "Searching...",
+    redirecting: "Redirecting to first result...",
+    linkIcon: "Link icon",
+    linkToSection: "Link to this section"
 }
 const categories = {
-    modules: "模块",
-    packages: "程序包",
-    types: "类和接口",
-    members: "成员",
-    searchTags: "搜索标记"
+    modules: "Modules",
+    packages: "Packages",
+    types: "Classes and Interfaces",
+    members: "Members",
+    searchTags: "Search Tags"
 };
 const highlight = "<span class='result-highlight'>$&</span>";
 const NO_MATCH = {};
