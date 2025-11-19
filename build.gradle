@@ -154,7 +154,7 @@ jar {
                 "Implementation-Version"  : project.version,
                 "Implementation-Vendor"   : "teddyxlandlee",
                 "Implementation-Timestamp": Instant.now(),
-                "MixinConfigs" : "ellp.mixins-forge.json",  // for FML
+                "MixinConfigs" : "ellp-forge.mixins.json",  // for FML
         ])
     }
 }

@@ -13,7 +13,6 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
     private volatile Integer forgeVersion;
     private static final int V117 = 36, V1194 = 45, V1206 = 50;
     private static final int V1161 = 32;
-    private static final String V1122 = "14.UNKNOWN";
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -35,23 +34,30 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
 			return "-1";
 		} catch (ClassNotFoundException ignored) {
 		}
-    
+
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             // 1.13.1+
             Class<?> c = Class.forName("net.minecraftforge.versions.forge.ForgeVersion");
-            MethodHandle mh = MethodHandles.lookup().findStatic(c, "getVersion", MethodType.methodType(String.class));
+            MethodHandle mh = lookup.findStatic(c, "getVersion", MethodType.methodType(String.class));
             return (String) mh.invokeExact();
         } catch (ClassNotFoundException ignored) {
             // probably 1.12.2
         } catch (Throwable e) {
-            throw new IllegalStateException("Not in Forge environment", e);
+            throw new IllegalStateException("Corrupted environment", e);
         }
 
         try {
-            // 1.12.2
-            Class.forName("net.minecraftforge.fml.relauncher.Side");
-            return V1122;
+            // 1.12.2~
+            Class<?> c = Class.forName("net.minecraftforge.fml.relauncher.FMLInjectionData");
+            java.lang.reflect.Method m = c.getMethod("data");
+            Object[] arr = (Object[]) lookup.unreflect(m).invoke();
+            if (arr == null || arr.length == 0) throw new ArrayIndexOutOfBoundsException(0);
+            return String.valueOf(arr[0]);
         } catch (ClassNotFoundException ignored) {
+            // probably not Forge 1.12.2
+        } catch (Throwable e) {
+            throw new IllegalStateException("Corrupt environment", e);
         }
 
         throw new IllegalStateException("Not in Forge environment");
