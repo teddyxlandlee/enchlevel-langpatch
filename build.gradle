@@ -310,8 +310,8 @@ publishMods {
     )
 
     additionalFiles.from(
-            'packAllArabic',
-            'packAllRoman',
+            tasks.packAllArabic,
+            tasks.packAllRoman,
     )
 }
 
