@@ -26,15 +26,5 @@ final class PredicatedPatch {
         return langPatch;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof PredicatedPatch)) return false;
-        PredicatedPatch that = (PredicatedPatch) o;
-        return this.keyPredicate.equals(that.keyPredicate) && this.langPatch.equals(that.langPatch);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * keyPredicate.hashCode() + langPatch.hashCode();
-    }
+    // no need for equals() and hashCode()
 }

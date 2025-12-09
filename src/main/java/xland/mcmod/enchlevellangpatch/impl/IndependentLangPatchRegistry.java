@@ -25,6 +25,7 @@ public final class IndependentLangPatchRegistry {
     public static final NamespacedKey LP_DEFAULT = NamespacedKey.of("enchlevel-langpatch:default");
 
     IndependentLangPatchRegistry(@NotNull String registryName, NamespacedKey defaultId) {
+        Objects.requireNonNull(registryName, "registryName");
         this.registryName = registryName;
         this.defaultId = defaultId;
     }

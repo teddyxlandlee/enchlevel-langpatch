@@ -1,8 +1,8 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.VisibleForTesting;
 
 @VisibleForTesting
 public final class ChineseExchange {
@@ -18,28 +18,33 @@ public final class ChineseExchange {
         static final ChineseExchange[] EXCHANGES = {
                 new ChineseExchange(
                         new String[]{"", "十", "百", "千"},
-                        new char[]{'零', '一', '二', '三', '四', '五', '六', '七', '八', '九'},
-                        new String[]{"", "万", "亿", "万亿"}
+                        "零一二三四五六七八九".toCharArray(),
+                        new String[]{"", "万", "亿", "万亿"},
+                        "零", "十一"
                 ),
                 new ChineseExchange(
                         new String[]{"", "拾", "佰", "仟"},
-                        new char[]{'零', '壹', '貳', '叄', '肆', '伍', '陸', '柒', '捌', '玖'},
-                        new String[]{"", "萬", "億", "萬億"}
+                        "零壹貳叄肆伍陸柒捌玖".toCharArray(),
+                        new String[]{"", "萬", "億", "兆"},
+                        "零", "拾壹"
                 )
         };
     }
 
     static final int NORMAL = 0, UPPER = 1;
 
-    ChineseExchange(String[] pos, char[] num, String[] sec) {
+    ChineseExchange(String[] pos, char[] num, String[] sec, String zeroS, String tenOne) {
         this.pos = pos;
         this.num = num;
         this.sec = sec;
-        zeroC = num[0];
-        zeroS = String.valueOf(zeroC);
-        tenOne = pos[1] + num[1];
+        this.zeroC = num[0];
+        this.zeroS = zeroS;
+        this.tenOne = tenOne;
+
+//        assert tenOne.equals(pos[1] + num[1]) && zeroS.equals(String.valueOf(num[0]));
     }
 
+    @VisibleForTesting
     public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num, int type) {
         if (num < 256) {
             return ValueTableHolder.CHINESE[type][num];
@@ -84,7 +89,7 @@ public final class ChineseExchange {
             return ret.toString();
         
         if (tenOne.equals(ret.substring(i)))
-            ret.setLength(++i);    // fix: 一十 -> 十
+            ret.setLength(i + 1);    // fix: 一十 -> 十
         return ret.reverse().toString();
     }
 
