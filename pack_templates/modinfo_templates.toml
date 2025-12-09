@@ -1,0 +1,14 @@
+modLoader="javafml"
+loaderVersion='(0,)'
+license='CC0-1.0'
+
+[[mods]]
+modId='${pack_id}'
+version='${pack_version}'
+description="${pack_desc}"
+
+[[dependencies.'${pack_id}']]
+modId='enchlevellangpatch'
+type='required'     # neo
+mandatory=true      # mcf
+versionRange='(3,)'

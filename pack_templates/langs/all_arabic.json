@@ -1,0 +1,6 @@
+{
+  "langpatch.conf.enchantment.override": "true",
+  "langpatch.conf.potion.override": "true",
+  "langpatch.conf.enchantment.default.type": "numeral",
+  "langpatch.conf.potion.default.type": "numeral"
+}

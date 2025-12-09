@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "${pack_id}",
+  "version": "${pack_version}",
+  "description": "${pack_desc}",
+  "depends": {
+    "enchlevel-langpatch": ">3"
+  },
+  "custom": {
+    "langpatch:generated": true
+  },
+  "license": "CC0-1.0"
+}

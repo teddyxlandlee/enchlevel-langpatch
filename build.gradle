@@ -141,6 +141,10 @@ javadoc {
     }
 }
 
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
 jar {
     from ("LICENSE") {
         rename {  "META-INF/${it}_${project.archives_base_name}"  }
@@ -157,6 +161,103 @@ jar {
                 "MixinConfigs" : "ellp-forge.mixins.json",  // for FML
         ])
     }
+}
+
+import javax.inject.Inject
+
+abstract class PackTemplate extends Jar {
+    @Input
+    final String templateId
+
+    private static final def DATE_FORMATTER = DateTimeFormatter.ofPattern('yyyyMMdd')
+    private static final def PKG_ENCODER = Base64.urlEncoder.withoutPadding()
+
+    private static final String b64encode(String input) {
+        return PKG_ENCODER.encodeToString(input.getBytes('utf-8')).replace('-', '$')
+    }
+
+    @Inject
+    PackTemplate(String templateId) {
+        this.templateId = templateId
+        def stubModId = 'lpstub_' + templateId
+
+        configure {
+            def packVersion = "${DATE_FORMATTER.format(ZonedDateTime.now())}.${project.template_patch_number ?: '0'}"
+
+            def templateProperties = [
+                    'pack_id': stubModId,
+                    'pack_version': packVersion,
+                    'pack_desc': "Generated stub pack for enchlevel-langpatch: '${templateId}'",
+            ]
+
+            inputs.properties templateProperties
+
+            from(project.file('pack_templates/fmj_templates.json')) {
+                rename { 'fabric.mod.json' }
+                expand(templateProperties)
+            }
+            ['META-INF/mods.toml', 'META-INF/neoforge.mods.toml'].each {fn ->
+                from(project.file('pack_templates/modinfo_templates.toml')) {
+                    rename { fn }
+                    expand(templateProperties)
+                }
+            }
+            ['en_us', 'zh_cn', 'lzh'].each {langCode ->
+                def targetFile = "assets/langpatch-generated-stubpack/lang/${langCode}.json"
+                from(project.file("pack_templates/langs/${templateId}.json")) {
+                    rename { targetFile }
+                }
+            }
+
+            this.archiveFileName.convention(project.provider {
+                "lpstub-${templateId}-${packVersion}.jar"
+            })
+
+            def pkgName = "lpstub_${PackTemplate.b64encode(templateId)}"
+            def classFile = project.layout.buildDirectory.dir('tmp/lpstub').map { it.file(pkgName + '.bin') }
+            def className = pkgName + '/a'
+            def genClass = project.tasks.register("packTemplateModClass_${templateId}") {
+                def parts = [
+                        "yv66vgAAADQAEQE=", // ClassFile Header
+                        // CP#1: utf8 modId
+                        "AQ==", // Constant '1'
+                        // CP#2: utf8 className
+                        "BwACAQAQamF2YS9sYW5nL09iamVjdAcABAEAI0xuZXQvbWluZWNyYWZ0Zm9yZ2UvZm1sL2NvbW1" +
+                                "vbi9Nb2Q7AQAFdmFsdWUBAB5MbmV0L25lb2ZvcmdlZC9mbWwvY29tbW9uL01vZDsBAA" +
+                                "Y8aW5pdD4BAAMoKVYMAAkACgoABQALAQAJR2VuZXJhdGVkAQAEQ29kZQEAClNvdXJjZ" +
+                                "UZpbGUBABlSdW50aW1lVmlzaWJsZUFubm90YXRpb25zACEAAwAFAAAAAAABAAEACQAK" +
+                                "AAEADgAAABEAAQABAAAABSq3AAyxAAAAAAACAA8AAAACAA0AEAAAABQAAgAGAAEAB3M" +
+                                "AAQAIAAEAB3MAAQ==",    // Rest of classfile
+                ]
+                doLast {
+                    classFile.get().asFile.withDataOutputStream {dos ->
+                        dos.write(parts[0].decodeBase64())
+                        dos.writeUTF(stubModId) // modId
+                        dos.write(parts[1].decodeBase64())
+                        dos.writeUTF(className) // className
+                        dos.write(parts[2].decodeBase64())
+                    }
+                }
+            }
+
+            from(genClass) {
+                rename { className + '.class' }
+            }
+
+            destinationDirectory.set project.layout.buildDirectory.dir('lpstub')
+        }
+    }
+}
+
+tasks.register('packAllArabic', PackTemplate.class, 'all_arabic')
+tasks.register('packAllRoman', PackTemplate.class, 'roman')
+
+tasks.register('templatePacks') {
+    dependsOn 'packAllArabic', 'packAllRoman'
+}
+
+tasks.build {
+    dependsOn 'templatePacks'
 }
 
 import me.modmuss50.mpp.ReleaseType
@@ -201,6 +302,15 @@ publishMods {
 		}
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 	}
+
+    additionalFiles.from(
+            tasks.sourcesJar
+    )
+
+    additionalFiles.from(
+            'packAllArabic',
+            'packAllRoman',
+    )
 }
 
 // configure the maven publication

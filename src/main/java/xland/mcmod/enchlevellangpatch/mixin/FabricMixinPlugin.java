@@ -15,9 +15,11 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     private static final Supplier<VersionPredicate> V1194_ABOVE = parseVersionPredicate(">=1.19.4-");
     /**
      * The version Mojang <b>declares</b> to completely remove obfuscation.
-     * Hopefully Mounts of Mayhem won't jump to 1.22 or something.
+     * Hopefully there's no hotfix for Mounts of Mayhem or something.
      * @see <a href='https://www.minecraft.net/zh-hans/article/removing-obfuscation-in-java-edition'>
      *     Removing obfuscation in Java Edition - minecraft.net</a>
+     * @see <a href='https://www.minecraft.net/zh-hans/article/minecraft-new-version-numbering-system'>
+     *     Minecraft's new version numbering system</a>
      */
     @API(status = API.Status.EXPERIMENTAL)
     private static final Supplier<VersionPredicate> V12112_ABOVE = parseVersionPredicate(">=1.21.12-");
