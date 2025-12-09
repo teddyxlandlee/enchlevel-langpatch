@@ -1,7 +1,5 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
@@ -27,7 +25,8 @@ public final class AsmHook {
             String key, Map<String, String> translations,
             String fallback, boolean useFallback
     ) {
-        Mutable<@Nullable String> ms = new MutableObject<>();
+//        Mutable<@Nullable String> ms = new MutableObject<>();
+        String[] ret = new String[1];   // ret[0] == null
         final Map<String, String> unmodifiable = Collections.unmodifiableMap(translations);
         LangPatchImpl.forEach((Predicate<String> keyPredicate,
                                EnchantmentLevelLangPatch valueMapping) -> {
@@ -40,12 +39,14 @@ public final class AsmHook {
                 }
                 if (candidate == null) return false;    // user skip
 
-                ms.setValue(candidate);
+//                ms.setValue(candidate);
+                ret[0] = candidate;
                 return true;    // interrupt
             }
             return false;   // predicate fail, skip
         });
-        return ms.getValue();
+//        return ms.getValue();
+        return ret[0];
     }
 
     private AsmHook() {}

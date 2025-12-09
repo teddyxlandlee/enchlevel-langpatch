@@ -48,32 +48,19 @@ allprojects {
             // Formerly COVID-Trump
             url = 'https://mvn.7c7.icu'
         }
-        maven {
-            name = "TerraformersMC"
-            url  = 'https://maven.terraformersmc.com/releases/'
-        }
     }
 }
 
 dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation 'com.google.guava:guava:21.0'
-    implementation 'org.apache.commons:commons-lang3:3.5'
     implementation 'it.unimi.dsi:fastutil:8.2.1'
     implementation 'net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5'
     implementation 'org.apache.logging.log4j:log4j-api:2.8.1'
-    // The maximum version which is compatible with Java 8.
-    // Use it to load mod translations.
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
-    //compileOnly project(':compile-lib')
     compileOnly 'org.jetbrains:annotations:26.0.2'
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
-    testRuntimeOnly 'net.fabricmc:fabric-loader:0.17.3'
-    // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-    // You may need to force-disable transitiveness on them.
-
-    //modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 forgeInitInjector {
@@ -158,7 +145,7 @@ jar {
                 "Implementation-Version"  : project.version,
                 "Implementation-Vendor"   : "teddyxlandlee",
                 "Implementation-Timestamp": Instant.now(),
-                "MixinConfigs" : "ellp-forge.mixins.json",  // for FML
+                "MixinConfigs" : "ellp-forge.mixins.json",  // for Forge FML
         ])
     }
 }

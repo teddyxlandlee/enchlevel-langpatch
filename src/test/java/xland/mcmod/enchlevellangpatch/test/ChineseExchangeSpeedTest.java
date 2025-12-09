@@ -1,6 +1,5 @@
 package xland.mcmod.enchlevellangpatch.test;
 
-import org.apache.commons.lang3.Validate;
 import xland.mcmod.enchlevellangpatch.impl.ChineseExchange;
 
 import java.util.Locale;
@@ -84,7 +83,7 @@ public final class ChineseExchangeSpeedTest {
     }
 
     public static void test255Map() throws Throwable {
-        Validate.notNull(PrecalculatedMap.MAP); // load the map
+        Objects.requireNonNull(PrecalculatedMap.MAP); // load the map
         elapseTime(() -> {
             Random rng = new Random(-4959108356860759198L);
             for (int cc = 0; cc < 100_000; cc++) {
@@ -95,7 +94,7 @@ public final class ChineseExchangeSpeedTest {
     }
 
     public static void main(String[] args) throws Throwable {
-        elapseTime(() -> Validate.notNull(PrecalculatedMap.MAP), "load MAP", 1L);
+        elapseTime(() -> Objects.requireNonNull(PrecalculatedMap.MAP), "load MAP", 1L);
         test255Map();
         System.out.println("\n================\n");
         test255();

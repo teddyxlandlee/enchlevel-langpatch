@@ -1,6 +1,6 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -129,7 +129,10 @@ public final class LangPatchImpl {
         POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
 
         // preload roman/chinese map
-        Validate.isTrue("I".equals(EnchantmentLevelLangPatch.intToRoman(1)));
+        Preconditions.checkState(
+                "I".equals(EnchantmentLevelLangPatch.intToRoman(1)),
+                "Corrupted Roman/Chinese Map"
+        );
     }
 
     // *** REGISTRY *** //
