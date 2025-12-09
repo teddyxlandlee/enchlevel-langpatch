@@ -230,7 +230,9 @@ abstract class PackTemplate extends Jar {
                                 "AAQAIAAEAB3MAAQ==",    // Rest of classfile
                 ]
                 doLast {
-                    classFile.get().asFile.withDataOutputStream {dos ->
+                    def f = classFile.get().asFile
+                    f.parentFile.mkdirs()
+                    f.withDataOutputStream {dos ->
                         dos.write(parts[0].decodeBase64())
                         dos.writeUTF(stubModId) // modId
                         dos.write(parts[1].decodeBase64())
