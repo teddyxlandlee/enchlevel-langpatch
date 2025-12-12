@@ -29,17 +29,34 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     private static final String UNOBFUSCATED_BUILD = "unobfuscated";
 
     private Version minecraftVersion;
-    private boolean is1194OrLater;
+    private boolean isMojMapped;
 
     private void initVersion() {
         ModContainer minecraft = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new NoSuchElementException("minecraft"));
         minecraftVersion = minecraft.getMetadata().getVersion();
-        is1194OrLater = V1194_ABOVE.get().test(minecraftVersion);
+        targetMethodDesc = targetMethodDesc(is1194OrLater = V1194_ABOVE.get().test(minecraftVersion));
+    }
+
+    private void initNames() {
+        if (isMojMapped) {
+            storageFieldName = "storage";
+            targetMethodName = "getOrDefault";
+        } else {
+            MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
+            storageFieldName = resolver.mapFieldName("intermediary", "net.minecraft.class_1078", "field_5330", "Ljava/util/Map;");
+            targetMethodName = resolver.mapMethodName(
+                    "intermediary",
+                    "net.minecraft.class_1078", "method_4679",
+                    targetMethodDesc
+            );
+        }
     }
 
     @Override
     public void onLoad(String mixinPackage) {
         initVersion();
+        isMojMapped = isMojMapped();
+        initNames();
     }
 
     public boolean isMojMapped() {
@@ -64,13 +81,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
     @Override
     public String getRefMapperConfig() {
-        return isMojMapped() ? null : "ellp.refmap-intermediary.json";
-    }
-
-    @Override
-    public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        final boolean b = mixinClassName.endsWith("1194");
-        return is1194OrLater == b;
+        return isMojMapped ? null : "ellp.refmap-intermediary.json";
     }
 
     private static Supplier<VersionPredicate> parseVersionPredicate(String predicate) {

@@ -279,7 +279,7 @@ publishMods {
 	curseforge {
 		projectId = "529854"
 		minecraftVersionRange {
-			start = "1.16"
+			start = "1.13"
 			end = "latest"
 		}
 		javaVersions(8, 22).each { jv ->
@@ -293,7 +293,7 @@ publishMods {
 	modrinth {
 		projectId = "Lf4kDKU9"
 		minecraftVersionRange {
-			start = "1.16"
+			start = "1.13"
 			end = "latest"
 			includeSnapshots = true
 		}
