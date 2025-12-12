@@ -27,13 +27,15 @@ public class ForgeModLauncherTransformation implements ITransformationService {
 
     @Override
     public void onLoad(IEnvironment env, Set<String> otherServices) {
-        skipMe = (otherServices.contains("mixin")) ||
-                ForgeVersion.FORGE_VERSION >= ForgeVersion.V1161 ||
-                ForgeVersion.FORGE_VERSION < 0;
+        skipMe = otherServices.contains("mixin");
     }
 
     @Override
     public @NotNull List<ITransformer<?>> transformers() {
+        int forgeVersion = ForgeVersion.getForgeVersionAsInt();
+
+        skipMe |= forgeVersion >= ForgeVersion.V1161 || forgeVersion < 0;
+
         if (skipMe) return Collections.emptyList();
 
         return Collections.singletonList(new ITransformer<MethodNode>() {

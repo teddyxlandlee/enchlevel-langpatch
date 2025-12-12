@@ -11,7 +11,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        this.forgeVersion = ForgeVersion.FORGE_VERSION;
+        this.forgeVersion = ForgeVersion.getForgeVersionAsInt();
         this.targetMethodDesc = targetMethodDesc(is1194OrLater = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194);
         initNames();
     }

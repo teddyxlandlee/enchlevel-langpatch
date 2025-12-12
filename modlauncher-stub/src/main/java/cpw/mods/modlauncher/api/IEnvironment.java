@@ -18,9 +18,21 @@
 
 package cpw.mods.modlauncher.api;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 /**
  * System environment. Global properties relevant to the current environment and lookups to find global artifacts
  * in the environment.
  */
 public interface IEnvironment {
+    <T> Optional<T> getProperty(TypesafeMap.Key<T> key);
+
+    static <T> Supplier<TypesafeMap.Key<T>> buildKey(String name, Class<T> clazz) {
+        throw new AssertionError("Trying to invoke a stub method");
+    }
+
+    final class Keys {
+        public static final Supplier<TypesafeMap.Key<String>> VERSION = buildKey("version", String.class);
+    }
 }

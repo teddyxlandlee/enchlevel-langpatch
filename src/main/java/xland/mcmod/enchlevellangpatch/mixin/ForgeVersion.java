@@ -5,14 +5,16 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 final class ForgeVersion {
     private ForgeVersion() {}
 
-    private static @NotNull String getForgeVersion() {
+    static @NotNull String getForgeVersion() {
         try {
             // Check Neo environment
-            Class<?> clazz = Class.forName("net.neoforged.api.distmarker.Dist");
+            Class.forName("net.neoforged.api.distmarker.Dist");
             return "-1";
         } catch (ClassNotFoundException ignored) {
         }
@@ -42,11 +44,28 @@ final class ForgeVersion {
             throw new IllegalStateException("Corrupt environment", e);
         }
 
+        try {
+            Class<?> c = Class.forName("net.minecraftforge.fml.loading.StringSubstitutor");
+            java.lang.reflect.Method method = Arrays.stream(c.getDeclaredMethods()).filter(m -> {
+                if (!"replace".equals(m.getName())) return false;
+                if (m.getReturnType() != String.class) return false;
+                if (!Modifier.isStatic(m.getModifiers()) || !Modifier.isPublic(m.getModifiers())) return false;
+                return m.getParameterCount() == 2 && m.getParameterTypes()[0] == String.class && !m.getParameterTypes()[1].isPrimitive();
+            }).findAny().orElseThrow(NoSuchMethodException::new);
+            return (String) java.lang.invoke.MethodHandles.lookup().unreflect(method).invoke("${global.forgeVersion}", null);
+        } catch (ClassNotFoundException ignored) {
+
+        } catch (Throwable e) {
+            throw new IllegalStateException("Corrupt environment", e);
+        }
+
         throw new IllegalStateException("Not in Forge environment");
+    }
+
+    static int getForgeVersionAsInt() {
+        return Integer.parseInt(getForgeVersion().split("\\.", 2)[0]);
     }
 
     static final int V117 = 36, V1194 = 45, V1206 = 50;
     static final int V1161 = 32;
-
-    static final int FORGE_VERSION = Integer.parseInt(getForgeVersion().split("\\.", 2)[0]);
 }
