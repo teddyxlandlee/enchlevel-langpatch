@@ -55,11 +55,16 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation 'com.google.guava:guava:21.0'
     implementation 'it.unimi.dsi:fastutil:8.2.1'
-    implementation 'net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5'
+    implementation('net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5') {
+        setTransitive(false)
+    }
+    implementation 'org.ow2.asm:asm:6.2'    // used by MCF 1.13.2
+    implementation 'org.ow2.asm:asm-tree:6.2'    // used by MCF 1.13.2
     implementation 'org.apache.logging.log4j:log4j-api:2.8.1'
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
     compileOnly 'org.jetbrains:annotations:26.0.2'
+    compileOnly project(':modlauncher-stub')
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
 }
 
