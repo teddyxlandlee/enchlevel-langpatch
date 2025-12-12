@@ -33,7 +33,9 @@ public final class LangPatchImpl {
     public static final String KEY_POTION_FORMAT = "potion.potency.x";
 
     // *** BUILT-IN REGISTRIES & HOOKS *** //
-    private static final List<PredicatedPatch> PREDICATES = Collections.synchronizedList(new ArrayList<>());
+    private static final List<PredicatedPatch> PREDICATES = new ArrayList<>(8);
+    private static final Object PREDICATES_WRITE_LOCK = new Object();
+    private static volatile boolean isPredicatesLocked;
 
     private static final EnchantmentLevelLangPatch DEFAULT_ENCHANTMENT_HOOKS =
             (Map<String, String> translationStorage, String key) -> {
@@ -165,12 +167,21 @@ public final class LangPatchImpl {
 
     public static void register(Predicate<String> keyPredicate,
                                 EnchantmentLevelLangPatch edition) {
-        PREDICATES.add(new PredicatedPatch(keyPredicate, edition));
+        synchronized (PREDICATES_WRITE_LOCK) {
+            if (isPredicatesLocked) {
+                LOGGER.warn(MARKER, "Patch list is frozen. The patch may not be applied.");
+                return;
+            }
+            PREDICATES.add(new PredicatedPatch(keyPredicate, edition));
+        }
     }
 
     private static void lockAll() {
         ENCHANTMENT_HOOK.freeze();
         POTION_HOOK.freeze();
+        synchronized (PREDICATES_WRITE_LOCK) {
+            isPredicatesLocked = true;
+        }
         LOGGER.debug(MARKER, "Registries are locked");
     }
 
@@ -235,10 +246,9 @@ public final class LangPatchImpl {
     // *** MINECRAFT HOOK *** //
 
     static void forEach(InterruptablePatchConsumer consumer) {
-        synchronized (PREDICATES) {
-            for (PredicatedPatch patch : PREDICATES) {
-                if (consumer.interrupt(patch)) return;
-            }
+        // no need to synchronize since PREDICATES is locked.
+        for (PredicatedPatch patch : PREDICATES) {
+            if (consumer.interrupt(patch)) return;
         }
     }
 

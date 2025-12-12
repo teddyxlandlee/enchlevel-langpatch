@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public final class AsmHook {
     public static @Nullable String langPatchHookWithFallback(
             String key, Map<String, String> translations,
