@@ -45,6 +45,7 @@ final class ForgeVersion {
         }
 
         try {
+            // If in bootstrap stage where Forge cannot be found...
             Class<?> c = Class.forName("net.minecraftforge.fml.loading.StringSubstitutor");
             java.lang.reflect.Method method = Arrays.stream(c.getDeclaredMethods()).filter(m -> {
                 if (!"replace".equals(m.getName())) return false;

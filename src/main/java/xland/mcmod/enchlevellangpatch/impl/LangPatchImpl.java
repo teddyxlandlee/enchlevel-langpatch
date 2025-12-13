@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -71,17 +70,6 @@ public final class LangPatchImpl {
         }
     }
 
-    // To avoid same-check
-    @SuppressWarnings("FunctionalExpressionCanBeFolded")
-    @ApiStatus.ScheduledForRemoval(inVersion = "3.5")
-    @Deprecated
-    private static final EnchantmentLevelLangPatch ROMAN_ENCHANTMENT_HOOKS = DEFAULT_ENCHANTMENT_HOOKS::apply;
-
-    @SuppressWarnings("FunctionalExpressionCanBeFolded")
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "3.5")
-    private static final EnchantmentLevelLangPatch ROMAN_POTION_HOOKS = DEFAULT_POTION_HOOKS::apply;
-
     private static @Nullable String configuredFormat(Map<String, String> translationStorage, int lvl, String configKey, String formatKey) {
         int cnMode;
         switch (translationStorage.getOrDefault(configKey, "").toLowerCase(Locale.ROOT)) {
@@ -127,8 +115,6 @@ public final class LangPatchImpl {
     static {
         ENCHANTMENT_HOOK.add("enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
         POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
-        ENCHANTMENT_HOOK.add("enchlevel-langpatch:roman", ROMAN_ENCHANTMENT_HOOKS);
-        POTION_HOOK.add("enchlevel-langpatch:roman", ROMAN_POTION_HOOKS);
 
         // preload roman/chinese map
         Preconditions.checkState(
@@ -179,10 +165,14 @@ public final class LangPatchImpl {
     private static void lockAll() {
         ENCHANTMENT_HOOK.freeze();
         POTION_HOOK.freeze();
+        LOGGER.debug(MARKER, "Registries are locked");
+    }
+
+    private static void lockPredicates() {
         synchronized (PREDICATES_WRITE_LOCK) {
             isPredicatesLocked = true;
         }
-        LOGGER.debug(MARKER, "Registries are locked");
+        LOGGER.debug(MARKER, "Predicates are locked");
     }
 
     // *** ENTRYPOINT *** //
@@ -202,6 +192,7 @@ public final class LangPatchImpl {
                         .getCurrentPotionHooks()
                         .apply(translationStorage, key)
         );
+        lockPredicates();
     }
 
     private static void applyConf4() {

@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "xland.mcmod.enchlevellangpatch.mixin",
+  "package": "xland.mcmod.enchlevellangpatch.mixin.stub",
   "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinTranslationStorage"

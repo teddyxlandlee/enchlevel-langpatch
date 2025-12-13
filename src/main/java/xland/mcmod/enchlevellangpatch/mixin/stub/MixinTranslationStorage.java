@@ -1,6 +1,7 @@
-package xland.mcmod.enchlevellangpatch.mixin;
+package xland.mcmod.enchlevellangpatch.mixin.stub;
 
 import org.spongepowered.asm.mixin.Mixin;
+import xland.mcmod.enchlevellangpatch.mixin.AsmTranslationStorage;
 
 /**
  * This is a stub; full implementation see {@link AsmTranslationStorage}.

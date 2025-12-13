@@ -1,12 +1,12 @@
 {
   "mappings": {
-    "xland/mcmod/enchlevellangpatch/mixin/MixinTranslationStorage": {
+    "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
       "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/client/resources/Locale"
     }
   },
   "data": {
     "searge": {
-      "xland/mcmod/enchlevellangpatch/mixin/MixinTranslationStorage": {
+      "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
         "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/client/resources/Locale"
       }
     }

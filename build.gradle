@@ -17,7 +17,7 @@ plugins {
     id 'java'
     id 'idea'
     id "me.modmuss50.mod-publish-plugin" version "1.1.0"
-    id 'xland.gradle.forge-init-injector' version '1.1.1'
+    id 'xland.gradle.forge-init-injector' version '1.2.0'
 }
 
 base {
@@ -48,6 +48,10 @@ allprojects {
             // Formerly COVID-Trump
             url = 'https://mvn.7c7.icu'
         }
+        maven {
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases'
+        }
     }
 }
 
@@ -64,8 +68,11 @@ dependencies {
 
     compileOnly 'org.apiguardian:apiguardian-api:1.1.2'
     compileOnly 'org.jetbrains:annotations:26.0.2'
-    compileOnly project(':modlauncher-stub')
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
+
+    testRuntimeOnly('net.minecraftforge:coremods:0.5.0') {
+        setTransitive(false)
+    }
 }
 
 forgeInitInjector {
@@ -279,7 +286,7 @@ publishMods {
 	curseforge {
 		projectId = "529854"
 		minecraftVersionRange {
-			start = "1.13"
+			start = "1.16"
 			end = "latest"
 		}
 		javaVersions(8, 22).each { jv ->
@@ -293,7 +300,7 @@ publishMods {
 	modrinth {
 		projectId = "Lf4kDKU9"
 		minecraftVersionRange {
-			start = "1.13"
+			start = "1.16"
 			end = "latest"
 			includeSnapshots = true
 		}

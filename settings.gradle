@@ -26,5 +26,3 @@ plugins {
 }
 
 rootProject.name = 'enchlevel-langpatch'
-
-include 'modlauncher-stub'
