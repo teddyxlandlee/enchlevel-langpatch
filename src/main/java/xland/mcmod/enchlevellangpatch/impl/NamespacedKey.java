@@ -1,11 +1,11 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.ApiStatus;
+import org.apiguardian.api.API;
 
 import java.util.regex.Pattern;
 
-@ApiStatus.Internal
+@API(status = API.Status.INTERNAL)
 public final class NamespacedKey implements Comparable<NamespacedKey> {
     private static final Pattern NS_PATTERN, PATH_PATTERN;
     private final String namespace, path;
@@ -18,10 +18,16 @@ public final class NamespacedKey implements Comparable<NamespacedKey> {
         this.path = path;
     }
 
+    // Trusted implementation
+    private NamespacedKey(String namespace, String path, String asString) {
+        this(namespace, path);
+        this.toString = asString;
+    }
+
     public static NamespacedKey of(String s) {
         final int i = s.indexOf(':');
         if (i < 0) return new NamespacedKey("minecraft", s);
-        return new NamespacedKey(s.substring(0, i), s.substring(i+1));
+        return new NamespacedKey(s.substring(0, i), s.substring(i+1), s);
     }
 
     @SuppressWarnings("unused")

@@ -32,12 +32,13 @@ public interface EnchantmentLevelLangPatch {
      */
     static void registerPatch(@NotNull Predicate<String> keyPredicate,
                               @NotNull EnchantmentLevelLangPatch edition) {
-        LangPatchImpl.register(Objects.requireNonNull(keyPredicate), Objects.requireNonNull(edition));
+        LangPatchImpl.register(Objects.requireNonNull(keyPredicate, "keyPredicate"), Objects.requireNonNull(edition, "edition"));
     }
 
     /**
      * Provides an algorithm for int-to-roman translation.
-     * Thanks youdiaodaxue16.
+     * Since there are only 3,998 roman number entries, this implementation
+     * enumerates them from a precalculated table.
      *
      * @param num the integer
      * @return The number in roman format, or {@code null} if
@@ -54,7 +55,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentEnchantmentHooks},
      * which switches the enchantment level patch to whichever you want.</p>
      *
-     * @param id <a href="https://minecraft.wiki/w/Resource_location">
+     * @param id <a href="https://minecraft.wiki/w/Identifier">
      *           Namespaced key</a> for your patch. Please follow the naming rule
      *           of namespaced keys.
      * @param edition Your patch for enchantment levels.
@@ -78,7 +79,7 @@ public interface EnchantmentLevelLangPatch {
      * {@link EnchantmentLevelLangPatchConfig#setCurrentPotionHooks},
      * which switches the potion potency patch to whichever you want.</p>
      *
-     * @param id <a href="https://minecraft.wiki/w/Resource_location">
+     * @param id <a href="https://minecraft.wiki/w/Identifier">
      *           Namespaced key</a> for your patch. Please follow the naming rule
      *           of namespaced keys.
      * @param edition Your patch for potion potencies.

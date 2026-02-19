@@ -52,8 +52,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
         insnList.add(new InsnNode(Opcodes.POP));
 
         // insert insnList to the head
-        insnList.add(m.instructions);
-        m.instructions = insnList;
+        m.instructions.insert(insnList);
     }
 
     @Override
