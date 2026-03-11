@@ -2,6 +2,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.lang.invoke.*;
@@ -13,20 +14,17 @@ import java.util.function.Predicate;
 @SuppressWarnings("unused")
 public final class AsmHook {
     public static @Nullable String langPatchHookWithFallback(
-            String key, Map<String, String> translations,
-            String fallback
+            String key, @Unmodifiable Map<String, String> translations, String fallback
     ) {
         return langPatchHook(key, translations, fallback, true);
     }
 
-    public static @Nullable String langPatchHook(
-            String key,
-            Map<String, String> translations) {
+    public static @Nullable String langPatchHook(String key, @Unmodifiable Map<String, String> translations) {
         return langPatchHook(key, translations, null, false);
     }
 
     private static @Nullable String langPatchHook(
-            String key, Map<String, String> translations,
+            String key, @Unmodifiable Map<String, String> translations,
             String fallback, boolean useFallback
     ) {
         /*
