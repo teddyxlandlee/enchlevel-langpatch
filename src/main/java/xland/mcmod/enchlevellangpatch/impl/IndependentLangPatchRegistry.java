@@ -102,7 +102,9 @@ public final class IndependentLangPatchRegistry {
         try {
             checkFreeze();
             this.snapshot = null;   // This is unnecessary, but let's do this
-            return this.map.remove(key);
+            EnchantmentLevelLangPatch oldValue = this.map.remove(key);
+            if (oldValue != null && Objects.equals(defaultId, key)) defaultValue = null;
+            return oldValue;
         } finally {
             readWriteLock.writeLock().unlock();
         }
