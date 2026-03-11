@@ -12,7 +12,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         this.forgeVersion = ForgeVersion.getForgeVersionAsInt();
-        this.targetMethodDesc = targetMethodDesc(is1194OrLater = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194);
+        this.targetMethodDesc = targetMethodDesc(appliesFallback = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194);
         initNames();
     }
 
@@ -26,6 +26,11 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
             storageFieldName = "field_135032_a";
             targetMethodName = "func_135026_c";
             refMapName = "ellp.refmap-113.json";
+
+            // Coincidentally, `ImmutableMap` wrap happens the same time
+            // `Locale` renames to `ClientLanguage`.
+            // @see AsmHook#langPatchHook(String, Map, String, boolean)
+            appliesUnmodifiableWrap = true;
         } else if (forgeVersion < ForgeVersion.V117) {
             storageFieldName = "field_239495_c_";
             targetMethodName = "func_230503_a_";
@@ -33,7 +38,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
         } else {
             refMapName = null;  // classnames are MojMapped
             storageFieldName = "f_118910_";
-            targetMethodName = is1194OrLater ? "m_118919_" : "m_6834_";
+            targetMethodName = appliesFallback ? "m_118919_" : "m_6834_";
         }
     }
 

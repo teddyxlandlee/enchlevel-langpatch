@@ -10,8 +10,14 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class FabricMixinPlugin extends AbstractMixinPlugin {
-    /** This version introduces Fallback Translation. */
+    /** The {@code storage} field was <i>not</i> unmodifiable until this version. */
+    private static final Supplier<VersionPredicate> UNDER_V116 = parseVersionPredicate("<1.16-alpha.20.22.a");
+
+    /** This version (23w03a, first snapshot of 1.19.4) introduces Fallback Translation. */
     private static final Supplier<VersionPredicate> V1194_ABOVE = parseVersionPredicate(">=1.19.4-");
+
+    /** Definitely not moj-named. */
+    private static final Supplier<VersionPredicate> V25W44A_BELOW = parseVersionPredicate("<=1.21.11-alpha.25.44.a");
     /**
      * The version Mojang <b>declares</b> to completely remove obfuscation.
      * @see <a href='https://www.minecraft.net/zh-hans/article/removing-obfuscation-in-java-edition'>
@@ -20,17 +26,17 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
      *     Minecraft's new version numbering system</a>
      */
     private static final Supplier<VersionPredicate> V26_ABOVE = parseVersionPredicate(">=26");
-    /** Definitely not moj-named. */
-    private static final Supplier<VersionPredicate> PRE_25W44A = parseVersionPredicate("<=1.21.11-alpha.25.44.a");
+
     /** SemVer support for <code>&lt;snapshot&gt;[ _][uU]nobfuscated</code> since Fabric Loader 0.18.0 */
     private static final String UNOBFUSCATED_BUILD = "unobfuscated";
 
     private boolean isMojMapped;
+    private transient Version mcVersion;
 
     private Version initVersion() {
         ModContainer minecraft = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new NoSuchElementException("minecraft"));
         Version minecraftVersion = minecraft.getMetadata().getVersion();
-        targetMethodDesc = targetMethodDesc(is1194OrLater = V1194_ABOVE.get().test(minecraftVersion));
+        targetMethodDesc = targetMethodDesc(appliesFallback = V1194_ABOVE.get().test(minecraftVersion));
         return minecraftVersion;
     }
 
@@ -46,12 +52,15 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
                     "net.minecraft.class_1078", "method_4679",
                     targetMethodDesc
             );
+
+            // small optimization: skip this check if already `isMojMapped`
+            appliesUnmodifiableWrap = UNDER_V116.get().test(mcVersion);
         }
     }
 
     @Override
     public void onLoad(String mixinPackage) {
-        isMojMapped = isMojMapped(initVersion());
+        isMojMapped = isMojMapped(mcVersion = initVersion());
         initNames();
     }
 
@@ -59,7 +68,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         Objects.requireNonNull(minecraftVersion);
         // TODO: so far
 
-        if (PRE_25W44A.get().test(minecraftVersion)) return false;  // definitely not moj-named, no obf removal at all
+        if (V25W44A_BELOW.get().test(minecraftVersion)) return false;  // definitely not moj-named, no obf removal at all
 
         boolean laterThanMountsOfMayhem = V26_ABOVE.get().test(minecraftVersion);
         if (laterThanMountsOfMayhem) return true;   // definitely moj-named, according to Mojang's declaration

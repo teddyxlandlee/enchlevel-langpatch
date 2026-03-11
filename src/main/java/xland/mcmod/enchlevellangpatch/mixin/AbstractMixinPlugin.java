@@ -12,7 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 
 abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
-    protected boolean is1194OrLater;
+    /** >=1.19.4- */
+    protected boolean appliesFallback;
+    protected boolean appliesUnmodifiableWrap;
     protected String storageFieldName;
     protected String targetMethodName;
     protected String targetMethodDesc;
@@ -51,7 +53,7 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
         MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc);
-        AsmTranslationStorage asm = new AsmTranslationStorage(is1194OrLater, targetClassName, storageFieldName);
+        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap);
         asm.accept(method);
     }
 }
