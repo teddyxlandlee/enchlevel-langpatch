@@ -96,6 +96,18 @@ public final class IndependentLangPatchRegistry {
         return defaultId;
     }
 
+    public EnchantmentLevelLangPatch remove(NamespacedKey key) {
+        readWriteLock.writeLock().lock();
+
+        try {
+            checkFreeze();
+            this.snapshot = null;   // This is unnecessary, but let's do this
+            return this.map.remove(key);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
     @Override
     public String toString() {
         return "LPRegistry[" + registryName + ']';
