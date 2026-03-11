@@ -236,18 +236,20 @@ public final class LangPatchImpl {
 
     // *** MINECRAFT HOOK *** //
 
-    static void forEach(InterruptablePatchConsumer consumer) {
+    static @Nullable String loop(InterruptablePatchConsumer consumer) {
         // no need to synchronize since PREDICATES is locked.
+        String s;
         for (PredicatedPatch patch : PREDICATES) {
-            if (consumer.interrupt(patch)) return;
+            if ((s = consumer.interrupt(patch)) != null) return s;
         }
+        return null;
     }
 
     @FunctionalInterface
     interface InterruptablePatchConsumer {
-        boolean interrupt(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch);
+        @Nullable String interrupt(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch);
 
-        default boolean interrupt(PredicatedPatch patch) {
+        @Nullable default String interrupt(PredicatedPatch patch) {
             return interrupt(patch.getKeyPredicate(), patch.getLangPatch());
         }
     }

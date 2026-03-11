@@ -29,9 +29,6 @@ public final class AsmHook {
             String key, Map<String, String> translations,
             String fallback, boolean useFallback
     ) {
-//        Mutable<@Nullable String> ms = new MutableObject<>();
-        String[] ret = new String[1];   // ret[0] == null
-
         /*
         * Post-1.16 versions report the `storage` field already unmodifiable.
         *   [20w22a+ uses Guava's ImmutableMap; 24w33a+ uses Map.copyOf()]
@@ -50,26 +47,13 @@ public final class AsmHook {
         //          translations instanceof ImmutableMap ||
         //          translations == Collections.unmodifiableMap(translations)
 
-        final Map<String, String> unmodifiable = translations;
-        LangPatchImpl.forEach((Predicate<String> keyPredicate,
-                               EnchantmentLevelLangPatch valueMapping) -> {
-            if (keyPredicate.test(key)) {
-                String candidate;
-                if (useFallback) {
-                    candidate = valueMapping.apply(unmodifiable, key, fallback);
-                } else {
-                    candidate = valueMapping.apply(unmodifiable, key);
-                }
-                if (candidate == null) return false;    // user skip
+        return LangPatchImpl.loop((Predicate<String> keyPredicate,
+                            EnchantmentLevelLangPatch valueMapping) -> {
+            if (!keyPredicate.test(key)) return null;   // predicate fail, skip
 
-//                ms.setValue(candidate);
-                ret[0] = candidate;
-                return true;    // interrupt
-            }
-            return false;   // predicate fail, skip
+            // returns nonnull -> interrupt; returns null -> skip
+            return useFallback ? valueMapping.apply(translations, key, fallback) : valueMapping.apply(translations, key);
         });
-//        return ms.getValue();
-        return ret[0];
     }
 
     public static CallSite guardRefEqual(MethodHandles.Lookup lookup, String errorMessage, MethodType methodType,
