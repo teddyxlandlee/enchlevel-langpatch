@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.lang.invoke.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -72,8 +74,8 @@ public final class AsmHook {
 
     public static CallSite guardRefEqual(MethodHandles.Lookup lookup, String errorMessage, MethodType methodType,
                                          MethodHandle... guards) {
+        errorMessage = new String(Base64.getUrlDecoder().decode(errorMessage), StandardCharsets.UTF_8);
         //<editor-fold desc="Parameter checks">
-        Preconditions.checkNotNull(errorMessage, "errorMessage cannot be null");
         final Class<?> paramType = checkSingleArgument(methodType);
         Preconditions.checkArgument(
                 !paramType.isPrimitive(),

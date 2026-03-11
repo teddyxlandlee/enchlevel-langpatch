@@ -13,10 +13,8 @@ import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -109,6 +107,8 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 new Handle(Opcodes.H_INVOKESTATIC, typeImmutableSortedMap.getInternalName(), "copyOf", Type.getMethodDescriptor(typeImmutableSortedMap, typeMap), false)
         );
 
+        final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+
         for (AbstractInsnNode node = m.instructions.getFirst(); node != null; node = node.getNext()) {
             if (node.getOpcode() == Opcodes.PUTFIELD && node instanceof FieldInsnNode) {
                 FieldInsnNode fieldNode = (FieldInsnNode) node;
@@ -120,7 +120,8 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
 
                     Type fieldType = Type.getType(fieldNode.desc);
                     InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
-                            errorMessage, Type.getMethodDescriptor(fieldType, fieldType),
+                            base64Encoder.encodeToString(errorMessage.getBytes(StandardCharsets.UTF_8)),
+                            Type.getMethodDescriptor(fieldType, fieldType),
                             bootstrapMethod, unmodifiableFilters.toArray()
                     );
                     m.instructions.insertBefore(fieldNode, indy);
