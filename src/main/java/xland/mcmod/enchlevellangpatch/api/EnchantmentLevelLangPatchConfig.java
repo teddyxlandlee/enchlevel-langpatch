@@ -79,7 +79,7 @@ public final class EnchantmentLevelLangPatchConfig {
      * @see #setCurrentEnchantmentHooks
      */
     @SuppressWarnings("unused")
-    @API(status = API.Status.EXPERIMENTAL)
+    @API(status = API.Status.EXPERIMENTAL, since = "3.3")
     public static boolean isEnchantmentHooksFrozen() {
         return LangPatchImpl.ENCHANTMENT_HOOK.isFrozen();
     }
@@ -92,7 +92,7 @@ public final class EnchantmentLevelLangPatchConfig {
      * @see #setCurrentPotionHooks
      */
     @SuppressWarnings("unused")
-    @API(status = API.Status.EXPERIMENTAL)
+    @API(status = API.Status.EXPERIMENTAL, since = "3.3")
     public static boolean isPotionHooksFrozen() {
         return LangPatchImpl.POTION_HOOK.isFrozen();
     }
@@ -119,7 +119,6 @@ public final class EnchantmentLevelLangPatchConfig {
      * Registered ID-LangPatch context of potion hooks.
      * @return Registered ID-LangPatch context of potion hooks.
      */
-    @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable
     @SuppressWarnings("unused")
     public static BiMap<String, EnchantmentLevelLangPatch> getPotionHooksContext() {
@@ -130,7 +129,6 @@ public final class EnchantmentLevelLangPatchConfig {
      * Registered ID-LangPatch context of enchantment hooks.
      * @return Registered ID-LangPatch context of enchantment hooks.
      */
-    @API(status = API.Status.EXPERIMENTAL)
     @Unmodifiable
     @SuppressWarnings("unused")
     public static BiMap<String, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
