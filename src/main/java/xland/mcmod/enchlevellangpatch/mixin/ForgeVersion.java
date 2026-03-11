@@ -1,6 +1,7 @@
 package xland.mcmod.enchlevellangpatch.mixin;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -11,14 +12,31 @@ import java.util.Arrays;
 final class ForgeVersion {
     private ForgeVersion() {}
 
-    static @NotNull String getForgeVersion() {
+    private static @Nullable String getForgeVersionOptional() {
         try {
             // Check Neo environment
             Class.forName("net.neoforged.api.distmarker.Dist");
-            return "-1";
+            return null;
         } catch (ClassNotFoundException ignored) {
         }
+        return getForgeVersion();
+    }
 
+    private static @NotNull String getNeoVersion() {
+        Class<?> fmlVersionClass;
+        try {
+            fmlVersionClass = Class.forName("net.neoforged.fml.FMLVersion");
+        } catch (ClassNotFoundException ignored) {
+            return "1";
+        }
+        try {
+            return (String) MethodHandles.lookup().findStatic(fmlVersionClass, "getVersion", MethodType.methodType(String.class)).invokeExact();
+        } catch (Throwable ignored) {
+            return "2";
+        }
+    }
+
+    private static @NotNull String getForgeVersion() {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             // 1.13.1+
@@ -64,9 +82,18 @@ final class ForgeVersion {
     }
 
     static int getForgeVersionAsInt() {
-        return Integer.parseInt(getForgeVersion().split("\\.", 2)[0]);
+        final String forgeVersion = getForgeVersionOptional();
+        if (forgeVersion != null) return parseIntBeforeDot(forgeVersion);
+
+        final String neoVersion = getNeoVersion();
+        return ~parseIntBeforeDot(neoVersion);  // 11.0.0 returns -12
     }
 
-    static final int V117 = 36, V1194 = 45, V1206 = 50;
+    private static int parseIntBeforeDot(String s) {
+        return Integer.parseInt(s.split("\\.", 2)[0]);
+    }
+
+    static final int V117 = 36, V1194 = 45, V1206 = 50, V121Z /*1.21.11*/ = 61;
     static final int V1161 = 32;
+    static final int NEO_11 = ~11;
 }

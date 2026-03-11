@@ -61,6 +61,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         isMojMapped = isMojMapped(mcVersion = initVersion());
+        appliesPutFieldGuardCheck = isMojMapped;
         initNames();
     }
 

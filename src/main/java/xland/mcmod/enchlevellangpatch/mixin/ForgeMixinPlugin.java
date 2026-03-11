@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
 public class ForgeMixinPlugin extends AbstractMixinPlugin {
-	// If in Neo environment: -1
+	// If in Neo environment: negative
 	// Otherwise: Forge major version
     private int forgeVersion;
     private @Nullable String refMapName;
@@ -22,6 +22,10 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
             storageFieldName = "storage";
             targetMethodName = "getOrDefault";
             refMapName = null;
+
+            if (forgeVersion <= ForgeVersion.NEO_11 || forgeVersion > ForgeVersion.V121Z) {
+                appliesPutFieldGuardCheck = true;
+            }
         } else if (forgeVersion < ForgeVersion.V1161) {
             storageFieldName = "field_135032_a";
             targetMethodName = "func_135026_c";
