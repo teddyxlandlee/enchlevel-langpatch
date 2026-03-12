@@ -5,19 +5,29 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.invoke.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
+@AsmHook.AsmEntrypoint
 public final class AsmHook {
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface AsmEntrypoint {}
+
+    @AsmEntrypoint
     public static @Nullable String langPatchHookWithFallback(
             String key, @Unmodifiable Map<String, String> translations, String fallback
     ) {
         return langPatchHook(key, translations, fallback, true);
     }
 
+    @AsmEntrypoint
     public static @Nullable String langPatchHook(String key, @Unmodifiable Map<String, String> translations) {
         return langPatchHook(key, translations, null, false);
     }
@@ -82,7 +92,8 @@ public final class AsmHook {
         ), "Cannot find Class.isInstance()");
     }
 
-    public static CallSite guardRefEqual(MethodHandles.Lookup lookup, String errorMessage, MethodType methodType,
+    @AsmEntrypoint
+    public static CallSite guardRefEqual(MethodHandles.Lookup ignoreLookup, String errorMessage, MethodType methodType,
                                          Object... checks) {
         errorMessage = new String(Base64.getUrlDecoder().decode(errorMessage), StandardCharsets.UTF_8);
         //<editor-fold desc="Parameter checks and casts">
@@ -182,6 +193,7 @@ public final class AsmHook {
         return handle;
     }
 
+    @AsmEntrypoint
     public static boolean isCollectionsUnmodifiable(Map<?, ?> map) {
         Map<?, ?> unmodifiable = Collections.unmodifiableMap(map);
         // unmodifiable.getClass() is exactly UnmodifiableMap and will not be its subclasses
