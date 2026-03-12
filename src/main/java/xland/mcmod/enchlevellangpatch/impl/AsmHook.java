@@ -3,6 +3,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -99,25 +100,66 @@ public final class AsmHook {
         // Wanted: (Ref, Key, M, ...) -> S
 
         // (Key, M+, ...) -> S
-        MethodHandle targetMethod = lookup.findStatic(AsmHook.class, methodName, targetMethodType);
-        // (Ref, M) -> M+
-        MethodHandle getOrDefaultStorageMap = GuardRefImpl.getOrDefaultStorageMap.asType(
-                MethodType.methodType(Map.class, Object.class, Map.class)
-        );
+        final MethodHandle targetMethod = lookup.findStatic(AsmHook.class, methodName, targetMethodType);
+        final VolatileCallSite callSite = new VolatileCallSite(methodType);
+        MethodHandle readStorageMap = MethodHandles.insertArguments(
+                GuardRefImpl.readStorageMap, 2,
+                callSite, methodType.parameterType(0), targetMethod
+        )   // (Ref, M) -> M+
+                .asType(MethodType.methodType(Map.class, Object.class, Map.class));
+
         // (Key, Ref, M, ...) -> S
-        MethodHandle handle = MethodHandles.collectArguments(targetMethod, 1, getOrDefaultStorageMap);
-        MethodType mt;
+        MethodHandle handle = MethodHandles.collectArguments(targetMethod, 1, readStorageMap);
         final int[] order = IntStream.concat(
                 IntStream.of(1, 0),     // reordered: (Ref, Key, M, ...) -> S
-                IntStream.range(2, (mt = handle.type()).parameterCount())
+                IntStream.range(2, handle.type().parameterCount())
         ).toArray();
-        mt = mt.insertParameterTypes(0, mt.parameterType(1));   // mt := (Ref, Key, Ref, M, ...) -> S
-        mt = mt.dropParameterTypes(2, 3);                                  // mt := (Ref, Key, M, ...) -> S
-        handle = MethodHandles.permuteArguments(handle, mt, order);
-        return new ConstantCallSite(handle);
+        handle = MethodHandles.permuteArguments(handle, methodType, order);
+
+        callSite.setTarget(handle);
+        return callSite;
     }
 
     private static final class GuardRefImpl {
+        @Contract(mutates = "param2")
+        static Object readStorageMap(
+                Object key, Object defaultValue,
+                /*mutable*/ CallSite callSite,
+                Class<?> param0Type,
+                MethodHandle targetMethod
+        ) {
+            targetMethod = MethodHandles.dropArguments(targetMethod, 0, param0Type);
+            // Now (Ref, Key, M, ...) -> S
+            Object val;
+            if ((val = storageToCacheMap.get(key)) != null) {
+                // Use cached map M+ to replace map M(2)
+                MethodHandle targetMethod0 = targetMethod;
+                MethodType targetMethodType = targetMethod.type();
+                Class<?> param2Type = targetMethodType.parameterType(2);
+                // (Ref, Key, M, M-, ...) -> S
+                targetMethod0 = MethodHandles.dropArguments(targetMethod0, 3, param2Type);
+                // (Ref, Key, M-, ...) -> S
+                targetMethod0 = MethodHandles.insertArguments(targetMethod0, 2, val);
+                callSite.setTarget(targetMethod0);
+            } else {
+                // Do not cache, just drop arg Ref(0)
+                callSite.setTarget(targetMethod);
+                val = defaultValue;
+            }
+            // TODO: remove the entry thread-safely when the shortcut call-site is already bound.
+            return val;
+        }
+
+        static final MethodHandle readStorageMap = doCall(() -> MethodHandles.lookup().findStatic(
+                GuardRefImpl.class, "readStorageMap",
+                MethodType.methodType(Object.class, Object.class, Object.class, CallSite.class, Class.class, MethodHandle.class)
+        ), "Cannot build GuardRefImpl::readStorageMap");
+
+        static final WeakHashMap<Object, Object> storageToCacheMap = new WeakHashMap<>();
+        static final MethodHandle putStorageMap = doCall(() -> MethodHandles.publicLookup().findVirtual(
+                Map.class, "put", MethodType.methodType(Object.class, Object.class, Object.class)
+        ).bindTo(storageToCacheMap), "Cannot build storageToCacheMap::put");
+
         private GuardRefImpl() {}
 
         private static <T> T doCall(java.util.concurrent.Callable<T> callable, String errorMessage) {
@@ -152,14 +194,6 @@ public final class AsmHook {
             );
             return handle.bindTo(logger);
         }, "Cannot build AsmHook.LOGGER::error");
-
-        static final WeakHashMap<Object, Object> storageToCacheMap = new WeakHashMap<>();
-        static final MethodHandle putStorageMap = doCall(() -> MethodHandles.publicLookup().findVirtual(
-                Map.class, "put", MethodType.methodType(Object.class, Object.class, Object.class)
-        ).bindTo(storageToCacheMap), "Cannot build storageToCacheMap::put");
-        static final MethodHandle getOrDefaultStorageMap = doCall(() -> MethodHandles.publicLookup().findVirtual(
-                Map.class, "getOrDefault", MethodType.methodType(Object.class, Object.class, Object.class)
-        ).bindTo(storageToCacheMap), "Cannot build storageToCacheMap::getOrDefault");
     }
 
     @AsmEntrypoint
@@ -241,11 +275,11 @@ public final class AsmHook {
             return new ConstantCallSite(MethodHandles.dropArguments(success, 0, methodType.parameterType(0)));
         }
 
-        final MethodHandle throwException = makeException(errorMessage, paramType, fallbackCache);
+        final MethodHandle fail = cacheAndLogError(errorMessage, paramType, fallbackCache);
         final MethodHandle paramToObject = MethodHandles.identity(paramType)
                 .asType(MethodType.methodType(Object.class, paramType));    // (T) -> O
 
-        MethodHandle ret = throwException;
+        MethodHandle ret = fail;
 
         for (Iterator<MethodHandle> itr = guards.descendingIterator(); itr.hasNext();) {
             MethodHandle process = itr.next();
@@ -259,13 +293,13 @@ public final class AsmHook {
                 );    // (Ref[O], UnmappedRef[T]) -> Z
                 test = MethodHandles.foldArguments(test, paramToObject);    // (T) -> Z
             }
-            ret = MethodHandles.guardWithTest(test, success, ret);
+            ret = MethodHandles.guardWithTest(MethodHandles.dropArguments(test, 0, methodType.parameterType(0)), success, ret);
         }
 
         return new ConstantCallSite(ret.asType(methodType));
     }
 
-    private static MethodHandle makeException(String errorMessage, Class<?> paramType, MethodHandle fallbackCache) {
+    private static MethodHandle cacheAndLogError(String errorMessage, Class<?> paramType, MethodHandle fallbackCache) {
         // (E) -> V: log Error
         MethodHandle handle = GuardRefImpl.logError.asType(MethodType.methodType(void.class, IncompatibleClassChangeError.class));
         // (String) -> V: log Error

@@ -54,12 +54,12 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
-        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap);
-        asm.accept(method);
-
         if (appliesPutFieldGuardCheck) {
             findMethod(targetClass, "<init>", null).forEach(AsmTranslationStorage::applyPutFieldGuardCheck);
         }
+
+        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
+        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck);
+        asm.accept(method);
     }
 }

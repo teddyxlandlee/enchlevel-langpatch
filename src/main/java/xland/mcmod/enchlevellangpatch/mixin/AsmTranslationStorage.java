@@ -26,9 +26,11 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
     private final transient String hookMethodDesc;
     private final boolean appliesFallback;
     private final boolean appliesUnmodifiableWrap;
+    private final boolean usesExperimentalIndy;
 
     public AsmTranslationStorage(@NotNull String thisClassName, @NotNull String storageMapFieldName,
-                                 boolean appliesFallback, boolean appliesUnmodifiableWrap) {
+                                 boolean appliesFallback, boolean appliesUnmodifiableWrap,
+                                 boolean usesExperimentalIndy) {
         this.thisClassName = thisClassName.replace('.', '/');
         this.storageMapFieldName = Objects.requireNonNull(storageMapFieldName);
         this.appliesFallback = appliesFallback;
@@ -40,6 +42,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
             hookMethodDesc = "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;";
         }
         this.appliesUnmodifiableWrap = appliesUnmodifiableWrap;
+        this.usesExperimentalIndy = usesExperimentalIndy;
     }
 
     @Override
@@ -47,6 +50,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
         InsnList insnList = new InsnList();
         LabelNode L_ifNull = new LabelNode();
 
+        if (usesExperimentalIndy) insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
         insnList.add(new VarInsnNode(Opcodes.ALOAD, 1));        // key
         insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
         insnList.add(new FieldInsnNode(Opcodes.GETFIELD, thisClassName, storageMapFieldName, "Ljava/util/Map;"));
@@ -56,7 +60,20 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
         if (appliesFallback) {
             insnList.add(new VarInsnNode(Opcodes.ALOAD, 2));    // fallback
         }
-        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, HOOK_CLASS, hookMethodName, hookMethodDesc, false));
+        if (!usesExperimentalIndy) {
+            insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, HOOK_CLASS, hookMethodName, hookMethodDesc, false));
+        } else {
+            insnList.add(new InvokeDynamicInsnNode(
+                    hookMethodName, "(Ljava/lang/Object;" + hookMethodDesc.substring(1),
+                    new Handle(
+                            Opcodes.H_INVOKESTATIC, HOOK_CLASS, "bootstrapLangPatchHook",
+                            Type.getMethodDescriptor(
+                                    Type.getType(CallSite.class),
+                                    Type.getType(MethodHandles.Lookup.class), Type.getType(String.class), Type.getType(MethodType.class)
+                            ), false
+                    )
+            ));
+        }
 
         insnList.add(new InsnNode(Opcodes.DUP));
         insnList.add(new JumpInsnNode(Opcodes.IFNULL, L_ifNull));
@@ -105,7 +122,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 // instanceof Collections.Unmodifiable[*]Map
                 new Handle(Opcodes.H_INVOKESTATIC, HOOK_CLASS, "isCollectionsUnmodifiable", Type.getMethodDescriptor(Type.BOOLEAN_TYPE, typeMap), false),
                 // is Collections.emptyMap()
-                new Handle(Opcodes.H_PUTSTATIC, "java/util/Collections", "EMPTY_MAP", typeMap.getDescriptor(), false),
+                new Handle(Opcodes.H_GETSTATIC, "java/util/Collections", "EMPTY_MAP", typeMap.getDescriptor(), false),
                 // is Collections.empty[Sorted,Navigable]Map()
                 new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "emptySortedMap", Type.getMethodDescriptor(Type.getType(SortedMap.class)), false)
                 // Other circumstances will not be considered
@@ -129,7 +146,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                     indyInstructions.add(new InsnNode(Opcodes.SWAP));
                     indyInstructions.add(new InvokeDynamicInsnNode(
                             base64Encoder.encodeToString(errorMessage.getBytes(StandardCharsets.UTF_8)),
-                            Type.getMethodDescriptor(fieldType, fieldType),
+                            Type.getMethodDescriptor(fieldType, Type.getType(Object.class), fieldType),
                             bootstrapMethod, Stream.concat(Stream.of(fallbackCache), unmodifiableFilters.stream()).toArray()
                     ));
                     m.instructions.insertBefore(fieldNode, indyInstructions);
