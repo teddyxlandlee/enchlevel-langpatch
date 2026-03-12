@@ -9,12 +9,14 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryOperator<MethodNode> {
     private final String thisClassName;
@@ -90,7 +92,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 Type.getMethodDescriptor(
                         Type.getType(CallSite.class),
                         Type.getType(MethodHandles.Lookup.class), Type.getType(String.class), Type.getType(MethodType.class),
-                        Type.getType(Object[].class)
+                        Type.getType(MethodHandle.class), Type.getType(Object[].class)
                 ), false
         );
         final Type typeMap = Type.getType(Map.class);
@@ -108,6 +110,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "emptySortedMap", Type.getMethodDescriptor(Type.getType(SortedMap.class)), false)
                 // Other circumstances will not be considered
         );
+        final Handle fallbackCache = new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "unmodifiableMap", Type.getMethodDescriptor(typeMap, typeMap), false);
 
         final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
@@ -121,12 +124,15 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                     );
 
                     Type fieldType = Type.getType(fieldNode.desc);
-                    InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
+                    InsnList indyInstructions = new InsnList();
+                    indyInstructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                    indyInstructions.add(new InsnNode(Opcodes.SWAP));
+                    indyInstructions.add(new InvokeDynamicInsnNode(
                             base64Encoder.encodeToString(errorMessage.getBytes(StandardCharsets.UTF_8)),
                             Type.getMethodDescriptor(fieldType, fieldType),
-                            bootstrapMethod, unmodifiableFilters.toArray()
-                    );
-                    m.instructions.insertBefore(fieldNode, indy);
+                            bootstrapMethod, Stream.concat(Stream.of(fallbackCache), unmodifiableFilters.stream()).toArray()
+                    ));
+                    m.instructions.insertBefore(fieldNode, indyInstructions);
                 }
             }
         }

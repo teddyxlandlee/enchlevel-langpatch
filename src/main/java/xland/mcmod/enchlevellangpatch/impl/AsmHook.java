@@ -1,6 +1,8 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
@@ -13,6 +15,7 @@ import java.lang.invoke.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 @AsmHook.AsmEntrypoint
 public final class AsmHook {
@@ -63,8 +66,59 @@ public final class AsmHook {
         });
     }
 
-    private static final class GuardRefConstants {
-        private GuardRefConstants() {}
+    @AsmEntrypoint
+    public static CallSite bootstrapLangPatchHook(MethodHandles.Lookup lookup, String methodName,
+                                                  MethodType methodType) throws ReflectiveOperationException {
+        //<editor-fold desc="Check Arguments">
+        Preconditions.checkArgument(
+                methodType.parameterCount() != 0,
+                "LangPatchHook must receive more than zero arguments, got %s", methodType
+        );
+        Preconditions.checkArgument(
+                !methodType.parameterType(0).isPrimitive(),
+                "First argument must not be primitive, got %s", methodType
+        );
+        MethodType targetMethodType = methodType.dropParameterTypes(0, 1);
+        switch (methodName) {
+            case "langPatchHook":
+                Preconditions.checkArgument(
+                        MethodType.methodType(String.class, String.class, Map.class).equals(targetMethodType),
+                        "Got wrong method type for langPatchHook: %s", targetMethodType
+                );
+                break;
+            case "langPatchHookWithFallback":
+                Preconditions.checkArgument(
+                        MethodType.methodType(String.class, String.class, Map.class, String.class).equals(targetMethodType),
+                        "Got wrong method type for langPatchHookWithFallback: %s", targetMethodType
+                );
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal method name: " + methodName);
+        }
+        //</editor-fold>
+        // Wanted: (Ref, Key, M, ...) -> S
+
+        // (Key, M+, ...) -> S
+        MethodHandle targetMethod = lookup.findStatic(AsmHook.class, methodName, targetMethodType);
+        // (Ref, M) -> M+
+        MethodHandle getOrDefaultStorageMap = GuardRefImpl.getOrDefaultStorageMap.asType(
+                MethodType.methodType(Map.class, Object.class, Map.class)
+        );
+        // (Key, Ref, M, ...) -> S
+        MethodHandle handle = MethodHandles.collectArguments(targetMethod, 1, getOrDefaultStorageMap);
+        MethodType mt;
+        final int[] order = IntStream.concat(
+                IntStream.of(1, 0),     // reordered: (Ref, Key, M, ...) -> S
+                IntStream.range(2, (mt = handle.type()).parameterCount())
+        ).toArray();
+        mt = mt.insertParameterTypes(0, mt.parameterType(1));   // mt := (Ref, Key, Ref, M, ...) -> S
+        mt = mt.dropParameterTypes(2, 3);                                  // mt := (Ref, Key, M, ...) -> S
+        handle = MethodHandles.permuteArguments(handle, mt, order);
+        return new ConstantCallSite(handle);
+    }
+
+    private static final class GuardRefImpl {
+        private GuardRefImpl() {}
 
         private static <T> T doCall(java.util.concurrent.Callable<T> callable, String errorMessage) {
             try {
@@ -80,7 +134,7 @@ public final class AsmHook {
         }
 
         static final MethodHandle refEqual = doCall(() -> MethodHandles.lookup().findStatic(
-                AsmHook.GuardRefConstants.class, "refEqual", MethodType.methodType(boolean.class, Object.class, Object.class)
+                GuardRefImpl.class, "refEqual", MethodType.methodType(boolean.class, Object.class, Object.class)
         ), "Cannot access refEqual");
 
         static final MethodHandle exceptionConstructor = doCall(() -> MethodHandles.publicLookup().findConstructor(
@@ -89,19 +143,36 @@ public final class AsmHook {
 
         static final MethodHandle checkInstance = doCall(() -> MethodHandles.publicLookup().findVirtual(
                 Class.class, "isInstance", MethodType.methodType(boolean.class, Object.class)
-        ), "Cannot find Class.isInstance()");
+        ), "Cannot find Class::isInstance");
+
+        static final MethodHandle logError = doCall(() -> {
+            final Logger logger = LogManager.getLogger(AsmHook.class);
+            MethodHandle handle = MethodHandles.publicLookup().findVirtual(
+                    Logger.class, "error", MethodType.methodType(void.class, Object.class)
+            );
+            return handle.bindTo(logger);
+        }, "Cannot build AsmHook.LOGGER::error");
+
+        static final WeakHashMap<Object, Object> storageToCacheMap = new WeakHashMap<>();
+        static final MethodHandle putStorageMap = doCall(() -> MethodHandles.publicLookup().findVirtual(
+                Map.class, "put", MethodType.methodType(Object.class, Object.class, Object.class)
+        ).bindTo(storageToCacheMap), "Cannot build storageToCacheMap::put");
+        static final MethodHandle getOrDefaultStorageMap = doCall(() -> MethodHandles.publicLookup().findVirtual(
+                Map.class, "getOrDefault", MethodType.methodType(Object.class, Object.class, Object.class)
+        ).bindTo(storageToCacheMap), "Cannot build storageToCacheMap::getOrDefault");
     }
 
     @AsmEntrypoint
-    public static CallSite guardRefEqual(MethodHandles.Lookup ignoreLookup, String errorMessage, MethodType methodType,
+    public static CallSite guardRefEqual(MethodHandles.Lookup lookup, String errorMessage, MethodType methodType,
+                                         MethodHandle fallbackCache,
                                          Object... checks) {
         errorMessage = new String(Base64.getUrlDecoder().decode(errorMessage), StandardCharsets.UTF_8);
         //<editor-fold desc="Parameter checks and casts">
         Preconditions.checkArgument(
-                methodType.parameterCount() == 1,
-                "Expected exact one argument, got: %s", methodType
+                methodType.parameterCount() == 2,
+                "Expected exact two argument, got: %s", methodType
         );
-        final Class<?> paramType = methodType.parameterType(0);
+        final Class<?> paramType = methodType.parameterType(1);
         Preconditions.checkArgument(
                 !paramType.isPrimitive(),
                 "Primitive argument is unsupported, got: %s", methodType
@@ -111,6 +182,17 @@ public final class AsmHook {
                         methodType.returnType().isAssignableFrom(paramType),
                 "Return type must be void or assignable from the parameter, got: %s", methodType
         );
+        Preconditions.checkArgument(
+                fallbackCache.type().parameterCount() == 1 &&
+                        fallbackCache.type().parameterType(0).isAssignableFrom(paramType),
+                "fallbackCache must be able to receive exact" +
+                        " one parameter (i.e. paramType), got handle: %s", fallbackCache
+        );
+        Preconditions.checkArgument(
+                fallbackCache.type().returnType() != void.class,
+                "fallbackCache must not return void, got handle: %s", fallbackCache
+        );
+        fallbackCache = fallbackCache.asType(MethodType.methodType(Object.class, paramType));
         final Deque<MethodHandle> guards = new ArrayDeque<>(checks.length);  // implicit null check
         for (Object arg : checks) {
             Preconditions.checkArgument(
@@ -132,7 +214,7 @@ public final class AsmHook {
                         break;
                     case 1:
                         Preconditions.checkArgument(
-                                methodType.parameterType(0).isAssignableFrom(paramType),
+                                handle.type().parameterType(0).isAssignableFrom(paramType),
                                 "Return type must be assignable from the parameter, got handle: %s", handle
                         );
                         break;
@@ -147,17 +229,19 @@ public final class AsmHook {
                 Preconditions.checkArgument(
                         !((Class<?>) arg).isPrimitive(), "Primitive type check is unsupported, got: %s", arg
                 );
-                guards.addLast(GuardRefConstants.checkInstance.bindTo(arg));
+                guards.addLast(GuardRefImpl.checkInstance.bindTo(arg));
             }
         }
         //</editor-fold>
 
-        final MethodHandle success = MethodHandles.identity(paramType).asType(methodType);
+        final MethodHandle success = MethodHandles.dropArguments(
+                MethodHandles.identity(paramType), 0, Object.class
+        ).asType(methodType);
         if (guards.isEmpty()) {
-            return new ConstantCallSite(success);
+            return new ConstantCallSite(MethodHandles.dropArguments(success, 0, methodType.parameterType(0)));
         }
 
-        final MethodHandle throwException = makeException(errorMessage, paramType);
+        final MethodHandle throwException = makeException(errorMessage, paramType, fallbackCache);
         final MethodHandle paramToObject = MethodHandles.identity(paramType)
                 .asType(MethodType.methodType(Object.class, paramType));    // (T) -> O
 
@@ -170,7 +254,7 @@ public final class AsmHook {
                 test = process.asType(MethodType.methodType(boolean.class, paramType));
             } else {
                 test = MethodHandles.filterArguments(
-                        GuardRefConstants.refEqual, 1,
+                        GuardRefImpl.refEqual, 1,
                         process.asType(MethodType.methodType(Object.class, paramType))
                 );    // (Ref[O], UnmappedRef[T]) -> Z
                 test = MethodHandles.foldArguments(test, paramToObject);    // (T) -> Z
@@ -181,15 +265,26 @@ public final class AsmHook {
         return new ConstantCallSite(ret.asType(methodType));
     }
 
-    private static MethodHandle makeException(String errorMessage, Class<?> paramType) {
-        // (E) -> T: throw (E) Error
-        MethodHandle handle = MethodHandles.throwException(paramType, IncompatibleClassChangeError.class);
-        // (String) -> T: throw Error
-        handle = MethodHandles.filterArguments(handle, 0, GuardRefConstants.exceptionConstructor);
-        // () -> T: throw Error
+    private static MethodHandle makeException(String errorMessage, Class<?> paramType, MethodHandle fallbackCache) {
+        // (E) -> V: log Error
+        MethodHandle handle = GuardRefImpl.logError.asType(MethodType.methodType(void.class, IncompatibleClassChangeError.class));
+        // (String) -> V: log Error
+        handle = MethodHandles.filterArguments(handle, 0, GuardRefImpl.exceptionConstructor);
+        // () -> V: log Error
         handle = handle.bindTo(errorMessage);
-        // (T) -> T: throw Error
-        handle = MethodHandles.dropArguments(handle, 0, paramType);
+        // (T) -> T: log Error
+        handle = MethodHandles.foldArguments(MethodHandles.identity(paramType), handle);
+        // (S, T) -> T: log Error
+        handle = MethodHandles.dropArguments(handle, 0, Object.class);
+
+        // (Obj, T) -> Obj: put cached(T)
+        MethodHandle putStorageMap = MethodHandles.filterArguments(GuardRefImpl.putStorageMap, 1, fallbackCache);
+
+        // (S, T) -> T: put {S=cached(T)} to cache -> log Error
+        handle = MethodHandles.foldArguments(
+                handle,
+                putStorageMap.asType(handle.type().changeReturnType(void.class))
+        );
         return handle;
     }
 
