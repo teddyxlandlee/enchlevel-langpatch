@@ -9,6 +9,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
@@ -86,11 +87,11 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
 
     static void applyPutFieldGuardCheck(MethodNode m) {
         final Handle bootstrapMethod = new Handle(
-                Opcodes.H_INVOKESTATIC, HOOK_CLASS, "guardRefEqual",
+                Opcodes.H_INVOKESTATIC, HOOK_CLASS, "makeUnmodifiableView",
                 Type.getMethodDescriptor(
                         Type.getType(CallSite.class),
                         Type.getType(MethodHandles.Lookup.class), Type.getType(String.class), Type.getType(MethodType.class),
-                        Type.getType(Object[].class)
+                        Type.getType(MethodHandle.class), Type.getType(Object[].class)
                 ), false
         );
         final Type typeMap = Type.getType(Map.class);
@@ -103,7 +104,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 // instanceof Collections.Unmodifiable[*]Map
                 new Handle(Opcodes.H_INVOKESTATIC, HOOK_CLASS, "isCollectionsUnmodifiable", Type.getMethodDescriptor(Type.BOOLEAN_TYPE, typeMap), false),
                 // is Collections.emptyMap()
-                new Handle(Opcodes.H_PUTSTATIC, "java/util/Collections", "EMPTY_MAP", typeMap.getDescriptor(), false),
+                new Handle(Opcodes.H_GETSTATIC, "java/util/Collections", "EMPTY_MAP", typeMap.getDescriptor(), false),
                 // is Collections.empty[Sorted,Navigable]Map()
                 new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "emptySortedMap", Type.getMethodDescriptor(Type.getType(SortedMap.class)), false)
                 // Other circumstances will not be considered
@@ -116,7 +117,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 FieldInsnNode fieldNode = (FieldInsnNode) node;
                 if ("storage".equals(fieldNode.name)) {
                     final String errorMessage = String.format(
-                            "[LangPatch] field storage:%2$s (invoked in constructor%1$s) is not unmodifiable",
+                            "[LangPatch] field storage:%2$s (invoked in constructor%1$s) should be unmodifiable, got {}@{}",
                             m.desc, fieldNode.desc
                     );
 
