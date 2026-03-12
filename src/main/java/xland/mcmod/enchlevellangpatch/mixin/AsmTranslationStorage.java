@@ -99,6 +99,8 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
         final Type typeImmutableMap = Type.getType(ImmutableMap.class);
         final Type typeImmutableSortedMap = Type.getType(ImmutableSortedMap.class);
         final List<Handle> unmodifiableFilters = Arrays.asList(
+                // Collections.unmodifiableMap(Map) : Map
+                new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "unmodifiableMap", Type.getMethodDescriptor(typeMap, typeMap), false),
                 // Map.copyOf(Map) : Map
                 new Handle(Opcodes.H_INVOKESTATIC, typeMap.getInternalName(), "copyOf", Type.getMethodDescriptor(typeMap, typeMap), true),
                 // ImmutableMap.copyOf(Map) : ImmutableMap
