@@ -2,7 +2,6 @@ package xland.mcmod.enchlevellangpatch.mixin;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
@@ -10,7 +9,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.invoke.CallSite;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
@@ -92,27 +90,29 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 Type.getMethodDescriptor(
                         Type.getType(CallSite.class),
                         Type.getType(MethodHandles.Lookup.class), Type.getType(String.class), Type.getType(MethodType.class),
-                        Type.getType(MethodHandle[].class)
+                        Type.getType(Object[].class)
                 ), false
         );
         final Type typeMap = Type.getType(Map.class);
         final Type typeImmutableMap = Type.getType(ImmutableMap.class);
-        final Type typeImmutableSortedMap = Type.getType(ImmutableSortedMap.class);
-        final List<Handle> unmodifiableFilters = Arrays.asList(
-                // Collections.unmodifiableMap(Map) : Map
-                new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "unmodifiableMap", Type.getMethodDescriptor(typeMap, typeMap), false),
+        final List<? /*extends ConstantDesc*/> unmodifiableFilters = Arrays.asList(
                 // Map.copyOf(Map) : Map
                 new Handle(Opcodes.H_INVOKESTATIC, typeMap.getInternalName(), "copyOf", Type.getMethodDescriptor(typeMap, typeMap), true),
-                // ImmutableMap.copyOf(Map) : ImmutableMap
-                new Handle(Opcodes.H_INVOKESTATIC, typeImmutableMap.getInternalName(), "copyOf", Type.getMethodDescriptor(typeImmutableMap, typeMap), false),
-                // ImmutableSortedMap.copyOf(Map) : ImmutableSortedMap
-                new Handle(Opcodes.H_INVOKESTATIC, typeImmutableSortedMap.getInternalName(), "copyOf", Type.getMethodDescriptor(typeImmutableSortedMap, typeMap), false)
+                // instanceof ImmutableMap, ImmutableSortedMap
+                typeImmutableMap,
+                // instanceof Collections.Unmodifiable[*]Map
+                new Handle(Opcodes.H_INVOKESTATIC, HOOK_CLASS, "isCollectionsUnmodifiable", Type.getMethodDescriptor(Type.BOOLEAN_TYPE, typeMap), false),
+                // is Collections.emptyMap()
+                new Handle(Opcodes.H_PUTSTATIC, "java/util/Collections", "EMPTY_MAP", typeMap.getDescriptor(), false),
+                // is Collections.empty[Sorted,Navigable]Map()
+                new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "emptySortedMap", Type.getMethodDescriptor(Type.getType(SortedMap.class)), false)
+                // Other circumstances will not be considered
         );
 
         final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
         for (AbstractInsnNode node = m.instructions.getFirst(); node != null; node = node.getNext()) {
-            if (node.getOpcode() == Opcodes.PUTFIELD && node instanceof FieldInsnNode) {
+            if (node.getOpcode() == Opcodes.PUTFIELD) {     // implicitly instanceof FieldInsnNode
                 FieldInsnNode fieldNode = (FieldInsnNode) node;
                 if ("storage".equals(fieldNode.name)) {
                     final String errorMessage = String.format(
