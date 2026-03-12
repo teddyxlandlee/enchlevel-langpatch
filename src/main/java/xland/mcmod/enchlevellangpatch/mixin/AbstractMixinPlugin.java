@@ -2,6 +2,7 @@ package xland.mcmod.enchlevellangpatch.mixin;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -54,12 +55,22 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
-        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap);
-        asm.accept(method);
-
-        if (appliesPutFieldGuardCheck) {
-            findMethod(targetClass, "<init>", null).forEach(AsmTranslationStorage::applyPutFieldGuardCheck);
+        boolean appliesPutFieldGuardCheck0 = this.appliesPutFieldGuardCheck;
+        if (appliesPutFieldGuardCheck0) {
+            targetClass.visitField(
+                    Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_FINAL,
+                    AsmTranslationStorage.unmodifiableViewFieldName, "Ljava/util/Map;", null, null
+            );
+            try {
+                findMethod(targetClass, "<init>", null).forEach(m -> AsmTranslationStorage.applyPutFieldGuardCheck(m, targetClass.name));
+            } catch (Exception ex) {
+                org.apache.logging.log4j.LogManager.getLogger().error("Exception while applying putFieldGuardCheck. This will be disabled.", ex);
+                appliesPutFieldGuardCheck0 = false;
+            }
         }
+
+        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
+        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
+        asm.accept(method);
     }
 }

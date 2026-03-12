@@ -1,6 +1,7 @@
 package xland.mcmod.enchlevellangpatch.mixin;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Handle;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryOperator<MethodNode> {
     private final String thisClassName;
@@ -25,11 +27,17 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
     private final transient String hookMethodDesc;
     private final boolean appliesFallback;
     private final boolean appliesUnmodifiableWrap;
+    private final boolean appliesPutFieldGuardCheck;
 
     public AsmTranslationStorage(@NotNull String thisClassName, @NotNull String storageMapFieldName,
-                                 boolean appliesFallback, boolean appliesUnmodifiableWrap) {
+                                 boolean appliesFallback, boolean appliesUnmodifiableWrap, boolean appliesPutFieldGuardCheck) {
         this.thisClassName = thisClassName.replace('.', '/');
-        this.storageMapFieldName = Objects.requireNonNull(storageMapFieldName);
+        Objects.requireNonNull(storageMapFieldName);
+        if (appliesPutFieldGuardCheck) {
+            this.storageMapFieldName = unmodifiableViewFieldName;
+        } else {
+            this.storageMapFieldName = storageMapFieldName;
+        }
         this.appliesFallback = appliesFallback;
         if (appliesFallback) {
             hookMethodName = "langPatchHookWithFallback";
@@ -39,6 +47,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
             hookMethodDesc = "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;";
         }
         this.appliesUnmodifiableWrap = appliesUnmodifiableWrap;
+        this.appliesPutFieldGuardCheck = appliesPutFieldGuardCheck;
     }
 
     @Override
@@ -82,10 +91,13 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 .add("target", thisClassName)
                 .add("appliesFallback", appliesFallback)
                 .add("appliesUnmodifiableWrap", appliesUnmodifiableWrap)
+                .add("appliesPutFieldGuardCheck", appliesPutFieldGuardCheck)
                 .toString();
     }
 
-    static void applyPutFieldGuardCheck(MethodNode m) {
+    static final String unmodifiableViewFieldName = "019ce1c8-e8f3-7231-b2bc-062dc83b1c42";
+
+    static void applyPutFieldGuardCheck(MethodNode m, String thisClassName) {
         final Handle bootstrapMethod = new Handle(
                 Opcodes.H_INVOKESTATIC, HOOK_CLASS, "makeUnmodifiableView",
                 Type.getMethodDescriptor(
@@ -109,27 +121,39 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "emptySortedMap", Type.getMethodDescriptor(Type.getType(SortedMap.class)), false)
                 // Other circumstances will not be considered
         );
+        final Handle fallbackHandle = new Handle(Opcodes.H_INVOKESTATIC, "java/util/Collections", "unmodifiableMap", Type.getMethodDescriptor(typeMap, typeMap), false);
 
         final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
+        boolean injected = false;
         for (AbstractInsnNode node = m.instructions.getFirst(); node != null; node = node.getNext()) {
             if (node.getOpcode() == Opcodes.PUTFIELD) {     // implicitly instanceof FieldInsnNode
                 FieldInsnNode fieldNode = (FieldInsnNode) node;
                 if ("storage".equals(fieldNode.name)) {
+                    if (!typeMap.getDescriptor().equals(fieldNode.desc)) {
+                        throw new IllegalArgumentException("Unsupported storage field: " + fieldNode.desc);
+                    }
+                    final String owner = fieldNode.owner;
+                    Preconditions.checkState(Objects.equals(owner, thisClassName), "storage::owner != this. Should not happen");
+
                     final String errorMessage = String.format(
-                            "[LangPatch] field storage:%2$s (invoked in constructor%1$s) should be unmodifiable, got {}@{}",
-                            m.desc, fieldNode.desc
+                            "[LangPatch] field storage:Ljava/util/Map; (invoked in constructor%1$s) should be unmodifiable, got",
+                            m.desc
                     );
 
-                    Type fieldType = Type.getType(fieldNode.desc);
-                    InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
+                    InsnList list = new InsnList();
+                    list.add(new InsnNode(Opcodes.DUP2));   // [this] | [storage]
+                    list.add(new InvokeDynamicInsnNode(
                             base64Encoder.encodeToString(errorMessage.getBytes(StandardCharsets.UTF_8)),
-                            Type.getMethodDescriptor(fieldType, fieldType),
-                            bootstrapMethod, unmodifiableFilters.toArray()
-                    );
-                    m.instructions.insertBefore(fieldNode, indy);
+                            Type.getMethodDescriptor(typeMap, typeMap),
+                            bootstrapMethod, Stream.concat(Stream.of(fallbackHandle), unmodifiableFilters.stream()).toArray()
+                    ));
+                    list.add(new FieldInsnNode(Opcodes.PUTFIELD, owner, unmodifiableViewFieldName, typeMap.getDescriptor()));
+                    m.instructions.insertBefore(fieldNode, list);
+                    injected = true;
                 }
             }
         }
+        Preconditions.checkState(injected, "No putField found");
     }
 }
