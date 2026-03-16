@@ -287,7 +287,7 @@ publishMods {
     modLoaders.addAll("fabric", "forge", "neoforge", "quilt")
     type = providers.gradleProperty("release_type").map(ReleaseType::of)
     changelog = providers.gradleProperty("changelog")
-    displayName = "[1.16+/ALL] LangPatch ${project.version}"
+    displayName = "[1.12+/ALL] LangPatch ${project.version}"
 
     val supportedAncientVersions = listOf("1.13.2", "1.12.2")
 
