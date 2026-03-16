@@ -93,7 +93,7 @@ final class ForgeVersion {
         return Integer.parseInt(s.split("\\.", 2)[0]);
     }
 
-    static final int V117 = 36, V1194 = 45, V1206 = 50, V121Z /*1.21.11*/ = 61;
+    static final int V117 = 37, V1194 = 45, V1206 = 50, V121Z /*1.21.11*/ = 61;
     static final int V1161 = 32;
     static final int NEO_11 = ~11;
 }
