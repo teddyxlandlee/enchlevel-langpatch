@@ -17,7 +17,7 @@ plugins {
     `java-library`
     idea
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-    id("xland.gradle.forge-init-injector") version "3.0.0"
+    id("xland.gradle.forge-init-injector") version "3.0.1"
     `maven-publish`
 }
 
