@@ -17,7 +17,7 @@ plugins {
     `java-library`
     idea
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
-    id("xland.gradle.forge-init-injector") version "3.0.1"
+    id("xland.gradle.forge-init-injector") version "3.1.0"
     `maven-publish`
 }
 
@@ -72,6 +72,7 @@ forgeInitInjector {
     stubPackage = "I_CDNx2L8vzK6E5HtDsRJ"
     setClientEntrypoint("xland/mcmod/enchlevellangpatch/impl/LangPatchImpl")
     neoFlag("pre_20_5", "post_20_5")
+    supportLegacyForgeLifecycle = true
 }
 
 tasks.processResources {
