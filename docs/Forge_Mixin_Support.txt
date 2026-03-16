@@ -1,0 +1,7 @@
+Forge Mixin Support
+1.16.2+	NATIVE
+1.16.1	32.0.72	2020/07/21
+1.15.2	31.2.44	2020/10/03
+1.14.4	28.1.45	MixinBootstrap
+1.13.x	REJECT	unsupported
+1.12.2	*	MixinBootstrap
