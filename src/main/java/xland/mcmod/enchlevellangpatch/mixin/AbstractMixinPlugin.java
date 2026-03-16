@@ -1,5 +1,6 @@
 package xland.mcmod.enchlevellangpatch.mixin;
 
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -72,5 +73,9 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
         MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
         AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
         asm.accept(method);
+    }
+
+    protected void printVersion() {
+        LogManager.getLogger(this).info("Loading LangPatch Mixin plugin {}", this);
     }
 }

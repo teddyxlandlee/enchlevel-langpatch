@@ -63,6 +63,8 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         isMojMapped = isMojMapped(mcVersion = initVersion());
         appliesPutFieldGuardCheck = isMojMapped;
         initNames();
+
+        printVersion();
     }
 
     public static boolean isMojMapped(Version minecraftVersion) {
@@ -98,5 +100,10 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
                 throw new IllegalArgumentException("Invalid version predicate: " + predicate, e);
             }
         });
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [Minecraft version: " + mcVersion + ']';
     }
 }

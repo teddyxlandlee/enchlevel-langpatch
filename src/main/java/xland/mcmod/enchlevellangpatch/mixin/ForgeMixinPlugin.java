@@ -14,6 +14,8 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
         this.forgeVersion = ForgeVersion.getForgeVersionAsInt();
         this.targetMethodDesc = targetMethodDesc(appliesFallback = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194);
         initNames();
+
+        printVersion();
     }
 
     private void initNames() {
@@ -49,5 +51,10 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
     @Override
     public String getRefMapperConfig() {
         return refMapName;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [Forge version: " + forgeVersion + ']';
     }
 }
