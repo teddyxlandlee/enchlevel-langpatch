@@ -289,7 +289,7 @@ publishMods {
     changelog = providers.gradleProperty("changelog")
     displayName = "[1.16+/ALL] LangPatch ${project.version}"
 
-    val supportedAncientVersions = listOf("1.13.2")
+    val supportedAncientVersions = listOf("1.13.2", "1.12.2")
 
     curseforge {
         projectId = "529854"
