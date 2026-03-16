@@ -14,4 +14,4 @@ issueTrackerURL='https://github.com/teddyxlandlee/enchlevel-langpatch/issues'
 authors='teddyxlandlee'
 
 [[mixins]]
-config="ellp-forge.mixins.json"
+config="ellp-neo.mixins.json"

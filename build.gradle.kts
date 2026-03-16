@@ -48,6 +48,12 @@ allprojects {
         maven("https://maven.neoforged.net/releases") {
             name = "NeoForged"
         }
+        maven("https://maven.minecraftforge.net") {
+            name = "MinecraftForge"
+            content {
+                includeGroup("net.minecraftforge")
+            }
+        }
     }
 }
 
@@ -58,13 +64,22 @@ dependencies {
     implementation("net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5") {
         isTransitive = false
     }
-    implementation("org.ow2.asm:asm:6.2")       // used by MCF 1.13.2
-    implementation("org.ow2.asm:asm-tree:6.2")  // used by MCF 1.13.2
+    implementation("org.ow2.asm:asm:6.2")       // used by MCF 1.12.2
+    implementation("org.ow2.asm:asm-tree:6.2")  // used by MCF 1.12.2
+    implementation("org.ow2.asm:asm-commons:6.2")  // used by MCF 1.12.2
     implementation("org.apache.logging.log4j:log4j-api:2.8.1")
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
     testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.25.3")
+
+    compileOnly("net.minecraftforge:forge:1.12.2-14.23.5.2864:universal") {
+        isTransitive = false
+    }
+    compileOnly("net.minecraft:launchwrapper:1.12") {
+        isTransitive = false
+    }
+    implementation("com.google.code.gson:gson:2.8.0")   // used by MCF 1.12.2~1.17.1
 }
 
 forgeInitInjector {
@@ -153,6 +168,7 @@ tasks.jar {
         "Implementation-Vendor"    to "teddyxlandlee",
         "Implementation-Timestamp" to Instant.now(),
         "MixinConfigs"             to "ellp-forge.mixins.json", // for Forge FML
+        "FMLCorePlugin"            to "xland.mcmod.enchlevellangpatch.mixin.LegacyFMLPlugin",
     )
 }
 

@@ -3,12 +3,72 @@ package xland.mcmod.enchlevellangpatch.mixin;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
-@SuppressWarnings("unused")
 public class ForgeMixinPlugin extends AbstractMixinPlugin {
+    /**
+     * In 1.12.2 FML environment, if the core-mod races with (potentially loaded) mixin
+     * config plugin, the transformation may run twice, which is definitely unexpected.
+     * <p>
+     * NeoForge (with {@code neoforge.mods.toml}) does not need this wrapped check, so
+     * it is only referenced in the jar manifest.
+     */
+    @SuppressWarnings("unused")
+    public static class Wrapped implements IMixinConfigPlugin {
+        private final IMixinConfigPlugin parent;
+
+        public Wrapped() {
+            if (ForgeVersion.isInjected.compareAndSet(false, true)) {
+                this.parent = new ForgeMixinPlugin();
+            } else {
+                this.parent = null;
+            }
+        }
+
+        // <editor-fold defaultState="collapsed" desc="Wrapped methods">
+        @Override
+        public void onLoad(String mixinPackage) {
+            if (parent != null) parent.onLoad(mixinPackage);
+        }
+
+        @Override
+        public String getRefMapperConfig() {
+            return parent != null ? parent.getRefMapperConfig() : null;
+        }
+
+        @Override
+        public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+            // if parent is null, no mixins are to be applied
+            return parent != null && parent.shouldApplyMixin(targetClassName, mixinClassName);
+        }
+
+        @Override
+        public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
+            if (parent != null) parent.acceptTargets(myTargets, otherTargets);
+        }
+
+        @Override
+        public List<String> getMixins() {
+            return parent != null ? parent.getMixins() : null;
+        }
+
+        @Override
+        public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+            if (parent != null) parent.preApply(targetClassName, targetClass, mixinClassName, mixinInfo);
+        }
+
+        @Override
+        public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+            if (parent != null) parent.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
+        }
+        // </editor-fold>
+    }
+
 	// If in Neo environment: negative
 	// Otherwise: Forge major version
     private int forgeVersion;

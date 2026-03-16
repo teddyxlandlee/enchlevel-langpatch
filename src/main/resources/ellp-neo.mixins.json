@@ -4,11 +4,10 @@
   "package": "xland.mcmod.enchlevellangpatch.mixin.stub",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "MixinTranslationStorage",
-    "MixinExternalLanguageMap"
+    "MixinTranslationStorage"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "xland.mcmod.enchlevellangpatch.mixin.ForgeMixinPlugin$Wrapped"
+  "plugin": "xland.mcmod.enchlevellangpatch.mixin.ForgeMixinPlugin"
 }
