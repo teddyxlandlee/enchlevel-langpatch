@@ -273,13 +273,17 @@ publishMods {
     changelog = providers.gradleProperty("changelog")
     displayName = "[1.16+/ALL] LangPatch ${project.version}"
 
+    val supportedAncientVersions = listOf("1.13.2")
+
     curseforge {
         projectId = "529854"
         minecraftVersionRange {
             start = "1.14"
             end = "latest"
         }
-        javaVersions.addAll(javaVersions(8..26))
+        minecraftVersions.addAll(supportedAncientVersions)
+        // CurseForge supports up to Java 22
+        javaVersions.addAll(javaVersions(8..22))
         clientRequired = true
         serverRequired = false
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
@@ -292,6 +296,7 @@ publishMods {
             end = "latest"
             includeSnapshots = true
         }
+        minecraftVersions.addAll(supportedAncientVersions)
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
     }
 

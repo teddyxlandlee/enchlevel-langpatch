@@ -1,6 +1,9 @@
 **For Forge 1.14.x users:** [MixinBootstrap](https://modrinth.com/mod/mixinbootstrap)
 (or any alternative Mixin loader) is required.
 
+**For Forge 1.13.x users:** [ModernMixins](https://modrinth.com/mod/modernmixins)
+(or any alternative Mixin loader) is required.
+
 Without the patch:
 
 ![Sharpness enchantment.level.100](https://i.loli.net/2021/10/04/2m8XUWgJZkA6BIs.png)
@@ -28,13 +31,13 @@ This mod supports a limited configuration of enchantment level and potion effect
 *   **`langpatch.conf.enchantment.default.type`** & **`langpatch.conf.potion.default.type`**:
     Modify the format of enchantment levels and potion effect levels, respectively.
 
-    | Value | Format | Example |
-    | :--- | :--- | :--- |
-    | `simplified`, `chinese`, `zh_normal` | Lowercase Chinese numerals | 一百二十三 |
-    | `traditional`, `zh_upper` | Uppercase Chinese numerals (traditional) | 壹佰貳拾叄 |
-    | `numeral`, `number`, `numeric`, `arabic`, `default` | Arabic numerals (default) | 123 |
-    | `roman` | Roman numerals | CXXIII |
-    | `skip`, `ignore` | No change (e.g., for only replacing other text) | — |
+    | Value                                               | Format                                           | Example |
+    |:----------------------------------------------------|:-------------------------------------------------|:--------|
+    | `simplified`, `chinese`, `zh_normal`                | Lowercase Chinese numerals                       | 一百二十三   |
+    | `traditional`, `zh_upper`                           | Uppercase Chinese numerals (traditional)         | 壹佰貳拾叄   |
+    | `numeral`, `number`, `numeric`, `arabic`, `default` | Arabic numerals (default)                        | 123     |
+    | `roman`                                             | Roman numerals                                   | CXXIII  |
+    | `skip`, `ignore`                                    | No change (e.g., for only replacing other text)  | —       |
 
 ### Override
 *   **`langpatch.conf.enchantment.override`** & **`langpatch.conf.potion.override`**:
