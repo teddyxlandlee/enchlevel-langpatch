@@ -4,7 +4,8 @@
   "package": "xland.mcmod.enchlevellangpatch.mixin.stub",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "MixinTranslationStorage"
+    "MixinTranslationStorage",
+    "MixinExternalLanguageMap"
   ],
   "injectors": {
     "defaultRequire": 1

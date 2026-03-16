@@ -2,12 +2,18 @@
   "mappings": {
     "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
       "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/class_1078"
+    },
+    "xland/mcmod/enchlevellangpatch/mixin/stub/MixinExternalLanguageMap": {
+      "net.minecraft.util.text.translation.LanguageMap": "net/minecraft/class_2477"
     }
   },
   "data": {
     "named:intermediary": {
       "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
         "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/class_1078"
+      },
+      "xland/mcmod/enchlevellangpatch/mixin/stub/MixinExternalLanguageMap": {
+        "net.minecraft.util.text.translation.LanguageMap": "net/minecraft/class_2477"
       }
     }
   }

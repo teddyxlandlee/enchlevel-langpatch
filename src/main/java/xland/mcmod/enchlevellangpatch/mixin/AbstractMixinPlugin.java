@@ -25,6 +25,7 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
     protected String storageFieldName;
     protected String targetMethodName;
     protected String targetMethodDesc;
+    protected abstract boolean shouldApplyExternalLanguageMap();
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
@@ -37,7 +38,17 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return true;
+        if (mixinClassName.endsWith(".MixinTranslationStorage")) {
+            return true;
+        } else if (mixinClassName.endsWith(".MixinExternalLanguageMap")) {
+            return shouldApplyExternalLanguageMap();
+        } else {    // should not happen
+            org.apache.logging.log4j.LogManager.getLogger().error(
+                    "Invalid mixin {} -> {} registered to LangPatch. Rejected.",
+                    mixinClassName, targetClassName
+            );
+            return false;
+        }
     }
 
     @Override

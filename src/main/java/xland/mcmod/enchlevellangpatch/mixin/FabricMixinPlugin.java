@@ -3,6 +3,9 @@ package xland.mcmod.enchlevellangpatch.mixin;
 import com.google.common.base.Suppliers;
 import net.fabricmc.loader.api.*;
 import net.fabricmc.loader.api.metadata.version.VersionPredicate;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -69,7 +72,6 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
     public static boolean isMojMapped(Version minecraftVersion) {
         Objects.requireNonNull(minecraftVersion);
-        // TODO: so far
 
         if (V25W44A_BELOW.get().test(minecraftVersion)) return false;  // definitely not moj-named, no obf removal at all
 
@@ -88,6 +90,11 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     }
 
     @Override
+    protected boolean shouldApplyExternalLanguageMap() {
+        return UNDER_V116.get().test(mcVersion);
+    }
+
+    @Override
     public String getRefMapperConfig() {
         return isMojMapped ? null : "ellp.refmap-intermediary.json";
     }
@@ -100,6 +107,22 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
                 throw new IllegalArgumentException("Invalid version predicate: " + predicate, e);
             }
         });
+    }
+
+    @Override
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
+
+        if (mixinClassName.endsWith(".MixinExternalLanguageMap")) {
+            MethodNode method = findMethod(targetClass, "method_10518", targetMethodDesc)
+                    .findAny()
+                    .orElseThrow(() -> new NoSuchElementException("method_10518 is not found in " + targetClassName));
+            AsmTranslationStorage asm = new AsmTranslationStorage(
+                    targetClassName, "field_11487",
+                    /*fallback=*/false, /*unmodifiableWrap=*/true, /*guardPutField=*/false
+            );
+            asm.accept(method);
+        }
     }
 
     @Override

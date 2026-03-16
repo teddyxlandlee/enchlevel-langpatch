@@ -1,0 +1,20 @@
+{
+  "mappings": {
+    "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
+      "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/client/resources/Locale"
+    },
+    "xland/mcmod/enchlevellangpatch/mixin/stub/MixinExternalLanguageMap": {
+      "net.minecraft.util.text.translation.LanguageMap": "net/minecraft/util/text/LanguageMap"
+    }
+  },
+  "data": {
+    "searge": {
+      "xland/mcmod/enchlevellangpatch/mixin/stub/MixinTranslationStorage": {
+        "net.minecraft.client.resources.language.ClientLanguage": "net/minecraft/client/resources/Locale"
+      },
+      "xland/mcmod/enchlevellangpatch/mixin/stub/MixinExternalLanguageMap": {
+        "net.minecraft.util.text.translation.LanguageMap": "net/minecraft/util/text/LanguageMap"
+      }
+    }
+  }
+}
