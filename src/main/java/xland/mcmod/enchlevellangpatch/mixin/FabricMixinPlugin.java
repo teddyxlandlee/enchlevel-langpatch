@@ -113,7 +113,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
         super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
 
-        if (mixinClassName.endsWith(".MixinExternalLanguageMap")) {
+        if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
             MethodNode method = findMethod(targetClass, "method_10518", targetMethodDesc)
                     .findAny()
                     .orElseThrow(() -> new NoSuchElementException("method_10518 is not found in " + targetClassName));

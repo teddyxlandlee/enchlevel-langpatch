@@ -80,7 +80,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
         // Processes MixinTranslationStorage
         super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
 
-        if (mixinClassName.endsWith(".MixinExternalLanguageMap")) {
+        if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
             MethodNode method = findMethod(targetClass, "func_135064_c", targetMethodDesc)
                     .findAny()
                     .orElseThrow(() -> new NoSuchElementException("func_135064_c is not found in " + targetClassName));

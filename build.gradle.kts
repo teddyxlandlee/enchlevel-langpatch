@@ -276,10 +276,10 @@ publishMods {
     curseforge {
         projectId = "529854"
         minecraftVersionRange {
-            start = "1.16"
+            start = "1.14"
             end = "latest"
         }
-        javaVersions.addAll(javaVersions(8..22))
+        javaVersions.addAll(javaVersions(8..26))
         clientRequired = true
         serverRequired = false
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
@@ -288,7 +288,7 @@ publishMods {
     modrinth {
         projectId = "Lf4kDKU9"
         minecraftVersionRange {
-            start = "1.16"
+            start = "18w43b"    // the first version to have Fabric
             end = "latest"
             includeSnapshots = true
         }

@@ -36,11 +36,14 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
         return null;
     }
 
+    protected static final String MIXIN_TRANSLATION_STORAGE = ".MixinTranslationStorage";
+    protected static final String MIXIN_EXTERNAL_LANGUAGE_MAP = ".MixinExternalLanguageMap";
+
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.endsWith(".MixinTranslationStorage")) {
+        if (mixinClassName.endsWith(MIXIN_TRANSLATION_STORAGE)) {
             return true;
-        } else if (mixinClassName.endsWith(".MixinExternalLanguageMap")) {
+        } else if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
             return shouldApplyExternalLanguageMap();
         } else {    // should not happen
             org.apache.logging.log4j.LogManager.getLogger().error(
@@ -67,6 +70,8 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        if (!mixinClassName.endsWith(MIXIN_TRANSLATION_STORAGE)) return;
+
         boolean appliesPutFieldGuardCheck0 = this.appliesPutFieldGuardCheck;
         if (appliesPutFieldGuardCheck0) {
             targetClass.visitField(
@@ -81,7 +86,11 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
             }
         }
 
-        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc).findAny().orElseThrow(NoSuchElementException::new);
+        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc)
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException(
+                        String.format("Method %s.%s:%s not found", targetClassName, targetMethodName, targetMethodDesc)
+                ));
         AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
         asm.accept(method);
     }

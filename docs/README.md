@@ -1,3 +1,6 @@
+**For Forge 1.14.x users:** [MixinBootstrap](https://modrinth.com/mod/mixinbootstrap)
+(or any alternative Mixin loader) is required.
+
 Without the patch:
 
 ![Sharpness enchantment.level.100](https://i.loli.net/2021/10/04/2m8XUWgJZkA6BIs.png)
