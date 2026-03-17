@@ -230,7 +230,7 @@ public final class LangPatchImpl {
         if (p != null) {
             final EnchantmentLevelLangPatch patch = POTION_HOOK.get(NamespacedKey.of(p));
             EnchantmentLevelLangPatchConfig.setCurrentPotionHooks(patch);
-            LOGGER.info(marker, "Set potion hook to {}", e);
+            LOGGER.info(marker, "Set potion hook to {}", p);
         }
     }
 
