@@ -8,22 +8,25 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @API(status = API.Status.INTERNAL)
-public final class IndependentLangPatchRegistry {
+public final class IndependentLangPatchRegistry implements Serializable {
     private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map = HashBiMap.create();
 
-    private volatile ImmutableBiMap<String, EnchantmentLevelLangPatch> snapshot;
+    private volatile transient ImmutableBiMap<String, EnchantmentLevelLangPatch> snapshot;
 
     private volatile boolean isFrozen;
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private transient ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     private final NamespacedKey defaultId;
-    private EnchantmentLevelLangPatch defaultValue;
+    private transient EnchantmentLevelLangPatch defaultValue;
     private final @NotNull String registryName;
 
     public static final NamespacedKey LP_DEFAULT = NamespacedKey.of("enchlevel-langpatch:default");
@@ -164,5 +167,17 @@ public final class IndependentLangPatchRegistry {
             }
         }
         return m;
+    }
+
+    private static final long serialVersionUID = 1L;
+
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        this.readWriteLock = new ReentrantReadWriteLock();
+
+        if (isFrozen) {
+            snapshot = computeMap();
+        }
+        this.defaultValue = defaultId == null ? null : map.get(this.defaultId);    // If not found, set to null
     }
 }

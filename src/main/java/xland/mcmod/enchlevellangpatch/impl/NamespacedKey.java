@@ -6,14 +6,15 @@ import org.apiguardian.api.API;
 import java.util.regex.Pattern;
 
 @API(status = API.Status.INTERNAL)
-public final class NamespacedKey implements Comparable<NamespacedKey> {
+public final class NamespacedKey implements Comparable<NamespacedKey>, java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private static final Pattern NS_PATTERN, PATH_PATTERN;
     private final String namespace, path;
-    private String toString;
+    private transient String toStringCache;
 
     public NamespacedKey(String namespace, String path) {
         Preconditions.checkArgument(NS_PATTERN.matcher(namespace).matches(), "Illegal namespace: " + namespace);
-        Preconditions.checkArgument(PATH_PATTERN.matcher(path).matches(), "Illegal path" + path);
+        Preconditions.checkArgument(PATH_PATTERN.matcher(path).matches(), "Illegal path: " + path);
         this.namespace = namespace;
         this.path = path;
     }
@@ -21,7 +22,7 @@ public final class NamespacedKey implements Comparable<NamespacedKey> {
     // Trusted implementation
     private NamespacedKey(String namespace, String path, String asString) {
         this(namespace, path);
-        this.toString = asString;
+        this.toStringCache = asString;
     }
 
     public static NamespacedKey of(String s) {
@@ -42,10 +43,10 @@ public final class NamespacedKey implements Comparable<NamespacedKey> {
 
     @Override
     public String toString() {
-        if (toString == null) {
-            toString = namespace + ':' + path;
+        if (toStringCache == null) {
+            toStringCache = namespace + ':' + path;
         }
-        return toString;
+        return toStringCache;
     }
 
     public int compareTo(NamespacedKey key) {
