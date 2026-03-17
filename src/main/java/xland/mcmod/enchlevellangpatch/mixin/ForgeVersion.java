@@ -8,7 +8,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 final class ForgeVersion {
     private ForgeVersion() {}
@@ -98,6 +97,5 @@ final class ForgeVersion {
     static final int V1161 = 32;
     static final int V115 = 29;
     static final int NEO_11 = ~11;
-
-    static final AtomicBoolean isInjected = new AtomicBoolean();
+    static final int V112X = 14;
 }

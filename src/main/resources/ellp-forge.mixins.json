@@ -10,5 +10,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "xland.mcmod.enchlevellangpatch.mixin.ForgeMixinPlugin$Wrapped"
+  "plugin": "xland.mcmod.enchlevellangpatch.mixin.ForgeMixinPlugin"
 }

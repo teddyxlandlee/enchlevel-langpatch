@@ -6,21 +6,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public final class LegacyFMLPlugin implements IFMLLoadingPlugin {
-    private final boolean shouldLoad;
-
     public LegacyFMLPlugin() {
-        shouldLoad = ForgeVersion.isInjected.compareAndSet(false, true);
     }
 
     @Override
     public String[] getASMTransformerClass() {
-        if (!shouldLoad) return new String[0];
         return new String[] {"xland.mcmod.enchlevellangpatch.mixin.legacy.LegacyTransformer"};
     }
 
     @Override
     public String getModContainerClass() {
-        if (!shouldLoad) return null;
         return "xland.mcmod.enchlevellangpatch.mixin.legacy.LegacyModContainer";
     }
 
