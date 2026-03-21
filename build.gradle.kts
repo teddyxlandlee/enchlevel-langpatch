@@ -315,7 +315,10 @@ publishMods {
             includeSnapshots = true
         }
         minecraftVersions.addAll(supportedAncientVersions)
+
+        this@modrinth.modLoaders.addAll(this@publishMods.modLoaders)
         this@modrinth.modLoaders.add("legacy-fabric")
+
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
     }
 

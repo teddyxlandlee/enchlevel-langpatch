@@ -1,0 +1,6 @@
+enchantment.level.x=%s
+potion.potency.x=%s
+langpatch.conf.enchantment.default.type=default
+langpatch.conf.potion.default.type=default
+langpatch.conf.enchantment.override=false
+langpatch.conf.potion.override=false
