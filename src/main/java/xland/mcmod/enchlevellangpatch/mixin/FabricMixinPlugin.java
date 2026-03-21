@@ -13,6 +13,9 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class FabricMixinPlugin extends AbstractMixinPlugin {
+    /** Before 1.13.2, the mapping was under <a href="https://github.com/Legacy-Fabric/Legacy-Intermediaries">
+     * Legacy Intermediaries</a>. */
+    private static final Supplier<VersionPredicate> V1132_BELOW = parseVersionPredicate("<=1.13.2");
     /** The {@code storage} field was <i>not</i> unmodifiable until this version. */
     private static final Supplier<VersionPredicate> UNDER_V116 = parseVersionPredicate("<1.16-alpha.20.22.a");
 
@@ -49,12 +52,29 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
             targetMethodName = "getOrDefault";
         } else {
             MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
-            storageFieldName = resolver.mapFieldName("intermediary", "net.minecraft.class_1078", "field_5330", "Ljava/util/Map;");
-            targetMethodName = resolver.mapMethodName(
-                    "intermediary",
-                    "net.minecraft.class_1078", "method_4679",
-                    targetMethodDesc
-            );
+            if (V1132_BELOW.get().test(mcVersion)) {
+                storageFieldName = resolver.mapFieldName(
+                        "intermediary",
+                        "net.minecraft.class_1667", "field_6654",
+                        "Ljava/util/Map;"
+                );
+                targetMethodName = resolver.mapMethodName(
+                        "intermediary",
+                        "net.minecraft.class_1667", "method_5951",
+                        targetMethodDesc
+                );
+            } else {
+                storageFieldName = resolver.mapFieldName(
+                        "intermediary",
+                        "net.minecraft.class_1078", "field_5330",
+                        "Ljava/util/Map;"
+                );
+                targetMethodName = resolver.mapMethodName(
+                        "intermediary",
+                        "net.minecraft.class_1078", "method_4679",
+                        targetMethodDesc
+                );
+            }
 
             // small optimization: skip this check if already `isMojMapped`
             appliesUnmodifiableWrap = UNDER_V116.get().test(mcVersion);
@@ -96,7 +116,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
     @Override
     public String getRefMapperConfig() {
-        return isMojMapped ? null : "ellp.refmap-intermediary.json";
+        return isMojMapped ? null : (V1132_BELOW.get().test(mcVersion) ? "ellp.refmap-legacy-fabric.json" : "ellp.refmap-intermediary.json");
     }
 
     private static Supplier<VersionPredicate> parseVersionPredicate(String predicate) {
@@ -114,11 +134,30 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
 
         if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
-            MethodNode method = findMethod(targetClass, "method_10518", targetMethodDesc)
+            final MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
+
+            final String mappedMethodName, mappedFieldName;
+            if (V1132_BELOW.get().test(mcVersion)) {
+                mappedMethodName = resolver.mapMethodName(
+                        "intermediary", "net.minecraft.class_244", "method_6006", targetMethodDesc
+                );
+                mappedFieldName = resolver.mapFieldName(
+                        "intermediary", "net.minecraft.class_244", "field_6692", "Ljava/util/Map;"
+                );
+            } else {
+                mappedMethodName = resolver.mapMethodName(
+                        "intermediary", "net.minecraft.class_2477", "method_10518", targetMethodDesc
+                );
+                mappedFieldName = resolver.mapFieldName(
+                        "intermediary", "net.minecraft.class_2477", "field_11487", "Ljava/util/Map;"
+                );
+            }
+
+            MethodNode method = findMethod(targetClass, mappedMethodName, targetMethodDesc)
                     .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("method_10518 is not found in " + targetClassName));
+                    .orElseThrow(() -> new NoSuchElementException(mappedMethodName + " is not found in " + targetClassName));
             AsmTranslationStorage asm = new AsmTranslationStorage(
-                    targetClassName, "field_11487",
+                    targetClassName, mappedFieldName,
                     /*fallback=*/false, /*unmodifiableWrap=*/true, /*guardPutField=*/false
             );
             asm.accept(method);
