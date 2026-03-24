@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static java.lang.invoke.MethodHandles.*;
+
 @AsmHook.AsmEntrypoint
 public final class AsmHook {
     @Target({ElementType.TYPE, ElementType.METHOD})
@@ -78,11 +80,11 @@ public final class AsmHook {
             return o1 == o2;
         }
 
-        static final MethodHandle refEqual = doCall(() -> MethodHandles.lookup().findStatic(
+        static final MethodHandle refEqual = doCall(() -> lookup().findStatic(
                 GuardRefImpl.class, "refEqual", MethodType.methodType(boolean.class, Object.class, Object.class)
         ), "Cannot access refEqual");
 
-        static final MethodHandle checkInstance = doCall(() -> MethodHandles.publicLookup().findVirtual(
+        static final MethodHandle checkInstance = doCall(() -> publicLookup().findVirtual(
                 Class.class, "isInstance", MethodType.methodType(boolean.class, Object.class)
         ), "Cannot find Class.isInstance()");
 
@@ -90,13 +92,13 @@ public final class AsmHook {
             final String identity = obj.getClass().getName() + '@' + Integer.toHexString(obj.hashCode());
             logger.error(new IncompatibleClassChangeError(errorMessage + ": " + identity));
         }
-        static final MethodHandle logError = doCall(() -> MethodHandles.lookup().findStatic(
+        static final MethodHandle logError = doCall(() -> lookup().findStatic(
                 GuardRefImpl.class, "logError", MethodType.methodType(void.class, Logger.class, String.class, Object.class)
         ).bindTo(LogManager.getLogger(AsmHook.class)), "Cannot build logError");
     }
 
     @AsmEntrypoint
-    public static CallSite makeUnmodifiableView(MethodHandles.Lookup ignoreLookup, String errorMessage, MethodType methodType,
+    public static CallSite makeUnmodifiableView(Lookup ignoreLookup, String errorMessage, MethodType methodType,
                                                 MethodHandle fallback,
                                                 Object... checks) {
         errorMessage = new String(Base64.getUrlDecoder().decode(errorMessage), StandardCharsets.UTF_8);
@@ -145,7 +147,7 @@ public final class AsmHook {
                 // Support zero or one argument
                 switch (handle.type().parameterCount()) {
                     case 0:
-                        handle = MethodHandles.dropArguments(handle, 0, paramType);
+                        handle = dropArguments(handle, 0, paramType);
                         break;
                     case 1:
                         Preconditions.checkArgument(
@@ -169,13 +171,13 @@ public final class AsmHook {
         }
         //</editor-fold>
 
-        final MethodHandle success = MethodHandles.identity(paramType).asType(methodType);
+        final MethodHandle success = identity(paramType).asType(methodType);
         if (guards.isEmpty()) {
             return new ConstantCallSite(success);
         }
 
         final MethodHandle logException = logException(fallback, errorMessage).asType(methodType);
-        final MethodHandle paramToObject = MethodHandles.identity(paramType)
+        final MethodHandle paramToObject = identity(paramType)
                 .asType(MethodType.methodType(Object.class, paramType));    // (T) -> O
 
         MethodHandle ret = logException;
@@ -186,20 +188,20 @@ public final class AsmHook {
             if (process.type().returnType() == boolean.class) {
                 test = process.asType(MethodType.methodType(boolean.class, paramType));
             } else {
-                test = MethodHandles.filterArguments(
+                test = filterArguments(
                         GuardRefImpl.refEqual, 1,
                         process.asType(MethodType.methodType(Object.class, paramType))
                 );    // (Ref[O], UnmappedRef[T]) -> Z
-                test = MethodHandles.foldArguments(test, paramToObject);    // (T) -> Z
+                test = foldArguments(test, paramToObject);    // (T) -> Z
             }
-            ret = MethodHandles.guardWithTest(test, success, ret);
+            ret = guardWithTest(test, success, ret);
         }
 
         return new ConstantCallSite(ret.asType(methodType));
     }
 
     private static MethodHandle logException(MethodHandle fallback, String errorMessage) {
-        return MethodHandles.foldArguments(
+        return foldArguments(
                 fallback.asType(fallback.type().changeParameterType(0, Object.class)),
                 GuardRefImpl.logError.bindTo(errorMessage)
         );
