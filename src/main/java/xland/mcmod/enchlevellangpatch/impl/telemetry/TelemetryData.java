@@ -9,6 +9,7 @@ public class TelemetryData {
     public static JsonObject getMandatory() {
         JsonObject obj = new JsonObject();
         obj.addProperty("schema", TELEMETRY_SCHEMA);
+        obj.addProperty("client_time", System.currentTimeMillis());
         obj.addProperty("mod_version", LangPatchImpl.class.getPackage().getImplementationVersion());
         obj.addProperty("mod_platform", Platform.CURRENT.getName());
         obj.addProperty("mc_version", Platform.CURRENT.getMinecraftVersion());
