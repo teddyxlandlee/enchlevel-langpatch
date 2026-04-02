@@ -17,3 +17,5 @@ plugins {
 }
 
 rootProject.name = "enchlevel-langpatch"
+
+include("telemetry")

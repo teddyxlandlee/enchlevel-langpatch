@@ -1,6 +1,7 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -9,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
+import xland.mcmod.enchlevellangpatch.impl.telemetry.LangPatchTelemetry;
+import xland.mcmod.enchlevellangpatch.impl.telemetry.TelemetryConfig;
+import xland.mcmod.enchlevellangpatch.impl.telemetry.TelemetryData;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -193,6 +197,7 @@ public final class LangPatchImpl {
                         .apply(translationStorage, key)
         );
         lockPredicates();
+        sendTelemetry();
     }
 
     private static void applyConf4() {
@@ -232,6 +237,32 @@ public final class LangPatchImpl {
             EnchantmentLevelLangPatchConfig.setCurrentPotionHooks(patch);
             LOGGER.info(marker, "Set potion hook to {}", p);
         }
+    }
+
+    private static void sendTelemetry() {
+        final Marker telemetryMarker = MarkerManager.getMarker("LangPatch/Telemetry");
+        final JsonObject data;
+
+        try {
+            switch (TelemetryConfig.getCurrent()) {
+                case DISABLED:
+                    LOGGER.debug(telemetryMarker, "Telemetry is disabled");
+                    return;
+                case MANDATORY:
+                    data = TelemetryData.getMandatory();
+                    break;
+                case FULL:
+                    data = TelemetryData.getFull();
+                    break;
+                default:
+                    throw new IncompatibleClassChangeError(TelemetryConfig.class.getName());
+            }
+        } catch (Exception e) {
+            LOGGER.debug(telemetryMarker, "Failed to send telemetry", e);
+            return;
+        }
+
+        LangPatchTelemetry.ofThread(data.toString()).start();
     }
 
     // *** MINECRAFT HOOK *** //

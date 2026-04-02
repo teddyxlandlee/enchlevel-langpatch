@@ -18,6 +18,7 @@ plugins {
     idea
     id("me.modmuss50.mod-publish-plugin") version "1.1.0"
     id("xland.gradle.forge-init-injector") version "3.1.0"
+    id("com.gradleup.shadow") version "9.4.1"
     `maven-publish`
 }
 
@@ -32,6 +33,13 @@ java {
 
 group = project.ext["maven_group"]!!
 version = project.ext["mod_version"]!!
+
+val embedded by configurations.registering {
+    isTransitive = false
+}
+configurations.implementation {
+    extendsFrom(embedded)
+}
 
 allprojects {
     repositories {
@@ -61,6 +69,9 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${project.ext["loader_version"]}")
     compileOnlyApi("com.google.guava:guava:21.0")
     implementation("it.unimi.dsi:fastutil:8.2.1")
+
+    add("embedded", project(":telemetry", configuration="allSources"))
+
     implementation("net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5") {
         isTransitive = false
     }
@@ -157,7 +168,9 @@ tasks.javadoc {
     }
 }
 
-tasks.jar {
+tasks.shadowJar {
+    configurations = embedded.map(::listOf)
+
     from("LICENSE") {
         rename { "META-INF/LICENSE_${project.base.archivesName.get()}" }
     }
@@ -172,6 +185,11 @@ tasks.jar {
         "MixinConfigs"             to "ellp-forge.mixins.json", // for Forge FML
         "FMLCorePlugin"            to "xland.mcmod.enchlevellangpatch.mixin.LegacyFMLPlugin",
     )
+    archiveClassifier = ""
+}
+
+tasks.jar {
+    archiveClassifier = "dev"
 }
 
 //<editor-fold desc="Template Packs" defaultstate="collapsed">
@@ -285,7 +303,7 @@ tasks.build {
 fun javaVersions(range: IntRange) = range.map(JavaVersion::toVersion)
 
 publishMods {
-    file = tasks.jar.flatMap { it.archiveFile }
+    file = tasks.shadowJar.flatMap { it.archiveFile }
     modLoaders.addAll("fabric", "forge", "neoforge", "quilt")
     type = providers.gradleProperty("release_type").map(ReleaseType::of)
     changelog = providers.gradleProperty("changelog")
@@ -330,7 +348,7 @@ publishMods {
 publishing {
     publications {
         register<MavenPublication>("mavenJava") {
-            artifact(tasks.jar)
+            artifact(tasks.shadowJar)
             artifact(tasks["sourcesJar"])
         }
     }
