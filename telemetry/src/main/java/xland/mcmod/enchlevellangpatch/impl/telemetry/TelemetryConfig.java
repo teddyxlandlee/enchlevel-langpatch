@@ -27,6 +27,8 @@ public enum TelemetryConfig {
         }
 
         Path path = Paths.get("config", "enchlevel-langpatch-telemetry.txt");
+        if (!Files.exists(path)) return DEFAULT;    // not using Files.notExists(): "unknown" -> false -> DEFAULT
+
         String line;
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             while ((line = reader.readLine()) != null) {
