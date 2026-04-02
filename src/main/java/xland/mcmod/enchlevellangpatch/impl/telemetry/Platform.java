@@ -3,6 +3,7 @@ package xland.mcmod.enchlevellangpatch.impl.telemetry;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -16,6 +17,11 @@ abstract class Platform {
     abstract String getName();
 
     abstract String getMinecraftVersion();
+
+    String getModVersion() {
+        String ver = LangPatchImpl.class.getPackage().getImplementationVersion();
+        return ver == null ? "" : ver;
+    }
 
     private static Platform probe() {
         try {
@@ -66,6 +72,13 @@ abstract class Platform {
         @Override
         String getMinecraftVersion() {
             return FabricLoader.getInstance().getRawGameVersion();
+        }
+
+        @Override
+        String getModVersion() {
+            return FabricLoader.getInstance().getModContainer("enchlevel-langpatch")
+                    .map(m -> m.getMetadata().getVersion().getFriendlyString())
+                    .orElse("");
         }
     }
 
@@ -146,6 +159,11 @@ abstract class Platform {
 
         @Override
         String getMinecraftVersion() {
+            return "";
+        }
+
+        @Override
+        String getModVersion() {
             return "";
         }
     }

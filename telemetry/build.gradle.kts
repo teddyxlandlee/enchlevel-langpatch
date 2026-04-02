@@ -23,6 +23,8 @@ val java16 by sourceSets.registering {
     java.srcDir("src/java16/java")
     compileClasspath += sourceSets.main.get().output
     runtimeClasspath += sourceSets.main.get().output
+    compileClasspath += sourceSets.main.get().compileClasspath
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath
 }
 
 java {

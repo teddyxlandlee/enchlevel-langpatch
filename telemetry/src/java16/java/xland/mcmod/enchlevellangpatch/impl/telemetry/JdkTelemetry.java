@@ -14,7 +14,7 @@ final class JdkTelemetry extends LangPatchTelemetry {
     @Override
     public Void call() throws Exception {
         // non-async: already run in new thread
-        HttpClient.newHttpClient().send(
+        var response = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create(TELEMETRY_ENDPOINT))
                         .setHeader("User-Agent", getUserAgent())
                         .setHeader("Content-Type", "application/json")
@@ -22,6 +22,10 @@ final class JdkTelemetry extends LangPatchTelemetry {
                         .build(),
                 HttpResponse.BodyHandlers.discarding()
         );
+        if (LOGGER.isDebugEnabled()) {
+            int statusCode = response.statusCode();
+            LOGGER.debug("Telemetry response [{}]", statusCode);
+        }
 
         return null;
     }

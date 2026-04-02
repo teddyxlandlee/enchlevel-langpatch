@@ -1,5 +1,6 @@
 package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -22,7 +23,11 @@ final class ApacheTelemetry extends LangPatchTelemetry {
             entity.setContentType("application/json");
 
             request.setEntity(entity);
-            client.execute(request);
+            CloseableHttpResponse response = client.execute(request);
+            if (LOGGER.isDebugEnabled()) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                LOGGER.debug("Telemetry response code: {}", statusCode);
+            }
         }
 
         return null;

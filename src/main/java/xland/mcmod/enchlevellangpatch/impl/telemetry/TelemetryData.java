@@ -1,7 +1,6 @@
 package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
 import com.google.gson.JsonObject;
-import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 
 public class TelemetryData {
     static final int TELEMETRY_SCHEMA = 1;
@@ -17,7 +16,7 @@ public class TelemetryData {
     public static JsonObject getFunctional() {
         JsonObject obj =  getNecessary();
         obj.addProperty("telemetry_level", LEVEL_FUNCTIONAL);
-        obj.addProperty("mod_version", LangPatchImpl.class.getPackage().getImplementationVersion());
+        obj.addProperty("mod_version", Platform.CURRENT.getModVersion());
         obj.addProperty("mod_platform", Platform.CURRENT.getName());
         obj.addProperty("mc_version", Platform.CURRENT.getMinecraftVersion());
         return obj;
