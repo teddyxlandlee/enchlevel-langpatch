@@ -17,7 +17,9 @@ public class TelemetryData {
     }
 
     public static JsonObject getFull() {
-        return getMandatory();
+        JsonObject obj =  getMandatory();
+        obj.addProperty("full_telemetry", true);
+        return obj;
     }
 
 }
