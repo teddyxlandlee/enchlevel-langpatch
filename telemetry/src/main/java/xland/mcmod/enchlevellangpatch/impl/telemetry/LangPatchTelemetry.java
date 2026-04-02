@@ -16,7 +16,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         final LangPatchTelemetry telemetry;
         if (isApacheHttpClientAvailable()) {
             telemetry = new ApacheTelemetry(data);
-        } else if (isJava11OrLater()) {
+        } else if (isJava16OrLater()) {
             try {
                 Class<?> c = Class.forName("xland.mcmod.enchlevellangpatch.impl.telemetry.JdkTelemetry");
                 telemetry = (LangPatchTelemetry) c.getConstructor(String.class).newInstance(data);
@@ -48,11 +48,11 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         }
     }
 
-    private static boolean isJava11OrLater() {
+    private static boolean isJava16OrLater() {
         String versionString = System.getProperty("java.version");
         int versionInt = Integer.parseInt(versionString.substring(0, versionString.indexOf('.')));
         // For Java 8, this variable is 1 (from "1.8.*"), also returns false
-        return versionInt >= 11;
+        return versionInt >= 16;
     }
 
     protected final String data;
