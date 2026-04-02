@@ -46,9 +46,21 @@ abstract class Platform {
     }
 
     private static final class FabricPlatform extends Platform {
+        private final boolean isQuilt;
+
+        private FabricPlatform() {
+            boolean isQuilt0 = false;
+            try {
+                Class.forName("org.quiltmc.loader.api.QuiltLoader");
+                isQuilt0 = true;
+            } catch (ClassNotFoundException ignore) {
+            }
+            isQuilt = isQuilt0;
+        }
+
         @Override
         String getName() {
-            return "fabric";
+            return isQuilt ? "quilt" : "fabric";
         }
 
         @Override
