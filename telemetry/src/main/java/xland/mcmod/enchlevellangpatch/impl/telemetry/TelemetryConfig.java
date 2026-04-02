@@ -9,72 +9,51 @@ import java.util.Locale;
 
 public enum TelemetryConfig {
     DISABLED,
-    MANDATORY,
-    FULL,
+    NECESSARY,
+    FUNCTIONAL,
+    OPTIONAL,
     ;
 
-    private static final TelemetryConfig CURRENT;
+    private static final TelemetryConfig DEFAULT = FUNCTIONAL;
+    private static final TelemetryConfig CURRENT = detect();
 
     public static TelemetryConfig getCurrent() {
         return CURRENT;
     }
 
-    static {
-        boolean isTelemetryDisabled0;
-        boolean enablesFullTelemetry0 = false;
-
+    private static TelemetryConfig detect() {
         if (Boolean.getBoolean("xland.mcmod.enchlevellangpatch.disableTelemetry")) {
-            isTelemetryDisabled0 = true;
-        } else {
-            Path path = Paths.get("config", "enchlevel-langpatch-telemetry.txt");
-            if (Files.notExists(path)) {
-                isTelemetryDisabled0 = false;
-            } else {
-                try (BufferedReader reader = Files.newBufferedReader(path)) {
-                    String option;
-                    while ((option = reader.readLine()) != null) {
-                        option = option.trim();
-                        if (!option.isEmpty() && !option.startsWith("#")) break;
-                    }
-
-                    if (option == null) {
-                        LangPatchTelemetry.LOGGER.warn("Invalid telemetry config file: {}", path);
-                        isTelemetryDisabled0 = false;
-                    } else {
-                        switch (option.toLowerCase(Locale.ROOT)) {
-                            case "no":
-                            case "disable":
-                            case "disabled":
-                            case "false":
-                                isTelemetryDisabled0 = true;
-                                break;
-                            case "full":
-                            case "extra":
-                                isTelemetryDisabled0 = false;
-                                enablesFullTelemetry0 = true;
-                                break;
-                            case "yes":
-                            case "enable":
-                            case "enabled":
-                            case "true":
-                            case "mandatory":
-                            default:
-                                isTelemetryDisabled0 = false;
-                                break;
-                        }
-                    }
-                } catch (IOException e) {
-                    isTelemetryDisabled0 = false;
-                }
-            }
+            return DISABLED;
         }
 
-        if (isTelemetryDisabled0) {
-            CURRENT = DISABLED;
-        } else if (enablesFullTelemetry0) {
-            CURRENT = FULL;
-        } else {
-            CURRENT = MANDATORY;
+        Path path = Paths.get("config", "enchlevel-langpatch-telemetry.txt");
+        String line;
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) break;
+            }
+            if (line == null) return DEFAULT;
+        } catch (IOException e) {
+            LangPatchTelemetry.LOGGER.warn("Telemetry config file read error", e);
+            return DEFAULT;
+        }
+
+        switch (line.toLowerCase(Locale.ROOT)) {
+            case "disabled":
+            case "-1":
+                return DISABLED;
+            case "necessary":
+            case "0":
+                return NECESSARY;
+            case "functional":
+            case "1":
+                return FUNCTIONAL;
+            case "optional":
+            case "2":
+                return OPTIONAL;
+            default:
+                return DEFAULT;
         }
     }
 }

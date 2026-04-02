@@ -244,14 +244,18 @@ public final class LangPatchImpl {
         final JsonObject data;
 
         try {
-            switch (TelemetryConfig.getCurrent()) {
+            TelemetryConfig telemetryConfig = TelemetryConfig.getCurrent();
+            LOGGER.info(telemetryMarker, "Telemetry Level: {}", telemetryConfig);
+            switch (telemetryConfig) {
                 case DISABLED:
-                    LOGGER.debug(telemetryMarker, "Telemetry is disabled");
                     return;
-                case MANDATORY:
-                    data = TelemetryData.getMandatory();
+                case NECESSARY:
+                    data = TelemetryData.getNecessary();
                     break;
-                case FULL:
+                case FUNCTIONAL:
+                    data = TelemetryData.getFunctional();
+                    break;
+                case OPTIONAL:
                     data = TelemetryData.getFull();
                     break;
                 default:
