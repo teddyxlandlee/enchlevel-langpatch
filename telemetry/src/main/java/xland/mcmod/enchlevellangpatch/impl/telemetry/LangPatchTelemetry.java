@@ -4,10 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class LangPatchTelemetry implements Callable<Void> {
-    public static Thread ofThread(String data) {
-        return new Thread(() -> sendTelemetry(data), "LangPatch-Telemetry");
+    public static CompletableFuture<Void> ofFuture(String data) {
+//        return new Thread(() -> sendTelemetry(data), "LangPatch-Telemetry");
+        return CompletableFuture.runAsync(() -> sendTelemetry(data));
     }
 
     private static void sendTelemetry(String data) {
