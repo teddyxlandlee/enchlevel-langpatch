@@ -4,6 +4,9 @@
 **For Forge 1.13.x users:** [ModernMixins](https://modrinth.com/mod/modernmixins)
 (or any alternative Mixin loader) is required.
 
+**Telemetry Settings:** You can adjust the telemetry level by creating/editing `config/enchlevel-langpatch-telemetry.txt`.  
+Available options: `disabled`, `necessary`, `functional`, or `optional`.
+
 Without the patch:
 
 ![Sharpness enchantment.level.100](https://i.loli.net/2021/10/04/2m8XUWgJZkA6BIs.png)
