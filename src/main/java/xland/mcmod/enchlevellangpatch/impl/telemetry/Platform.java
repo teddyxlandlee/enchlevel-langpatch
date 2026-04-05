@@ -25,12 +25,6 @@ abstract class Platform {
 
     private static Platform probe() {
         try {
-            Class.forName("net.fabricmc.loader.api.FabricLoader");
-            return new FabricPlatform();
-        } catch (ClassNotFoundException ignore) {
-        }
-
-        try {
             Class.forName("net.minecraftforge.versions.forge.ForgeVersion");
             return new ForgePlatform();
         } catch (ClassNotFoundException ignore) {
@@ -45,6 +39,14 @@ abstract class Platform {
         try {
             Class<?> c = Class.forName("net.neoforged.fml.loading.FMLLoader");
             return new NeoPlatform(c);
+        } catch (ClassNotFoundException ignore) {
+        }
+
+        // Sort Fabric after (Neo)Forge because of Sinytra Connector and stuff
+        // see issue #9
+        try {
+            Class.forName("net.fabricmc.loader.api.FabricLoader");
+            return new FabricPlatform();
         } catch (ClassNotFoundException ignore) {
         }
 
@@ -71,14 +73,24 @@ abstract class Platform {
 
         @Override
         String getMinecraftVersion() {
-            return FabricLoader.getInstance().getRawGameVersion();
+            try {
+                return FabricLoader.getInstance().getRawGameVersion();
+            } catch (Throwable t) {
+                LOGGER.warn("Failed to access rawGameVersion", t);
+                return "";
+            }
         }
 
         @Override
         String getModVersion() {
-            return FabricLoader.getInstance().getModContainer("enchlevel-langpatch")
-                    .map(m -> m.getMetadata().getVersion().getFriendlyString())
-                    .orElse("");
+            try {
+                return FabricLoader.getInstance().getModContainer("enchlevel-langpatch")
+                        .map(m -> m.getMetadata().getVersion().getFriendlyString())
+                        .orElse("");
+            } catch (Throwable t) {
+                LOGGER.warn("Failed to access modVersion", t);
+                return super.getModVersion();
+            }
         }
     }
 

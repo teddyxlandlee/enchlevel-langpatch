@@ -262,7 +262,7 @@ public final class LangPatchImpl {
                 default:
                     throw new IncompatibleClassChangeError(TelemetryConfig.class.getName());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOGGER.debug(telemetryMarker, "Failed to send telemetry", e);
             return;
         }
