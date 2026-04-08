@@ -8,7 +8,7 @@ import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import java.util.Map;
 
 public class TelemetryData {
-    static final int TELEMETRY_SCHEMA = 1;
+    static final int TELEMETRY_SCHEMA = 2;
 
     public static JsonObject getNecessary() {
         JsonObject obj = new JsonObject();
