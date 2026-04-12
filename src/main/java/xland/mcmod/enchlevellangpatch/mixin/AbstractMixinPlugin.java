@@ -24,7 +24,11 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
     protected boolean appliesPutFieldGuardCheck;
     protected String storageFieldName;
     protected String targetMethodName;
-    protected String targetMethodDesc;
+
+    protected String targetMethodDesc() {
+        return targetMethodDesc(/*isAbove1194 = */appliesFallback);
+    }
+
     protected abstract boolean shouldApplyExternalLanguageMap();
 
     @Override
@@ -64,36 +68,40 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
                 .filter(m -> name.equals(m.name) && (desc == null || desc.equals(m.desc)));
     }
 
-    protected static String targetMethodDesc(boolean isAbove1194) {
+    private static String targetMethodDesc(boolean isAbove1194) {
         return isAbove1194 ? "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;" : "(Ljava/lang/String;)Ljava/lang/String;";
     }
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        if (!mixinClassName.endsWith(MIXIN_TRANSLATION_STORAGE)) return;
-
-        boolean appliesPutFieldGuardCheck0 = this.appliesPutFieldGuardCheck;
-        if (appliesPutFieldGuardCheck0) {
-            targetClass.visitField(
-                    Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_FINAL,
-                    AsmTranslationStorage.unmodifiableViewFieldName, "Ljava/util/Map;", null, null
-            );
-            try {
-                findMethod(targetClass, "<init>", null).forEach(m -> AsmTranslationStorage.applyPutFieldGuardCheck(m, targetClass.name));
-            } catch (Exception ex) {
-                org.apache.logging.log4j.LogManager.getLogger().error("Exception while applying putFieldGuardCheck. This will be disabled.", ex);
-                appliesPutFieldGuardCheck0 = false;
+        if (mixinClassName.endsWith(MIXIN_TRANSLATION_STORAGE)) {
+            boolean appliesPutFieldGuardCheck0 = this.appliesPutFieldGuardCheck;
+            if (appliesPutFieldGuardCheck0) {
+                targetClass.visitField(
+                        Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_FINAL,
+                        AsmTranslationStorage.unmodifiableViewFieldName, "Ljava/util/Map;", null, null
+                );
+                try {
+                    findMethod(targetClass, "<init>", null).forEach(m -> AsmTranslationStorage.applyPutFieldGuardCheck(m, targetClass.name));
+                } catch (Exception ex) {
+                    org.apache.logging.log4j.LogManager.getLogger().error("Exception while applying putFieldGuardCheck. This will be disabled.", ex);
+                    appliesPutFieldGuardCheck0 = false;
+                }
             }
-        }
 
-        MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc)
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException(
-                        String.format("Method %s.%s:%s not found", targetClassName, targetMethodName, targetMethodDesc)
-                ));
-        AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
-        asm.accept(method);
+            MethodNode method = findMethod(targetClass, targetMethodName, targetMethodDesc())
+                    .findAny()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            String.format("Method %s.%s:%s not found", targetClassName, targetMethodName, targetMethodDesc())
+                    ));
+            AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
+            asm.accept(method);
+        } else if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
+            applyExternal(targetClassName, targetClass);
+        }
     }
+
+    protected abstract void applyExternal(String targetClassName, ClassNode targetClass);
 
     protected void printVersion() {
         LogManager.getLogger(this).info("Loading LangPatch Mixin plugin {}", this);

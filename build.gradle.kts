@@ -336,6 +336,7 @@ publishMods {
 
         this@modrinth.modLoaders.addAll(this@publishMods.modLoaders)
         this@modrinth.modLoaders.add("legacy-fabric")
+        this@modrinth.modLoaders.add("ornithe")
 
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
     }

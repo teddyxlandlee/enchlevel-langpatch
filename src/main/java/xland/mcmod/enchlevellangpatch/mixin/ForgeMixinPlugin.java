@@ -3,7 +3,6 @@ package xland.mcmod.enchlevellangpatch.mixin;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.NoSuchElementException;
 
@@ -16,7 +15,7 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         this.forgeVersion = ForgeVersion.getForgeVersionAsInt();
-        this.targetMethodDesc = targetMethodDesc(appliesFallback = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194);
+        appliesFallback = forgeVersion < 0 || forgeVersion >= ForgeVersion.V1194;
         initNames();
 
         printVersion();
@@ -84,20 +83,15 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
     }
 
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        // Processes MixinTranslationStorage
-        super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo);
-
-        if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
-            MethodNode method = findMethod(targetClass, "func_135064_c", targetMethodDesc)
-                    .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("func_135064_c is not found in " + targetClassName));
-            AsmTranslationStorage asm = new AsmTranslationStorage(
-                    targetClassName, "field_74816_c",
-                    /*fallback=*/false, /*unmodifiableWrap=*/true, /*guardPutField=*/false
-            );
-            asm.accept(method);
-        }
+    protected void applyExternal(String targetClassName, ClassNode targetClass) {
+        MethodNode method = findMethod(targetClass, "func_135064_c", targetMethodDesc())
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("func_135064_c is not found in " + targetClassName));
+        AsmTranslationStorage asm = new AsmTranslationStorage(
+                targetClassName, "field_74816_c",
+                /*fallback=*/false, /*unmodifiableWrap=*/true, /*guardPutField=*/false
+        );
+        asm.accept(method);
     }
 
     @Override
