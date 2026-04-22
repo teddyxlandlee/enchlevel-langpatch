@@ -65,20 +65,28 @@ allprojects {
     }
 }
 
+// Technically, modifications of LangPatch should apply to 1.7.10 as well.
+// However, due to dependency issues (requiring ancient Guava, Log4j, ASM and FML support),
+// we decide to support versions not lower than 1.12.2, whereas attempts on lower versions are
+// not forbidden.
 dependencies {
     implementation("net.fabricmc:fabric-loader:${project.ext["loader_version"]}")
     compileOnlyApi("com.google.guava:guava:21.0")
+    implementation("com.google.code.gson:gson:2.8.0")   // used by MCF 1.12.2~1.17.1
     implementation("it.unimi.dsi:fastutil:8.2.1")
+    implementation("org.apache.logging.log4j:log4j-api:2.8.1")
 
     add("embedded", project(":telemetry", configuration="allSources"))
 
     implementation("net.fabricmc:sponge-mixin:0.11.4+mixin.0.8.5") {
         isTransitive = false
     }
-    implementation("org.ow2.asm:asm:6.2")       // used by MCF 1.12.2
-    implementation("org.ow2.asm:asm-tree:6.2")  // used by MCF 1.12.2
-    implementation("org.ow2.asm:asm-commons:6.2")  // used by MCF 1.12.2
-    implementation("org.apache.logging.log4j:log4j-api:2.8.1")
+
+    // Used by MCF 1.12.2 (actually 5.2; source compiled under 6.2 works; 5.2 targets JDK 1.3
+    // where templates are unsupported)
+    implementation("org.ow2.asm:asm:6.2")
+    implementation("org.ow2.asm:asm-tree:6.2")
+    implementation("org.ow2.asm:asm-commons:6.2")
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
@@ -92,7 +100,6 @@ dependencies {
     compileOnly("net.minecraft:launchwrapper:1.12") {
         isTransitive = false
     }
-    implementation("com.google.code.gson:gson:2.8.0")   // used by MCF 1.12.2~1.17.1
 }
 
 forgeInitInjector {
