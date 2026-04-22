@@ -180,6 +180,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         appliesUnmodifiableWrap = mappingEnv.appliesUnmodifiableWrap(mcVersion);
 
         printVersion();
+        setSystemProperties(mappingEnv);
     }
 
     public static boolean isMojMapped(Version minecraftVersion) {
@@ -199,6 +200,18 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
         // An alternative option (still unclear of its availability)
         // return "official".equals(FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace());
+    }
+
+    private static void setSystemProperties(MappingEnvironment mappingEnv) {
+        switch (mappingEnv) {
+            case ORNITHES_V1:
+            case ORNITHES_V2:
+                System.setProperty("langpatch.fabricEnv", "ornithes");
+                break;
+            case LEGACY_FABRIC:
+                System.setProperty("langpatch.fabricEnv", "legacy-fabric");
+                break;
+        }
     }
 
     @Override

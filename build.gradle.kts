@@ -9,7 +9,7 @@ import me.modmuss50.mpp.ReleaseType
 
 buildscript {
     dependencies {
-        classpath("com.google.guava:guava:33.5.0-jre")
+        classpath("com.google.guava:guava:33.6.0-jre")
     }
 }
 
@@ -82,8 +82,8 @@ dependencies {
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.3")
-    runtimeOnly("com.google.guava:guava:33.5.0-jre")
+    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.4")
+    runtimeOnly("com.google.guava:guava:33.6.0-jre")
     runtimeOnly("com.google.code.gson:gson:2.13.2")
 
     compileOnly("net.minecraftforge:forge:1.12.2-14.23.5.2864:universal") {

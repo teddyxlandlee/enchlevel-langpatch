@@ -68,7 +68,12 @@ abstract class Platform {
 
         @Override
         String getName() {
-            return isQuilt ? "quilt" : "fabric";
+            if (isQuilt) return "quilt";
+            switch (System.getProperty("langpatch.fabricEnv", "")) {
+                case "ornithes": return "ornithes";
+                case "legacy-fabric": return "legacy-fabric";
+                default: return "fabric";
+            }
         }
 
         @Override
