@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNullByDefault;
 import org.jetbrains.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
@@ -156,8 +157,8 @@ public final class LangPatchImpl {
         reg.add(id, hooks);
     }
 
-    public static void register(Predicate<String> keyPredicate,
-                                EnchantmentLevelLangPatch edition) {
+    public static void register(@NotNull Predicate<String> keyPredicate,
+                                @NotNull EnchantmentLevelLangPatch edition) {
         synchronized (PREDICATES_WRITE_LOCK) {
             if (isPredicatesLocked) {
                 LOGGER.warn(MARKER, "Patch list is frozen. The patch may not be applied.");
@@ -283,6 +284,7 @@ public final class LangPatchImpl {
     }
 
     @FunctionalInterface
+    @NotNullByDefault
     interface InterruptablePatchConsumer {
         @Nullable String interrupt(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch);
 

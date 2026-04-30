@@ -1,10 +1,12 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.NotNullByDefault;
 import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.VisibleForTesting;
 
 @VisibleForTesting
+@NotNullByDefault
 public final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
     private final String[] pos;
@@ -45,15 +47,18 @@ public final class ChineseExchange {
     }
 
     @VisibleForTesting
-    public static @NotNull String numberToChinese(@Range(from = 0, to = Integer.MAX_VALUE) int num, int type) {
+    public static String numberToChinese(
+            @Range(from = 0, to = Integer.MAX_VALUE) int num,
+            @MagicConstant(intValues = {NORMAL, UPPER}) int type
+    ) {
         if (num < 256) {
-            return ValueTableHolder.CHINESE[type][num];
+            return ValueTableHolder.CHINESE[type * 256 + num];
         }
         return Lazy.EXCHANGES[type].numberToChinese(num);
     }
 
     @VisibleForTesting
-    public static String numberToChineseCacheless(int num, int type) {
+    public static String numberToChineseCacheless(int num, @MagicConstant(intValues = {NORMAL, UPPER}) int type) {
         return Lazy.EXCHANGES[type].numberToChinese0(num);
     }
 
@@ -61,7 +66,7 @@ public final class ChineseExchange {
         return cacheMap.computeIfAbsent(num, this::numberToChinese0);
     }
 
-    private @NotNull String numberToChinese0(int num) {
+    private String numberToChinese0(int num) {
         if (num == 0) {
             return zeroS;
         }

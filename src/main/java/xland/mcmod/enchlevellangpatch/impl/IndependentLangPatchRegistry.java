@@ -3,6 +3,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.errorprone.annotations.ThreadSafe;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @API(status = API.Status.INTERNAL)
+@ThreadSafe
 public final class IndependentLangPatchRegistry implements Serializable {
     private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map = HashBiMap.create();
 

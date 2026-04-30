@@ -2,15 +2,18 @@ package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNullByDefault;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
 @API(status = API.Status.INTERNAL)
+@NotNullByDefault
 public final class NamespacedKey implements Comparable<NamespacedKey>, java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private static final Pattern NS_PATTERN, PATH_PATTERN;
     private final String namespace, path;
-    private transient String toStringCache;
+    private transient @Nullable String toStringCache;
 
     public NamespacedKey(String namespace, String path) {
         Preconditions.checkArgument(NS_PATTERN.matcher(namespace).matches(), "Illegal namespace: " + namespace);

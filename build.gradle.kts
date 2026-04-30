@@ -90,6 +90,7 @@ dependencies {
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
+    compileOnly("com.google.errorprone:error_prone_annotations:2.49.0")
     runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.4")
     runtimeOnly("com.google.guava:guava:33.6.0-jre")
     runtimeOnly("com.google.code.gson:gson:2.13.2")

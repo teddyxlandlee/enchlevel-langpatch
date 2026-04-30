@@ -69,4 +69,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
     protected static String getUserAgent() {
         return "LangPatch/" + LangPatchTelemetry.class.getPackage().getImplementationVersion();
     }
+
+    @Override
+    public abstract Void call() throws Exception;
 }

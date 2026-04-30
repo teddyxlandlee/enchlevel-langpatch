@@ -36,7 +36,7 @@ public class LegacyModContainer extends DummyModContainer {
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
+    @SuppressWarnings("UnstableApiUsage")   // Guava's EventBus
     public boolean registerBus(EventBus bus, LoadController controller) {
         bus.register(new Object() {
             @Subscribe

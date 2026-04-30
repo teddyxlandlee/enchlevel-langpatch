@@ -1,16 +1,17 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNullByDefault;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@NotNullByDefault
 final class PredicatedPatch {
-    private final @NotNull Predicate<String> keyPredicate;
-    private final @NotNull EnchantmentLevelLangPatch langPatch;
+    private final Predicate<String> keyPredicate;
+    private final EnchantmentLevelLangPatch langPatch;
 
-    PredicatedPatch(@NotNull Predicate<String> keyPredicate, @NotNull EnchantmentLevelLangPatch langPatch) {
+    PredicatedPatch(Predicate<String> keyPredicate, EnchantmentLevelLangPatch langPatch) {
         Objects.requireNonNull(keyPredicate, "keyPredicate");
         Objects.requireNonNull(langPatch, "langPatch");
 
@@ -18,11 +19,11 @@ final class PredicatedPatch {
         this.langPatch = langPatch;
     }
 
-    public @NotNull Predicate<String> getKeyPredicate() {
+    public Predicate<String> getKeyPredicate() {
         return keyPredicate;
     }
 
-    public @NotNull EnchantmentLevelLangPatch getLangPatch() {
+    public EnchantmentLevelLangPatch getLangPatch() {
         return langPatch;
     }
 
