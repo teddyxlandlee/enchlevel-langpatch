@@ -2,13 +2,16 @@ package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class LangPatchTelemetry implements Callable<Void> {
     public static CompletableFuture<Void> ofFuture(String data) {
-//        return new Thread(() -> sendTelemetry(data), "LangPatch-Telemetry");
         return CompletableFuture.runAsync(() -> sendTelemetry(data));
     }
 
@@ -16,9 +19,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         if (TelemetryConfig.getCurrent() == TelemetryConfig.DISABLED) return;
 
         final LangPatchTelemetry telemetry;
-        if (isApacheHttpClientAvailable()) {
-            telemetry = new ApacheTelemetry(data);
-        } else if (isJava16OrLater()) {
+        if (isJava11OrLater()) {
             try {
                 Class<?> c = Class.forName("xland.mcmod.enchlevellangpatch.impl.telemetry.JdkTelemetry");
                 telemetry = (LangPatchTelemetry) c.getConstructor(String.class).newInstance(data);
@@ -26,6 +27,8 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
                 LOGGER.error("Failed to instantiate JdkTelemetry", e);
                 return;
             }
+        } else if (isApacheHttpClientAvailable()) {
+            telemetry = new ApacheTelemetry(data);
         } else {
             LOGGER.error(
                     "Corrupted telemetry environment: no Apache httpclient found; Java version: {}",
@@ -50,11 +53,11 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         }
     }
 
-    private static boolean isJava16OrLater() {
+    private static boolean isJava11OrLater() {
         String versionString = System.getProperty("java.version");
         int versionInt = Integer.parseInt(versionString.substring(0, versionString.indexOf('.')));
         // For Java 8, this variable is 1 (from "1.8.*"), also returns false
-        return versionInt >= 16;
+        return versionInt >= 11;
     }
 
     protected final String data;
@@ -66,10 +69,36 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
 
     protected static final String TELEMETRY_ENDPOINT = "https://telemetry.langpatch.mc.7c7.icu/api/telemetry";
 
-    protected static String getUserAgent() {
-        return "LangPatch/" + LangPatchTelemetry.class.getPackage().getImplementationVersion();
+    protected static final String REDIRECT_HEADER = "X-Entrypoint-Redirect";
+    protected static final Collection<String> ALLOWED_REDIRECT_HOST = Collections.singleton(
+            "telemetry2.langpatch.mc.7c7.icu"
+    );
+
+    protected static void redirectIfLegal(@Nullable URI redirectHeaderValue, Callable<?> action) throws Exception {
+        String host;
+        if (redirectHeaderValue != null && (host = redirectHeaderValue.getHost()) != null &&
+                ALLOWED_REDIRECT_HOST.contains(host) &&
+                "https".equals(redirectHeaderValue.getScheme())
+        ) {
+            action.call();
+        } else {
+            LOGGER.warn("Illegal {} value: {}. Redirection aborted.", REDIRECT_HEADER, redirectHeaderValue);
+        }
+    }
+
+    protected static void redirectIfLegal(@Nullable String redirectHeaderValue, Callable<?> action) throws Exception {
+        redirectIfLegal(
+                redirectHeaderValue == null ? null : URI.create(redirectHeaderValue),
+                action
+        );
+    }
+
+    protected String getUserAgent() {
+        return "LangPatch/" +
+                LangPatchTelemetry.class.getPackage().getImplementationVersion() +
+                "(Client: " + getClass().getSimpleName() + ')';
     }
 
     @Override
-    public abstract Void call() throws Exception;
+    public abstract @Nullable Void call() throws Exception;
 }

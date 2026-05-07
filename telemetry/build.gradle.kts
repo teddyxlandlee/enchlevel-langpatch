@@ -8,6 +8,9 @@ dependencies {
     // java.net.http for 1.17+ (in `java11` sourceset)
     compileOnly("org.apache.httpcomponents:httpclient:4.3.3")
     implementation("org.apache.logging.log4j:log4j-api:2.8.1")
+
+    // Nullability annotations
+    compileOnly("org.jetbrains:annotations:26.1.0")
 }
 
 tasks.withType<JavaCompile>().configureEach {
