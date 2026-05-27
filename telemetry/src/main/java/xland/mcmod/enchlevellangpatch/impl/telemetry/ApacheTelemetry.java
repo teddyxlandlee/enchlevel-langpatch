@@ -1,11 +1,14 @@
 package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
-import org.apache.http.Header;
+import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.protocol.HttpContext;
 
 import java.nio.charset.StandardCharsets;
 
@@ -18,6 +21,22 @@ final class ApacheTelemetry extends LangPatchTelemetry {
     public Void call() throws Exception {
         try (CloseableHttpClient client = HttpClientBuilder.create()
                 .setUserAgent(getUserAgent())
+                .setRedirectStrategy(new LaxRedirectStrategy() {
+                    @Override
+                    @SuppressWarnings("IncorrectHttpHeaderInspection")
+                    public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context) throws ProtocolException {
+                        StatusLine statusLine = response.getStatusLine();
+                        if (statusLine != null && statusLine.getStatusCode() == 308) {
+                            // permanent redirect is not supported by Apache's httpclient v4.3.3
+                            // let it be 307
+                            response.setStatusCode(HttpStatus.SC_TEMPORARY_REDIRECT);
+                            //noinspection IncorrectHttpHeaderInspection
+                            response.addHeader("X-Http-Status-Mock", "308");
+                        }
+
+                        return super.getRedirect(request, response, context);
+                    }
+                })
                 .build()) {
             HttpPost request = buildJsonPostRequest(TELEMETRY_ENDPOINT);
             CloseableHttpResponse response = client.execute(request);

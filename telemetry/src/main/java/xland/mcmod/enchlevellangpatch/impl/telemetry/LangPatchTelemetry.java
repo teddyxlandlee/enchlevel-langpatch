@@ -2,6 +2,7 @@ package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
@@ -69,7 +70,9 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
 
     protected static final String TELEMETRY_ENDPOINT = "https://telemetry.langpatch.mc.7c7.icu/api/telemetry";
 
+    @ApiStatus.Obsolete
     protected static final String REDIRECT_HEADER = "X-Entrypoint-Redirect";
+    @ApiStatus.Obsolete
     protected static final Collection<String> ALLOWED_REDIRECT_HOST = Collections.singleton(
             "telemetry2.langpatch.mc.7c7.icu"
     );

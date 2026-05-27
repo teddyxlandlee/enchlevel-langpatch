@@ -15,7 +15,9 @@ final class JdkTelemetry extends LangPatchTelemetry {
     @Override
     public Void call() throws Exception {
         // non-async: already run in new thread
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
         var response = client.send(
                 buildPostRequest(TELEMETRY_ENDPOINT),
                 HttpResponse.BodyHandlers.discarding()
