@@ -54,8 +54,8 @@ LangPatch, as is named, allows developers to make dynamic changes to in-game tra
 To introduce LangPatch API as a dependency:
 ```groovy
 repositories {
-    // Our new maven
-    maven { url 'https://mvn.7c7.icu' }
+    // Our new maven (2nd change)
+    maven { url 'https://maven.hixland.com' }
 }
 
 dependencies {

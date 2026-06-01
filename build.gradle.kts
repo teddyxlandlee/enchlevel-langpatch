@@ -50,7 +50,7 @@ allprojects {
         maven("https://libraries.minecraft.net") {
             name = "Mojang"
         }
-        maven("https://mvn.7c7.icu") {
+        maven("https://maven.hixland.com") {
             name = "7c7maven"
         }
         maven("https://maven.neoforged.net/releases") {
