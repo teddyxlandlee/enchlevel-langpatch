@@ -68,14 +68,12 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         this.data = data;
     }
 
-    protected static final String TELEMETRY_ENDPOINT = "https://telemetry.langpatch.mc.7c7.icu/api/telemetry";
+    protected static final String TELEMETRY_ENDPOINT = "https://telem.ellp.mods.hixland.com/v2";
 
     @ApiStatus.Obsolete
     protected static final String REDIRECT_HEADER = "X-Entrypoint-Redirect";
     @ApiStatus.Obsolete
-    protected static final Collection<String> ALLOWED_REDIRECT_HOST = Collections.singleton(
-            "telemetry2.langpatch.mc.7c7.icu"
-    );
+    protected static final Collection<String> ALLOWED_REDIRECT_HOST = Collections.emptySet();
 
     protected static void redirectIfLegal(@Nullable URI redirectHeaderValue, Callable<?> action) throws Exception {
         String host;
