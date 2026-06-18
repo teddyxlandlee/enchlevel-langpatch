@@ -156,7 +156,7 @@ abstract class Platform {
 
                 if (mh == null) {
                     MethodHandle getCurrent = lookup.findStatic(fmlLoaderClass, "getCurrent", MethodType.methodType(fmlLoaderClass));
-                    mh = MethodHandles.filterReturnValue(getCurrent, lookup.findVirtual(fmlLoaderClass, "getVersionInfo", MethodType.methodType(fmlLoaderClass)));
+                    mh = MethodHandles.filterReturnValue(getCurrent, lookup.findVirtual(fmlLoaderClass, "getVersionInfo", MethodType.methodType(versionInfoClass)));
                 }
 
                 mh = MethodHandles.filterReturnValue(mh, lookup.findVirtual(versionInfoClass, "mcVersion", MethodType.methodType(String.class)));
