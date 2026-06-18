@@ -7,8 +7,11 @@ public final class FabricEntrypoint {
     private FabricEntrypoint() {}
 
     public static void init() {
-        FabricLoader.getInstance().getEntrypoints("enchlevel-langpatch.init", ClientModInitializer.class)
-                .forEach(ClientModInitializer::onInitializeClient);
+        FabricLoader.getInstance().invokeEntrypoints(
+                "enchlevel-langpatch.init",
+                ClientModInitializer.class,
+                ClientModInitializer::onInitializeClient
+        );
         LangPatchImpl.init();
     }
 }
