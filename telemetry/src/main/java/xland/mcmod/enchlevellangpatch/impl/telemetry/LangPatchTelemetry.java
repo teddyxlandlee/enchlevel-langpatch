@@ -10,11 +10,35 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class LangPatchTelemetry implements Callable<Void> {
-    public static CompletableFuture<Void> ofFuture(String data) {
-        return CompletableFuture.runAsync(() -> sendTelemetry(data));
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.10")
+    public static CompletableFuture<@Nullable Void> ofFuture(String data) {
+        CompletableFuture<@Nullable Void> future = new CompletableFuture<>();
+        Thread templateThread = ofThread(data);
+        Thread actualThread = new Thread(() -> {
+            try {
+                //noinspection CallToThreadRun
+                templateThread.run();
+                future.complete(null);
+            } catch (Throwable t) {
+                future.completeExceptionally(null);
+            }
+        }, templateThread.getName());
+        actualThread.setDaemon(true);
+        actualThread.start();
+        return future;
     }
+
+    public static Thread ofThread(String data) {
+        Thread thread = new Thread(() -> sendTelemetry(data), "LangPatchTelemetry-" + THREAD_COUNTER.incrementAndGet());
+        thread.setDaemon(true);
+        return thread;
+    }
+
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger();
 
     private static void sendTelemetry(String data) {
         if (TelemetryConfig.getCurrent() == TelemetryConfig.DISABLED) return;
