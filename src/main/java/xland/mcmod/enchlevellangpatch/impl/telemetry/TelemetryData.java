@@ -8,7 +8,7 @@ import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import java.util.Map;
 
 public class TelemetryData {
-    static final int TELEMETRY_SCHEMA = 2;
+    static final int TELEMETRY_SCHEMA = 3;
 
     public static JsonObject getNecessary() {
         JsonObject obj = new JsonObject();
@@ -26,6 +26,7 @@ public class TelemetryData {
         obj.addProperty("mc_version", Platform.CURRENT.getMinecraftVersion());
 
         obj.add("current_hooks", getCurrentHooksInfo());
+        obj.addProperty("patch_count", LangPatchImpl.getPatchCount());
         return obj;
     }
 

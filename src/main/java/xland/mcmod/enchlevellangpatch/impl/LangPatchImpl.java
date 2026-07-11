@@ -272,6 +272,10 @@ public final class LangPatchImpl {
         // Do not join, we don't want to block the main thread.
     }
 
+    public static int getPatchCount() {
+        return PREDICATES.size();
+    }
+
     // *** MINECRAFT HOOK *** //
 
     static @Nullable String loop(InterruptablePatchConsumer consumer) {
