@@ -34,7 +34,7 @@ java {
 group = project.ext["maven_group"]!!
 version = project.ext["mod_version"]!!
 
-val embedded by configurations.registering {
+val embedded = configurations.register("embedded") {
     isTransitive = false
 }
 configurations.implementation {
