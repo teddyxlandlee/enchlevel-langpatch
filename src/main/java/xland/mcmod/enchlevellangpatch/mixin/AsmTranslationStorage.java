@@ -97,7 +97,7 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
 
     static final String unmodifiableViewFieldName = "019ce1c8-e8f3-7231-b2bc-062dc83b1c42";
 
-    static void applyPutFieldGuardCheck(MethodNode m, String thisClassName) {
+    static boolean applyPutFieldGuardCheck(MethodNode m, String thisClassName) {
         final Handle bootstrapMethod = new Handle(
                 Opcodes.H_INVOKESTATIC, HOOK_CLASS, "makeUnmodifiableView",
                 Type.getMethodDescriptor(
@@ -154,6 +154,6 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
                 }
             }
         }
-        Preconditions.checkState(injected, "No putField found");
+        return injected;
     }
 }

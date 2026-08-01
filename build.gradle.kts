@@ -16,9 +16,9 @@ buildscript {
 plugins {
     `java-library`
     idea
-    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
+    id("me.modmuss50.mod-publish-plugin") version "2.2.0"
     id("xland.gradle.forge-init-injector") version "3.1.0"
-    id("com.gradleup.shadow") version "9.4.1"
+    id("com.gradleup.shadow") version "9.6.1"
     `maven-publish`
 }
 
@@ -119,6 +119,7 @@ tasks.processResources {
 }
 
 tasks.register("checkValueTableSum") {
+    description = "Compile-time check ValueTable.txt SHA-256 sum"
     val valueTableFile = file("src/main/resources/xland/mcmod/enchlevellangpatch/impl/ValueTable.txt")
     val expectedHash = "3c09cc78904fc47fd583b680ecfa9e2ad7370787ea149d843a56fb8f8c15c8d4"
 
@@ -263,6 +264,7 @@ object TemplatePacks {  // break implicit inner class declaration
             }
             val className = "$pkgName/a"
             val genClass = project.tasks.register("packTemplateModClass_$templateId") {
+                description = "Generate mod class for stub packs"
                 val parts = Triple(
                     "yv66vgAAADQAEQE=", // ClassFile Header
                     // CP#1: utf8 modId
@@ -300,6 +302,7 @@ tasks.register<TemplatePacks.PackTemplate>("packAllArabic", "all_arabic")
 tasks.register<TemplatePacks.PackTemplate>("packAllRoman", "roman")
 
 tasks.register("templatePacks") {
+    description = "Generate stub packs"
     dependsOn("packAllArabic", "packAllRoman")
 }
 
@@ -307,8 +310,6 @@ tasks.build {
     dependsOn("templatePacks")
 }
 //</editor-fold>
-
-fun javaVersions(range: IntRange) = range.map(JavaVersion::toVersion)
 
 publishMods {
     file = tasks.shadowJar.flatMap { it.archiveFile }
@@ -326,10 +327,8 @@ publishMods {
             end = "latest"
         }
         minecraftVersions.addAll(supportedAncientVersions)
-        // CurseForge supports up to Java 22
-        javaVersions.addAll(javaVersions(8..22))
-        clientRequired = true
-        serverRequired = false
+        client = true
+        server = false
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
     }
 

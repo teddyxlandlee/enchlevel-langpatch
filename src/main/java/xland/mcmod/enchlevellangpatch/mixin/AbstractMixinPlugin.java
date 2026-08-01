@@ -1,5 +1,6 @@
 package xland.mcmod.enchlevellangpatch.mixin;
 
+import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,10 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
@@ -82,7 +80,12 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
                         AsmTranslationStorage.unmodifiableViewFieldName, "Ljava/util/Map;", null, null
                 );
                 try {
-                    findMethod(targetClass, "<init>", null).forEach(m -> AsmTranslationStorage.applyPutFieldGuardCheck(m, targetClass.name));
+                    Iterator<MethodNode> iterator = findMethod(targetClass, "<init>", null).iterator();
+                    boolean injected = false;
+                    while (iterator.hasNext()) {
+                        injected |= AsmTranslationStorage.applyPutFieldGuardCheck(iterator.next(), targetClass.name);
+                    }
+                    Preconditions.checkArgument(injected, "No putField found among constructor(s) of " + targetClassName);
                 } catch (Exception ex) {
                     org.apache.logging.log4j.LogManager.getLogger().error("Exception while applying putFieldGuardCheck. This will be disabled.", ex);
                     appliesPutFieldGuardCheck0 = false;
