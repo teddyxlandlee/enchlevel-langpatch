@@ -1,1 +1,0 @@
-typeSearchIndex = [{"p":"xland.mcmod.enchlevellangpatch.api","l":"EnchantmentLevelLangPatch"},{"p":"xland.mcmod.enchlevellangpatch.api","l":"EnchantmentLevelLangPatchConfig"},{"p":"xland.mcmod.enchlevellangpatch.api","l":"EnchantmentLevelLangPatch.WithFallback"},{"l":"所有类和接口","u":"allclasses-index.html"}];updateSearchResults();

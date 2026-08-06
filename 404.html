@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - 页面未找到</title>
+    <style>
+        /* 可选的默认样式，用于显示简单错误信息 */
+        body { font-family: sans-serif; text-align: center; padding: 2rem; }
+        h1 { font-size: 2.5rem; }
+    </style>
+</head>
+<body>
+<script>
+    (function() {
+        // 防止因替换内容导致的无限递归（标志只在首次执行时生效）
+        if (window._redirectProcessed) return;
+        window._redirectProcessed = true;
+
+        var pathname = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+
+        // 工具函数：匹配路径前缀，返回通配符部分（splat）
+        // prefix 不包含尾部斜杠，例如 '/enchlevel-langpatch/javadoc'
+        function matchPrefix(path, prefix) {
+            if (path.startsWith(prefix)) {
+                var rest = path.slice(prefix.length);
+                // 允许剩余部分为空或以 '/' 开头（保证匹配目录本身及子路径）
+                if (rest === '' || rest.startsWith('/')) {
+                    var splat = rest;
+                    // 去掉前导斜杠，避免拼接后出现双斜杠
+                    if (splat.startsWith('/')) {
+                        splat = splat.slice(1);
+                    }
+                    return splat;
+                }
+            }
+            return null;
+        }
+
+        // ---------- 规则 1 ----------
+        // 如果 pathname 匹配 /enchlevel-langpatch/javadoc/*，
+        // 重定向至 https://docs.ellp.mods.hixland.com/:splat
+        var splat = matchPrefix(pathname, '/enchlevel-langpatch/javadoc');
+        if (splat !== null) {
+            var target = 'https://docs.ellp.mods.hixland.com/' + splat + search + hash;
+            window.location.replace(target);
+            return;
+        }
+
+        // ---------- 规则 2 ----------
+        // 如果 pathname 匹配 /enchlevel-langpatch/*，
+        // 则 HEAD 检查 https://ellp.mods.hixland.com/:splat 是否返回 2xx
+        splat = matchPrefix(pathname, '/enchlevel-langpatch');
+        if (splat !== null) {
+            var checkUrl = 'https://ellp.mods.hixland.com/' + splat; // HEAD 请求仅检查路径
+            var redirectUrl = 'https://ellp.mods.hixland.com/' + splat + search + hash; // 重定向时保留查询参数
+            fetch(checkUrl, { method: 'HEAD' })
+                .then(function(response) {
+                    if (response.ok) {
+                        window.location.replace(redirectUrl);
+                    } else {
+                        showDefault404();
+                    }
+                })
+                .catch(function() {
+                    showDefault404();
+                });
+            return;
+        }
+
+        // ---------- 规则 3 ----------
+        // 以上都不满足，则获取 /404.html 的内容并展示
+        showDefault404();
+
+        function showDefault404() {
+            fetch('/404.html')
+                .then(function(res) { return res.text(); })
+                .then(function(html) {
+                    // 替换整个文档内容（由于设置了 _redirectProcessed，新解析的脚本不会再次执行）
+                    document.documentElement.innerHTML = html;
+                })
+                .catch(function() {
+                    // 降级方案：若 fetch 失败，显示简单错误信息
+                    document.body.innerHTML = '<h1>404 - 页面未找到</h1><p>您请求的资源不存在。</p>';
+                });
+        }
+    })();
+</script>
+</body>
+</html>
