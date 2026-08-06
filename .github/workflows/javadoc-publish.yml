@@ -1,0 +1,30 @@
+name: Publish Javadocs
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        name: Checkout repository
+      - uses: actions/setup-java@v5
+        name: Setup Java 25
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: ./gradlew javadoc
+        name: Generate Javadocs
+      - run: cp -r build/docs/javadoc/* javadoc-site
+        name: Copy Javadocs to target directory
+      - uses: actions/upload-artifact@v7
+        name: Upload artifacts
+        with:
+          path: 'javadoc-site'
+      - uses: nwtgck/actions-netlify@v4
+        name: Upload to Netlify
+        with:
+          publish-dir: 'javadoc-site'
+        env:
+          NETLIFY_SITE_ID: ${{ vars.JAVADOCS_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.JAVADOCS_AUTH_TOKEN }}

@@ -158,6 +158,10 @@ java {
 }
 
 tasks.javadoc {
+    javadocTool = javaToolchains.javadocToolFor {
+        languageVersion = JavaLanguageVersion.of(25)
+        vendor = JvmVendorSpec.MICROSOFT
+    }
     isFailOnError = false
     options {
         locale = "en_US"    // this option is invalid in Java 17
@@ -166,7 +170,7 @@ tasks.javadoc {
         encoding = "UTF-8"
         header("LangPatch").apply {
             links(
-                "https://docs.oracle.com/en/java/javase/17/docs/api/",
+                "https://docs.oracle.com/en/java/javase/25/docs/api/",
                 "https://javadoc.io/doc/com.google.guava/guava/21.0/",
                 "https://javadoc.io/doc/org.jetbrains/annotations/26.1.0/",
                 "https://javadoc.io/doc/org.apiguardian/apiguardian-api/1.1.2/",
