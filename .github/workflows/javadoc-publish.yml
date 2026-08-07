@@ -21,10 +21,19 @@ jobs:
         name: Upload artifacts
         with:
           path: 'javadoc-site'
+      - run: |
+          if echo "${{ github.event.head_commit.message }}" | grep '\[javadoc publish\]' ; then
+            echo 'is_production=true' >> $GITHUB_OUTPUT
+          else
+            echo 'is_production=false' >> $GITHUB_OUTPUT
+          fi
+        name: Check production state
+        id: check_production
       - uses: nwtgck/actions-netlify@v4
         name: Upload to Netlify
         with:
           publish-dir: 'javadoc-site'
+          production-deploy: ${{ steps.check_production.outputs.is_production }}
         env:
           NETLIFY_SITE_ID: ${{ vars.JAVADOCS_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.JAVADOCS_AUTH_TOKEN }}
