@@ -90,6 +90,7 @@ dependencies {
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
+    compileOnlyApi("org.jspecify:jspecify:1.0.1")
     compileOnly("com.google.errorprone:error_prone_annotations:2.49.0")
     runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.4")
     runtimeOnly("com.google.guava:guava:33.6.0-jre")
@@ -174,8 +175,10 @@ tasks.javadoc {
                 "https://javadoc.io/doc/com.google.guava/guava/21.0/",
                 "https://javadoc.io/doc/org.jetbrains/annotations/26.1.0/",
                 "https://javadoc.io/doc/org.apiguardian/apiguardian-api/1.1.2/",
+                "https://maven.fabricmc.net/docs/fabric-loader-0.19.3/",
+                "https://javadoc.io/doc/org.jspecify/jspecify/1.0.1/",
             )
-            tags("implNote")
+            tags("implNote:a:Implementation Note")
         }
         include("xland/mcmod/enchlevellangpatch/api/**")
     }

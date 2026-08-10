@@ -2,6 +2,8 @@ package xland.mcmod.enchlevellangpatch.impl.telemetry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,13 +51,14 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
                 Class<?> c = Class.forName("xland.mcmod.enchlevellangpatch.impl.telemetry.JdkTelemetry");
                 telemetry = (LangPatchTelemetry) c.getConstructor(String.class).newInstance(data);
             } catch (Exception e) {
-                LOGGER.error("Failed to instantiate JdkTelemetry", e);
+                LOGGER.error(MARKER, "Failed to instantiate JdkTelemetry", e);
                 return;
             }
         } else if (isApacheHttpClientAvailable()) {
             telemetry = new ApacheTelemetry(data);
         } else {
             LOGGER.error(
+                    MARKER,
                     "Corrupted telemetry environment: no Apache httpclient found; Java version: {}",
                     System.getProperty("java.version")
             );
@@ -65,7 +68,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         try {
             telemetry.call();
         } catch (Exception e) {
-            LOGGER.error("Failed to send telemetry", e);
+            LOGGER.error(MARKER, "Failed to send telemetry", e);
         }
     }
 
@@ -87,6 +90,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
 
     protected final String data;
     protected static final Logger LOGGER = LogManager.getLogger();
+    protected static final Marker MARKER = MarkerManager.getMarker("LangPatch/Telemetry");
 
     public LangPatchTelemetry(String data) {
         this.data = data;
@@ -107,7 +111,7 @@ public abstract class LangPatchTelemetry implements Callable<Void> {
         ) {
             action.call();
         } else {
-            LOGGER.warn("Illegal {} value: {}. Redirection aborted.", REDIRECT_HEADER, redirectHeaderValue);
+            LOGGER.warn(MARKER, "Illegal {} value: {}. Redirection aborted.", REDIRECT_HEADER, redirectHeaderValue);
         }
     }
 

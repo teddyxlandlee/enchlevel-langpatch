@@ -6,9 +6,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.impl.IndependentLangPatchRegistry;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
@@ -21,6 +21,7 @@ import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
  * @see EnchantmentLevelLangPatch#registerPotionPatch
  */
 @API(status = API.Status.STABLE)
+@NullMarked
 public final class EnchantmentLevelLangPatchConfig {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("LangPatch/Config");
@@ -29,7 +30,7 @@ public final class EnchantmentLevelLangPatchConfig {
      * A thread-safe storage for the ID of the current enchantment level and potion
      * potency patches.
      */
-    static volatile @NotNull NamespacedKey
+    static volatile NamespacedKey
             currentEnchantmentHooksId = IndependentLangPatchRegistry.LP_DEFAULT,
             currentPotionHooksId = IndependentLangPatchRegistry.LP_DEFAULT;
 
@@ -78,7 +79,6 @@ public final class EnchantmentLevelLangPatchConfig {
      * @return whether the enchantment level patch registry is frozen
      * @see #setCurrentEnchantmentHooks
      */
-    @SuppressWarnings("unused")
     @API(status = API.Status.EXPERIMENTAL, since = "3.3")
     public static boolean isEnchantmentHooksFrozen() {
         return LangPatchImpl.ENCHANTMENT_HOOK.isFrozen();
@@ -91,7 +91,6 @@ public final class EnchantmentLevelLangPatchConfig {
      * @return whether the potion potency patch registry is frozen
      * @see #setCurrentPotionHooks
      */
-    @SuppressWarnings("unused")
     @API(status = API.Status.EXPERIMENTAL, since = "3.3")
     public static boolean isPotionHooksFrozen() {
         return LangPatchImpl.POTION_HOOK.isFrozen();
@@ -116,22 +115,22 @@ public final class EnchantmentLevelLangPatchConfig {
     private EnchantmentLevelLangPatchConfig() {}
 
     /**
-     * Registered ID-LangPatch context of potion hooks.
-     * @return Registered ID-LangPatch context of potion hooks.
-     */
-    @Unmodifiable
-    @SuppressWarnings("unused")
-    public static BiMap<String, EnchantmentLevelLangPatch> getPotionHooksContext() {
-        return LangPatchImpl.POTION_HOOK.asImmutableBiMap();
-    }
-
-    /**
      * Registered ID-LangPatch context of enchantment hooks.
-     * @return Registered ID-LangPatch context of enchantment hooks.
+     * @return A snapshot of registered ID-to-hook map of enchantment hooks.
      */
     @Unmodifiable
     @SuppressWarnings("unused")
     public static BiMap<String, EnchantmentLevelLangPatch> getEnchantmentHooksContext() {
         return LangPatchImpl.ENCHANTMENT_HOOK.asImmutableBiMap();
+    }
+
+    /**
+     * Registered ID-LangPatch context of potion hooks.
+     * @return A snapshot of registered ID-to-hook map of potion hooks.
+     */
+    @Unmodifiable
+    @SuppressWarnings("unused")
+    public static BiMap<String, EnchantmentLevelLangPatch> getPotionHooksContext() {
+        return LangPatchImpl.POTION_HOOK.asImmutableBiMap();
     }
 }

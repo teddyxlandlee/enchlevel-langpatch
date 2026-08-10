@@ -2,7 +2,12 @@ package xland.mcmod.enchlevellangpatch.api;
 
 import org.apiguardian.api.API;
 import org.intellij.lang.annotations.Pattern;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 import xland.mcmod.enchlevellangpatch.impl.NamespacedKey;
 import xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil;
@@ -18,6 +23,7 @@ import java.util.function.Predicate;
  */
 @API(status = API.Status.STABLE)
 @FunctionalInterface
+@NullMarked
 public interface EnchantmentLevelLangPatch {
     /**
      * Register language patch for any language item you want.
@@ -30,8 +36,8 @@ public interface EnchantmentLevelLangPatch {
      * @see #registerEnchantmentPatch(String, EnchantmentLevelLangPatch)
      * @see #registerPotionPatch(String, EnchantmentLevelLangPatch)
      */
-    static void registerPatch(@NotNull Predicate<String> keyPredicate,
-                              @NotNull EnchantmentLevelLangPatch edition) {
+    static void registerPatch(Predicate<String> keyPredicate,
+                              EnchantmentLevelLangPatch edition) {
         LangPatchImpl.register(Objects.requireNonNull(keyPredicate, "keyPredicate"), Objects.requireNonNull(edition, "edition"));
     }
 
@@ -44,7 +50,7 @@ public interface EnchantmentLevelLangPatch {
      * @return The number in roman format, or {@code null} if
      * {@code num} is out of range ({@code 1..3998}).
      */
-    @Nullable
+    @NullUnmarked
     static String intToRoman(@Range(from = 1, to = 3998) int num) {
         return NumberFormatUtil.intToRoman(num);
     }
@@ -66,8 +72,8 @@ public interface EnchantmentLevelLangPatch {
      * @see #registerPotionPatch
      */
     static void registerEnchantmentPatch(
-            @NotNull @Pattern("^([0-9a-z_\\-]+:)?[0-9a-z_\\-/]+$") String id,
-            @NotNull EnchantmentLevelLangPatch edition) {
+            @Pattern("^([0-9a-z_\\-]+:)?[0-9a-z_\\-/]+$") String id,
+            EnchantmentLevelLangPatch edition) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(edition, "patch");
         LangPatchImpl.hookEnchantmentPatch(NamespacedKey.of(id), edition);
@@ -90,8 +96,8 @@ public interface EnchantmentLevelLangPatch {
      * @see #registerEnchantmentPatch
      */
     static void registerPotionPatch(
-            @NotNull @Pattern("^([0-9a-z_\\-]+:)?[0-9a-z_\\-/]+$") String id,
-            @NotNull EnchantmentLevelLangPatch edition) {
+            @Pattern("^([0-9a-z_\\-]+:)?[0-9a-z_\\-/]+$") String id,
+            EnchantmentLevelLangPatch edition) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(edition, "patch");
         LangPatchImpl.hookPotionPatch(NamespacedKey.of(id), edition);

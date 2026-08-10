@@ -3,11 +3,9 @@ package xland.mcmod.enchlevellangpatch.impl;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNullByDefault;
 import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.VisibleForTesting;
 
-@VisibleForTesting
 @NotNullByDefault
-public final class ChineseExchange {
+final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
     private final String[] pos;
     private final char[] num;
@@ -46,8 +44,7 @@ public final class ChineseExchange {
 //        assert tenOne.equals(pos[1] + num[1]) && zeroS.equals(String.valueOf(num[0]));
     }
 
-    @VisibleForTesting
-    public static String numberToChinese(
+    static String numberToChinese(
             @Range(from = 0, to = Integer.MAX_VALUE) int num,
             @MagicConstant(intValues = {NORMAL, UPPER}) int type
     ) {
@@ -57,7 +54,6 @@ public final class ChineseExchange {
         return Lazy.EXCHANGES[type].numberToChinese(num);
     }
 
-    @VisibleForTesting
     public static String numberToChineseCacheless(int num, @MagicConstant(intValues = {NORMAL, UPPER}) int type) {
         return Lazy.EXCHANGES[type].numberToChinese0(num);
     }

@@ -42,7 +42,7 @@ final class ApacheTelemetry extends LangPatchTelemetry {
             CloseableHttpResponse response = client.execute(request);
             if (LOGGER.isDebugEnabled()) {
                 int statusCode = response.getStatusLine().getStatusCode();
-                LOGGER.debug("Telemetry response code: {}", statusCode);
+                LOGGER.debug(MARKER, "Telemetry response code: {}", statusCode);
             }
 
             Header redirectHeader = request.getFirstHeader(REDIRECT_HEADER);
@@ -59,7 +59,7 @@ final class ApacheTelemetry extends LangPatchTelemetry {
         CloseableHttpResponse response = client.execute(request);
         if (LOGGER.isDebugEnabled()) {
             int statusCode = response.getStatusLine().getStatusCode();
-            LOGGER.debug("Telemetry response code (redirected): {}", statusCode);
+            LOGGER.debug(MARKER, "Telemetry response code (redirected): {}", statusCode);
         }
         return null;
     }

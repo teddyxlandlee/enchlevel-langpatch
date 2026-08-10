@@ -3,6 +3,8 @@ package xland.mcmod.enchlevellangpatch.impl.telemetry;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import xland.mcmod.enchlevellangpatch.impl.LangPatchImpl;
 
 import java.lang.invoke.MethodHandle;
@@ -12,6 +14,7 @@ import java.lang.invoke.MethodType;
 // Why building another wheel: separate "mixin" package
 abstract class Platform {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final Marker MARKER = MarkerManager.getMarker("LangPatch/Telemetry");
     static final Platform CURRENT = probe();
 
     abstract String getName();
@@ -81,7 +84,7 @@ abstract class Platform {
             try {
                 return FabricLoader.getInstance().getRawGameVersion();
             } catch (Throwable t) {
-                LOGGER.warn("Failed to access rawGameVersion", t);
+                LOGGER.warn(MARKER, "Failed to access rawGameVersion", t);
                 return "";
             }
         }
@@ -93,7 +96,7 @@ abstract class Platform {
                         .map(m -> m.getMetadata().getVersion().getFriendlyString())
                         .orElse("");
             } catch (Throwable t) {
-                LOGGER.warn("Failed to access modVersion", t);
+                LOGGER.warn(MARKER, "Failed to access modVersion", t);
                 return super.getModVersion();
             }
         }
@@ -122,7 +125,7 @@ abstract class Platform {
                 }
                 return (String) mh.invokeExact();
             } catch (Throwable t) {
-                LOGGER.warn("Failed to get minecraft version on Forge platform for telemetry", t);
+                LOGGER.warn(MARKER, "Failed to get minecraft version on Forge platform for telemetry", t);
                 return "";
             }
         }
@@ -162,7 +165,7 @@ abstract class Platform {
                 mh = MethodHandles.filterReturnValue(mh, lookup.findVirtual(versionInfoClass, "mcVersion", MethodType.methodType(String.class)));
                 return (String) mh.invokeExact();
             } catch (Throwable e) {
-                LOGGER.warn("Failed to get version info class on Neo platform for telemetry", e);
+                LOGGER.warn(MARKER, "Failed to get version info class on Neo platform for telemetry", e);
                 return "";
             }
         }

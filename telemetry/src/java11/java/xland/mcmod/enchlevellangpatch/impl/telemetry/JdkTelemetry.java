@@ -24,7 +24,7 @@ final class JdkTelemetry extends LangPatchTelemetry {
         );
         if (LOGGER.isDebugEnabled()) {
             int statusCode = response.statusCode();
-            LOGGER.debug("JDK Telemetry response [{}]", statusCode);
+            LOGGER.debug(MARKER, "JDK Telemetry response [{}]", statusCode);
         }
 
         Optional<String> redirectHeaderValue = response.headers().firstValue(REDIRECT_HEADER);
@@ -33,7 +33,7 @@ final class JdkTelemetry extends LangPatchTelemetry {
                 var newResponse = client.send(buildPostRequest(redirectHeaderValue.get()), HttpResponse.BodyHandlers.discarding());
                 if (LOGGER.isDebugEnabled()) {
                     int statusCode = newResponse.statusCode();
-                    LOGGER.debug("JDK Telemetry response (redirected) [{}]", statusCode);
+                    LOGGER.debug(MARKER, "JDK Telemetry response (redirected) [{}]", statusCode);
                 }
                 return null;
             });
