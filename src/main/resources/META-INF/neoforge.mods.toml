@@ -10,6 +10,8 @@ displayName='Enchantment Level Language Patch'
 description='Sharpness enchantment.level.255 => Sharpness 255/CCLV'
 modUrl='https://modrinth.com/mod/enchlevel-langpatch'
 displayURL='https://modrinth.com/mod/enchlevel-langpatch'
+iconFile='enchlevel-langpatch:icon.png'
+logoFile='assets/enchlevel-langpatch/icon.png'
 issueTrackerURL='https://github.com/teddyxlandlee/enchlevel-langpatch/issues'
 authors='teddyxlandlee'
 
