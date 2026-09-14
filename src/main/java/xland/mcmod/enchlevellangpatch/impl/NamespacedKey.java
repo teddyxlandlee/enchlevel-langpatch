@@ -31,7 +31,7 @@ public final class NamespacedKey implements Comparable<NamespacedKey>, java.io.S
     public static NamespacedKey of(String s) {
         final int i = s.indexOf(':');
         if (i < 0) return new NamespacedKey("minecraft", s);
-        return new NamespacedKey(s.substring(0, i), s.substring(i+1), s);
+        return new NamespacedKey(s.substring(0, i), s.substring(i + 1), s);
     }
 
     @SuppressWarnings("unused")

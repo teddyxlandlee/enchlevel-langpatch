@@ -152,8 +152,10 @@ public final class IndependentLangPatchRegistry implements Serializable {
 
     @SuppressWarnings("UnstableApiUsage")
     private ImmutableBiMap<String, EnchantmentLevelLangPatch> computeMap() {
-        return this.map.entrySet().stream()
-                .collect(ImmutableBiMap.toImmutableBiMap(e -> e.getKey().toString(), Map.Entry::getValue));
+        return this.map.entrySet().stream().collect(ImmutableBiMap.toImmutableBiMap(
+                e -> e.getKey().toString(),
+                Map.Entry::getValue
+        ));
     }
 
     public ImmutableBiMap<String, EnchantmentLevelLangPatch> asImmutableBiMap() {

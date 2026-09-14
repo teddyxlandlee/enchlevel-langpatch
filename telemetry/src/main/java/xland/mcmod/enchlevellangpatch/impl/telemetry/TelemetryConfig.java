@@ -14,7 +14,7 @@ public enum TelemetryConfig {
     OPTIONAL,
     ;
 
-    private static final TelemetryConfig DEFAULT = FUNCTIONAL;
+    private static final TelemetryConfig DEFAULT = DISABLED;
     private static final TelemetryConfig CURRENT = detect();
 
     public static TelemetryConfig getCurrent() {
