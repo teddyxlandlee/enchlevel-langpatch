@@ -31,8 +31,8 @@ public final class EnchantmentLevelLangPatchConfig {
      * potency patches.
      */
     static volatile NamespacedKey
-            currentEnchantmentHooksId = IndependentLangPatchRegistry.LP_DEFAULT,
-            currentPotionHooksId = IndependentLangPatchRegistry.LP_DEFAULT;
+            currentEnchantmentHooksId = IndependentLangPatchRegistry.DEFAULT_KEY,
+            currentPotionHooksId = IndependentLangPatchRegistry.DEFAULT_KEY;
 
     /**
      * <p>The setter for the current enchantment level patch. Will be set to default if

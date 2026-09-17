@@ -1,10 +1,8 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNullByDefault;
 import org.jetbrains.annotations.Range;
 
-@NotNullByDefault
 final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
     private final String[] pos;
@@ -54,6 +52,7 @@ final class ChineseExchange {
         return Lazy.EXCHANGES[type].numberToChinese(num);
     }
 
+    @Deprecated
     public static String numberToChineseCacheless(int num, @MagicConstant(intValues = {NORMAL, UPPER}) int type) {
         return Lazy.EXCHANGES[type].numberToChinese0(num);
     }

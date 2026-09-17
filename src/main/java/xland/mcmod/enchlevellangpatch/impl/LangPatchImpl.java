@@ -1,19 +1,14 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.NotNullByDefault;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatchConfig;
-import xland.mcmod.enchlevellangpatch.impl.telemetry.LangPatchTelemetry;
-import xland.mcmod.enchlevellangpatch.impl.telemetry.TelemetryConfig;
-import xland.mcmod.enchlevellangpatch.impl.telemetry.TelemetryData;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -65,9 +60,9 @@ public final class LangPatchImpl {
                 return configuredFormat(translationStorage, lvl, KEY_POTION_TYPE, KEY_POTION_FORMAT);
             };
 
-    private static @NotNull String safeFormat(Map<String, String> translationStorage, String key, @NotNull Object arg) {
+    private static String safeFormat(Map<String, String> translationStorage, String key, Object arg) {
         try {
-            return String.format(translationStorage.getOrDefault(key, "%s"), arg);
+            return String.format(Locale.ENGLISH, translationStorage.getOrDefault(key, "%s"), arg);
         } catch (IllegalFormatException e) {
             // Invalid format
             LOGGER.warn(MARKER, "Invalid format string for translation key {}. Using as-is format.", key, e);
@@ -114,13 +109,10 @@ public final class LangPatchImpl {
     }
 
     static public final IndependentLangPatchRegistry
-        ENCHANTMENT_HOOK = IndependentLangPatchRegistry.of("enchantments"),
-        POTION_HOOK = IndependentLangPatchRegistry.of("potions");
+        ENCHANTMENT_HOOK = new IndependentLangPatchRegistry("enchantments", DEFAULT_ENCHANTMENT_HOOKS),
+        POTION_HOOK = new IndependentLangPatchRegistry("potions", DEFAULT_POTION_HOOKS);
 
     static {
-        ENCHANTMENT_HOOK.add("enchlevel-langpatch:default", DEFAULT_ENCHANTMENT_HOOKS);
-        POTION_HOOK.add("enchlevel-langpatch:default", DEFAULT_POTION_HOOKS);
-
         // preload roman/chinese map
         Preconditions.checkState(
                 "I".equals(EnchantmentLevelLangPatch.intToRoman(1)),
@@ -131,15 +123,15 @@ public final class LangPatchImpl {
     // *** REGISTRY *** //
 
     public static void hookEnchantmentPatch(
-            @NotNull NamespacedKey id,
-            @NotNull EnchantmentLevelLangPatch hooks
+            NamespacedKey id,
+            EnchantmentLevelLangPatch hooks
     ) {
         hookPatch(ENCHANTMENT_HOOK, id, hooks);
     }
 
     public static void hookPotionPatch(
-            @NotNull NamespacedKey id,
-            @NotNull EnchantmentLevelLangPatch hooks
+            NamespacedKey id,
+            EnchantmentLevelLangPatch hooks
     ) {
         hookPatch(POTION_HOOK, id, hooks);
     }
@@ -156,8 +148,8 @@ public final class LangPatchImpl {
         reg.add(id, hooks);
     }
 
-    public static void register(@NotNull Predicate<String> keyPredicate,
-                                @NotNull EnchantmentLevelLangPatch edition) {
+    public static void register(Predicate<String> keyPredicate,
+                                EnchantmentLevelLangPatch edition) {
         synchronized (PREDICATES_WRITE_LOCK) {
             if (isPredicatesLocked) {
                 LOGGER.warn(MARKER, "Patch list is frozen. The patch may not be applied.");
@@ -167,7 +159,7 @@ public final class LangPatchImpl {
         }
     }
 
-    private static void lockAll() {
+    private static void lockHooks() {
         ENCHANTMENT_HOOK.freeze();
         POTION_HOOK.freeze();
         LOGGER.debug(MARKER, "Registries are locked");
@@ -184,7 +176,7 @@ public final class LangPatchImpl {
 
     public static void init() {
         applyConf4();
-        lockAll();
+        lockHooks();
         EnchantmentLevelLangPatch.registerPatch(
                 s -> s.startsWith("enchantment.level.") && NumberFormatUtil.isDigit(s, 18),
                 (translationStorage, key) -> EnchantmentLevelLangPatchConfig
@@ -242,36 +234,22 @@ public final class LangPatchImpl {
 
     private static void sendTelemetry() {
         final Marker telemetryMarker = MarkerManager.getMarker("LangPatch/Telemetry");
-        final JsonObject data;
 
         try {
             TelemetryConfig telemetryConfig = TelemetryConfig.getCurrent();
             LOGGER.info(telemetryMarker, "Telemetry Level: {}", telemetryConfig);
-            switch (telemetryConfig) {
-                case DISABLED:
-                    return;
-                case NECESSARY:
-                    data = TelemetryData.getNecessary();
-                    break;
-                case FUNCTIONAL:
-                    data = TelemetryData.getFunctional();
-                    break;
-                case OPTIONAL:
-                    data = TelemetryData.getFull();
-                    break;
-                default:
-                    throw new IncompatibleClassChangeError(TelemetryConfig.class.getName());
+            if (telemetryConfig != TelemetryConfig.DISABLED) {
+                LOGGER.warn(telemetryMarker, "Telemetry service is down." +
+                        " Disable it by removing `config/enchlevel-langpatch-telemetry.txt`"
+                );
             }
         } catch (Throwable e) {
             LOGGER.debug(telemetryMarker, "Failed to send telemetry", e);
-            return;
         }
-
-        final Thread thread = LangPatchTelemetry.ofThread(data.toString());
-        thread.start();
         // Do not join, we don't want to block the main thread.
     }
 
+    @Deprecated   // If not found, set to null
     public static int getPatchCount() {
         return PREDICATES.size();
     }

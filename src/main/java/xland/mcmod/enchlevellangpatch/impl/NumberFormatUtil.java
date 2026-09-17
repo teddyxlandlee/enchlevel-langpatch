@@ -1,10 +1,8 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
 import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNullByDefault;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@NotNullByDefault
 public final class NumberFormatUtil {
     private NumberFormatUtil() {}
 
@@ -40,7 +38,7 @@ public final class NumberFormatUtil {
             return ChineseExchange.numberToChinese(num, ChineseExchange.NORMAL);
         } else if (type == ChineseExchange.UPPER) {
             return ChineseExchange.numberToChinese(num, ChineseExchange.UPPER);
-        } else {
+        } else {    // type == -1
             String ret = intToRoman(num);
             return ret == null ? Integer.toString(num) : ret;
         }

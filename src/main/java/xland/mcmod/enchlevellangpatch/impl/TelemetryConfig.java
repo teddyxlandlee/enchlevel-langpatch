@@ -1,4 +1,4 @@
-package xland.mcmod.enchlevellangpatch.impl.telemetry;
+package xland.mcmod.enchlevellangpatch.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-public enum TelemetryConfig {
+enum TelemetryConfig {
     DISABLED,
     NECESSARY,
     FUNCTIONAL,
@@ -21,6 +21,7 @@ public enum TelemetryConfig {
         return CURRENT;
     }
 
+    // will stop detecting (silent ignore) since 3.10
     private static TelemetryConfig detect() {
         if (Boolean.getBoolean("xland.mcmod.enchlevellangpatch.disableTelemetry")) {
             return DISABLED;
@@ -37,7 +38,7 @@ public enum TelemetryConfig {
             }
             if (line == null) return DEFAULT;
         } catch (IOException e) {
-            LangPatchTelemetry.LOGGER.warn("Telemetry config file read error", e);
+            // fail silently
             return DEFAULT;
         }
 

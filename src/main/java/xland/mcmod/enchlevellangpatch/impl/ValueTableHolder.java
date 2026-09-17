@@ -3,16 +3,13 @@ package xland.mcmod.enchlevellangpatch.impl;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
-import org.jetbrains.annotations.NotNullByDefault;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
-@NotNullByDefault
 @SuppressWarnings("UnstableApiUsage")
 final class ValueTableHolder {
     static final String[] ROMAN = new String[3999];
@@ -21,10 +18,8 @@ final class ValueTableHolder {
 
     static {
         final HashCode expectedHash = HashCode.fromString("3c09cc78904fc47fd583b680ecfa9e2ad7370787ea149d843a56fb8f8c15c8d4");
-        final InputStream inputStream = Objects.requireNonNull(
-                ValueTableHolder.class.getResourceAsStream("ValueTable.txt"),
-                "ValueTable.txt not found. This should not happen."
-        );
+        final InputStream inputStream = ValueTableHolder.class.getResourceAsStream("ValueTable.txt");
+        if (inputStream == null) throw new IllegalStateException("ValueTable.txt not found. This should not happen.");
 
         final HashingInputStream hashingInputStream = new HashingInputStream(Hashing.sha256(), inputStream);
 

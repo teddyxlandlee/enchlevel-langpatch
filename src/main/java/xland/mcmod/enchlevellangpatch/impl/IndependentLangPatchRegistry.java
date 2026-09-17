@@ -5,11 +5,12 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.errorprone.annotations.ThreadSafe;
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Map;
@@ -22,35 +23,34 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class IndependentLangPatchRegistry implements Serializable {
     private final BiMap<NamespacedKey, EnchantmentLevelLangPatch> map = HashBiMap.create();
 
-    private volatile transient ImmutableBiMap<String, EnchantmentLevelLangPatch> snapshot;
+    private volatile transient @Nullable ImmutableBiMap<String, EnchantmentLevelLangPatch> snapshot;
 
     private volatile boolean isFrozen;
     private transient ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-    private final NamespacedKey defaultId;
     private transient EnchantmentLevelLangPatch defaultValue;
-    private final @NotNull String registryName;
+    private final String registryName;
 
-    public static final NamespacedKey LP_DEFAULT = NamespacedKey.of("enchlevel-langpatch:default");
+    public static final NamespacedKey DEFAULT_KEY = NamespacedKey.of("enchlevel-langpatch:default");
 
-    IndependentLangPatchRegistry(@NotNull String registryName, NamespacedKey defaultId) {
+    IndependentLangPatchRegistry(String registryName, EnchantmentLevelLangPatch defaultValue) {
         Objects.requireNonNull(registryName, "registryName");
+        Objects.requireNonNull(defaultValue, "defaultValue");
         this.registryName = registryName;
-        this.defaultId = defaultId;
+
+        map.put(DEFAULT_KEY, defaultValue);
+        this.defaultValue = defaultValue;
     }
 
-    @Contract("_ -> new")
-    static @NotNull IndependentLangPatchRegistry of(String registryName) {
-        return new IndependentLangPatchRegistry(registryName, LP_DEFAULT);
-    }
-
-    public void add(NamespacedKey id, EnchantmentLevelLangPatch e) {
+    public void add(NamespacedKey id, EnchantmentLevelLangPatch patch) {
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(patch, "patch");
         readWriteLock.writeLock().lock();
         try {
             checkFreeze();
-            map.put(id, e);
-            if (Objects.equals(defaultId, id)) {
-                this.defaultValue = e;
+            map.put(id, patch);
+            if (DEFAULT_KEY.equals(id)) {
+                this.defaultValue = patch;
             }
             snapshot = null;
         } finally {
@@ -63,6 +63,7 @@ public final class IndependentLangPatchRegistry implements Serializable {
     }
 
     public EnchantmentLevelLangPatch get(NamespacedKey id) {
+        Objects.requireNonNull(id, "id");
         if (isFrozen) return getCached(id);
 
         readWriteLock.readLock().lock();
@@ -75,17 +76,17 @@ public final class IndependentLangPatchRegistry implements Serializable {
     }
 
     private EnchantmentLevelLangPatch getCached(NamespacedKey id) {
-        // snapshot shall be nonnull
-        return snapshot.getOrDefault(id.toString(), defaultValue);
+        return Objects.requireNonNull(snapshot).getOrDefault(id.toString(), defaultValue);
     }
 
-    public NamespacedKey getId(EnchantmentLevelLangPatch e) {
+    public NamespacedKey getId(@Nullable EnchantmentLevelLangPatch e) {
+        if (e == null) return DEFAULT_KEY;
         if (isFrozen) return getIdCached(e);
 
         readWriteLock.readLock().lock();
         try {
             if (isFrozen) return getIdCached(e);
-            return map.inverse().getOrDefault(e, defaultId);
+            return map.inverse().getOrDefault(e, DEFAULT_KEY);
         } finally {
             readWriteLock.readLock().unlock();
         }
@@ -93,23 +94,21 @@ public final class IndependentLangPatchRegistry implements Serializable {
 
     private NamespacedKey getIdCached(EnchantmentLevelLangPatch e) {
         // snapshot shall be nonnull
-        String s = snapshot.inverse().get(e);
-        return s == null ? defaultId : NamespacedKey.of(s);
+        String s = Objects.requireNonNull(snapshot).inverse().get(e);
+        return s == null ? DEFAULT_KEY : NamespacedKey.of(s);
     }
 
-    public NamespacedKey getDefaultId() {
-        return defaultId;
-    }
-
-    public EnchantmentLevelLangPatch remove(NamespacedKey key) {
+    @ApiStatus.Experimental
+    public @Nullable EnchantmentLevelLangPatch remove(NamespacedKey key) {
+        if (DEFAULT_KEY.equals(key)) {
+            throw new IllegalArgumentException("Default entry cannot be removed. Call add() to replace it.");
+        }
         readWriteLock.writeLock().lock();
 
         try {
             checkFreeze();
-            this.snapshot = null;   // This is unnecessary, but let's do this
-            EnchantmentLevelLangPatch oldValue = this.map.remove(key);
-            if (oldValue != null && Objects.equals(defaultId, key)) defaultValue = null;
-            return oldValue;
+            this.snapshot = null;
+            return this.map.remove(key);
         } finally {
             readWriteLock.writeLock().unlock();
         }
@@ -140,6 +139,7 @@ public final class IndependentLangPatchRegistry implements Serializable {
         }
     }
 
+    @ApiStatus.Experimental
     public void unfreeze() {
         readWriteLock.writeLock().lock();
         try {
@@ -173,15 +173,20 @@ public final class IndependentLangPatchRegistry implements Serializable {
         return m;
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
+        EnchantmentLevelLangPatch defaultValue;
+        if ((defaultValue = map.get(DEFAULT_KEY)) == null) {
+            throw new InvalidObjectException("default entry is absent");
+        }
+
         this.readWriteLock = new ReentrantReadWriteLock();
 
         if (isFrozen) {
             snapshot = computeMap();
         }
-        this.defaultValue = defaultId == null ? null : map.get(this.defaultId);    // If not found, set to null
+        this.defaultValue = defaultValue;
     }
 }

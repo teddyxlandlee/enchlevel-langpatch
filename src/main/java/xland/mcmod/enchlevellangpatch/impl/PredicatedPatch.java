@@ -1,12 +1,10 @@
 package xland.mcmod.enchlevellangpatch.impl;
 
-import org.jetbrains.annotations.NotNullByDefault;
 import xland.mcmod.enchlevellangpatch.api.EnchantmentLevelLangPatch;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
-@NotNullByDefault
 final class PredicatedPatch {
     private final Predicate<String> keyPredicate;
     private final EnchantmentLevelLangPatch langPatch;

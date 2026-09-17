@@ -15,7 +15,7 @@ public final class NamespacedKey implements Comparable<NamespacedKey>, java.io.S
     private final String namespace, path;
     private transient @Nullable String toStringCache;
 
-    public NamespacedKey(String namespace, String path) {
+    public NamespacedKey(String namespace, String path) throws IllegalArgumentException {
         Preconditions.checkArgument(NS_PATTERN.matcher(namespace).matches(), "Illegal namespace: " + namespace);
         Preconditions.checkArgument(PATH_PATTERN.matcher(path).matches(), "Illegal path: " + path);
         this.namespace = namespace;
@@ -28,7 +28,7 @@ public final class NamespacedKey implements Comparable<NamespacedKey>, java.io.S
         this.toStringCache = asString;
     }
 
-    public static NamespacedKey of(String s) {
+    public static NamespacedKey of(String s) throws IllegalArgumentException {
         final int i = s.indexOf(':');
         if (i < 0) return new NamespacedKey("minecraft", s);
         return new NamespacedKey(s.substring(0, i), s.substring(i + 1), s);

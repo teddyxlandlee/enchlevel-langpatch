@@ -33,7 +33,7 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
     /** Definitely not moj-named. */
     private static final Supplier<VersionPredicate> V25W44A_BELOW = parseVersionPredicate("<=1.21.11-alpha.25.44.a");
     /**
-     * The version Mojang <b>declares</b> to completely remove obfuscation.
+     * The version Mojang begins to completely remove obfuscation.
      * @see <a href='https://www.minecraft.net/zh-hans/article/removing-obfuscation-in-java-edition'>
      *     Removing obfuscation in Java Edition - minecraft.net</a>
      * @see <a href='https://www.minecraft.net/zh-hans/article/minecraft-new-version-numbering-system'>
