@@ -4,8 +4,13 @@
 **For Forge 1.13.x users:** [ModernMixins](https://modrinth.com/mod/modernmixins)
 (or any alternative Mixin loader) is required.
 
-**Telemetry Settings:** You can adjust the telemetry level by creating/editing `config/enchlevel-langpatch-telemetry.txt`.  
-Available options: `disabled`, `necessary`, `functional`, or `optional`.
+> **📢 Telemetry Update**
+> 
+> Telemetry is now **off by default (Level -1)**. The backend is offline and will be permanently shut down; current versions collect and send no data.
+> 
+> After months of collection, we now understand player preferences, so the service is retired. Existing reports remain [available here](https://privacy.ellp.mods.hixland.com/reports); all raw data and copies have been deleted.
+> 
+> `config/enchlevel-langpatch-telemetry.txt` is no longer needed. See our [Privacy Policy](https://privacy.ellp.mods.hixland.com/privacy). Thanks for your support!
 
 Without the patch:
 
@@ -59,10 +64,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly "xland.mcmod:enchlevel-langpatch:3.1.0"
+    compileOnly "xland.mcmod:enchlevel-langpatch:3.9.1"
 }
 ```
 
-Online javadoc can be found [here](https://teddyxlandlee.github.io/enchlevel-langpatch/javadoc).
+Online javadoc can be found [here](https://docs.ellp.mods.hixland.com).
 
 
