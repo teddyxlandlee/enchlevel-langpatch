@@ -16,7 +16,7 @@ buildscript {
 plugins {
     `java-library`
     idea
-    id("me.modmuss50.mod-publish-plugin") version "2.2.0"
+    id("me.modmuss50.mod-publish-plugin") version "2.2.1"
     id("xland.gradle.forge-init-injector") version "3.1.0"
     `maven-publish`
 }
@@ -329,13 +329,21 @@ publishMods {
             end = "latest"
             includeSnapshots = true
         }
-        minecraftVersions.addAll(supportedAncientVersions)
-
-        this@modrinth.modLoaders.addAll(this@publishMods.modLoaders)
-        this@modrinth.modLoaders.add("legacy-fabric")
-        this@modrinth.modLoaders.add("ornithe")
-
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+    }
+
+    modrinth("modrinthLegacy") {
+        projectId = "Lf4kDKU9"
+        minecraftVersions = supportedAncientVersions
+
+        this@modrinth.modLoaders.also { loaders ->
+            loaders.addAll(this@publishMods.modLoaders.map { list ->
+                list.filter { it != "neoforge" }    // Fuck modrinth validator
+            })
+            loaders.add("legacy-fabric")
+            loaders.add("ornithe")
+        }
+        version = "${project.version}-for-legacy"
     }
 
     additionalFiles.from(
