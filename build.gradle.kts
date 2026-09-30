@@ -337,9 +337,7 @@ publishMods {
         minecraftVersions = supportedAncientVersions
 
         this@modrinth.modLoaders.also { loaders ->
-            loaders.addAll(this@publishMods.modLoaders.map { list ->
-                list.filter { it != "neoforge" }    // Fuck modrinth validator
-            })
+            loaders.add("forge")
             loaders.add("legacy-fabric")
             loaders.add("ornithe")
         }
