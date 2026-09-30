@@ -344,6 +344,7 @@ publishMods {
             loaders.add("ornithe")
         }
         version = "${project.version}-for-legacy"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
     }
 
     additionalFiles.from(
