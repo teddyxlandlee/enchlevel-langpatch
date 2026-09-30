@@ -11,7 +11,7 @@
     "homepage": "https://modrinth.com/mod/enchlevel-langpatch",
     "sources": "https://github.com/teddyxlandlee/enchlevel-langpatch",
     "issues": "https://github.com/teddyxlandlee/enchlevel-langpatch/issues",
-    "privacy": "https://telemetry.langpatch.mc.7c7.icu/privacy"
+    "privacy": "https://privacy.ellp.mods.hixland.com/privacy"
   },
   "icon": "assets/enchlevel-langpatch/icon.png",
   "license": "WTFPL",
@@ -25,7 +25,7 @@
     "ellp-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.18.0"
+    "fabricloader": ">=0.19.0"
   },
   "breaks": {
     "enchlevel-langpatch-config": "<2",

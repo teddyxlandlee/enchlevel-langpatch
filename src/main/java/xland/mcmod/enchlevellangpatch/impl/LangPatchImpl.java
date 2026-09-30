@@ -190,7 +190,6 @@ public final class LangPatchImpl {
                         .apply(translationStorage, key)
         );
         lockPredicates();
-        sendTelemetry();
     }
 
     private static void applyConf4() {
@@ -230,23 +229,6 @@ public final class LangPatchImpl {
             EnchantmentLevelLangPatchConfig.setCurrentPotionHooks(patch);
             LOGGER.info(marker, "Set potion hook to {}", p);
         }
-    }
-
-    private static void sendTelemetry() {
-        final Marker telemetryMarker = MarkerManager.getMarker("LangPatch/Telemetry");
-
-        try {
-            TelemetryConfig telemetryConfig = TelemetryConfig.getCurrent();
-            LOGGER.info(telemetryMarker, "Telemetry Level: {}", telemetryConfig);
-            if (telemetryConfig != TelemetryConfig.DISABLED) {
-                LOGGER.warn(telemetryMarker, "Telemetry service is down." +
-                        " Disable it by removing `config/enchlevel-langpatch-telemetry.txt`"
-                );
-            }
-        } catch (Throwable e) {
-            LOGGER.debug(telemetryMarker, "Failed to send telemetry", e);
-        }
-        // Do not join, we don't want to block the main thread.
     }
 
     @Deprecated   // If not found, set to null
