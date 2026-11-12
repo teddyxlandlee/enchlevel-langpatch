@@ -1,11 +1,15 @@
 package xland.mcmod.enchlevellangpatch.test;
 
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+
 public class ValueTableValidationTest {
-    public static void main(String[] args) {
-        try {
-            Class.forName("xland.mcmod.enchlevellangpatch.impl.ValueTableHolder");
-        } catch (Throwable e) {
-            throw new RuntimeException("Failed to load or initialize ValueTableHolder", e);
-        }
+    @Test
+    public void verifyTable() throws Exception {
+        Class<?> c = Class.forName("xland.mcmod.enchlevellangpatch.impl.ValueTableHolder");
+        Method verifier = c.getDeclaredMethod("verifyValues");
+        verifier.setAccessible(true);
+        verifier.invoke(null);
     }
 }

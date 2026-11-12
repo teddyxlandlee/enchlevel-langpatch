@@ -16,7 +16,7 @@ import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil.intToRomanImpl;
+import static xland.mcmod.enchlevellangpatch.impl.NumberFormatUtil.formatLevel;
 
 public final class LangPatchImpl {
     private LangPatchImpl() {}
@@ -105,7 +105,7 @@ public final class LangPatchImpl {
                 cnMode = -1;
         }
 
-        return safeFormat(translationStorage, formatKey, intToRomanImpl(lvl, cnMode));
+        return safeFormat(translationStorage, formatKey, formatLevel(lvl, cnMode));
     }
 
     static public final IndependentLangPatchRegistry
@@ -114,10 +114,12 @@ public final class LangPatchImpl {
 
     static {
         // preload roman/chinese map
-        Preconditions.checkState(
-                "I".equals(EnchantmentLevelLangPatch.intToRoman(1)),
-                "Corrupted Roman/Chinese Map"
-        );
+        if (Debug.CACHE_CHECK != Debug.CACHE_CHECK_DISABLED) {
+            Preconditions.checkState(
+                    "I".equals(EnchantmentLevelLangPatch.intToRoman(1)),
+                    "Corrupted Roman/Chinese Map"
+            );
+        }
     }
 
     // *** REGISTRY *** //

@@ -9,7 +9,7 @@ import me.modmuss50.mpp.ReleaseType
 
 buildscript {
     dependencies {
-        classpath("com.google.guava:guava:33.6.0-jre")
+        classpath("com.google.guava:guava:33.8.0-jre")
     }
 }
 
@@ -63,7 +63,9 @@ allprojects {
 // not forbidden.
 dependencies {
     implementation("net.fabricmc:fabric-loader:${project.ext["loader_version"]}")
+    @Suppress("VulnerableLibraries")
     compileOnlyApi("com.google.guava:guava:21.0")
+    @Suppress("VulnerableLibraries")
     implementation("com.google.code.gson:gson:2.8.0")   // used by MCF 1.12.2~1.17.1
     implementation("it.unimi.dsi:fastutil:8.2.1")
     implementation("org.apache.logging.log4j:log4j-api:2.8.1")
@@ -74,17 +76,19 @@ dependencies {
 
     // Used by MCF 1.12.2 (actually 5.2; source compiled under 6.2 works; 5.2 targets JDK 1.3
     // where templates are unsupported)
+    @Suppress("VulnerableLibraries")
     implementation("org.ow2.asm:asm:6.2")
     implementation("org.ow2.asm:asm-tree:6.2")
+    @Suppress("VulnerableLibraries")
     implementation("org.ow2.asm:asm-commons:6.2")
 
     compileOnlyApi("org.apiguardian:apiguardian-api:1.1.2")
     compileOnlyApi("org.jetbrains:annotations:26.1.0")
     compileOnlyApi("org.jspecify:jspecify:1.0.1")
     compileOnly("com.google.errorprone:error_prone_annotations:2.49.0")
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.4")
-    runtimeOnly("com.google.guava:guava:33.6.0-jre")
-    runtimeOnly("com.google.code.gson:gson:2.13.2")
+    runtimeOnly("org.apache.logging.log4j:log4j-core:2.26.1")
+    runtimeOnly("com.google.guava:guava:33.8.0-jre")
+    runtimeOnly("com.google.code.gson:gson:2.15.0")
 
     compileOnly("net.minecraftforge:forge:1.12.2-14.23.5.2864:universal") {
         isTransitive = false
@@ -92,6 +96,10 @@ dependencies {
     compileOnly("net.minecraft:launchwrapper:1.12") {
         isTransitive = false
     }
+
+    testImplementation(platform("org.junit:junit-bom:5.14.4"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 forgeInitInjector {
@@ -205,6 +213,8 @@ object TemplatePacks {  // break implicit inner class declaration
         }
 
         init {
+            description = "Generate $templateId pack"
+
             val packVersion = run {
                 val time = dateFormatter.format(ZonedDateTime.now())
                 val patch = project.providers.gradleProperty("template_patch_number").getOrElse("0")
@@ -363,5 +373,5 @@ publishing {
 }
 
 tasks.test {
-    failOnNoDiscoveredTests = false
+    useJUnitPlatform()
 }

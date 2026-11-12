@@ -68,6 +68,6 @@ dependencies {
 }
 ```
 
-Online javadoc can be found [here](https://docs.ellp.mods.hixland.com).
+Online Javadoc can be found [here](https://docs.ellp.mods.hixland.com).
 
 

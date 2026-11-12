@@ -2,6 +2,7 @@ package xland.mcmod.enchlevellangpatch.impl;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.VisibleForTesting;
 
 final class ChineseExchange {
     private final NumResultCacheMap cacheMap = new NumResultCacheMap();
@@ -46,13 +47,15 @@ final class ChineseExchange {
             @Range(from = 0, to = Integer.MAX_VALUE) int num,
             @MagicConstant(intValues = {NORMAL, UPPER}) int type
     ) {
+        if (Debug.NO_CACHE_CHINESE) return numberToChineseCacheless(num, type);
+
         if (num < 256) {
             return ValueTableHolder.CHINESE[type * 256 + num];
         }
         return Lazy.EXCHANGES[type].numberToChinese(num);
     }
 
-    @Deprecated
+    @VisibleForTesting
     public static String numberToChineseCacheless(int num, @MagicConstant(intValues = {NORMAL, UPPER}) int type) {
         return Lazy.EXCHANGES[type].numberToChinese0(num);
     }
