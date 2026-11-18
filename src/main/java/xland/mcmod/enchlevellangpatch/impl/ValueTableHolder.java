@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
-@SuppressWarnings("UnstableApiUsage")
 final class ValueTableHolder {
     static final String[] ROMAN = new String[3999];
     static final String[] CHINESE = new String[2 * 256];
@@ -30,13 +30,16 @@ final class ValueTableHolder {
                 readFromStream(inputStream);
                 verifyValues();
             } else {
+                @SuppressWarnings("UnstableApiUsage")
                 final HashCode expectedHash = HashCode.fromString(HASH);
+                @SuppressWarnings("UnstableApiUsage")
                 final HashingInputStream hashingInputStream = new HashingInputStream(Hashing.sha256(), inputStream);
 
                 readFromStream(hashingInputStream);
 
+                @SuppressWarnings("UnstableApiUsage")
                 final HashCode hash = hashingInputStream.hash();
-                if (!expectedHash.equals(hash)) {
+                if (!Objects.equals(expectedHash, hash)) {
                     throw new IllegalStateException("ValueTable.txt is corrupted, sha256 hash mismatch: expected" + expectedHash + ", got " + hash);
                 }
             }

@@ -17,13 +17,22 @@
  *              String s = storage.get(key);
  *              if (s != null) return s;
  *              if (s.length() == prefixLen) return "???";
- *              return String.join(" ", Arrays.stream(s.substring(prefixLen).split("_"))
- *                  .flatMap(word -> {
- *                      String w = word.strip();
- *                      if (w.isEmpty()) return Stream.empty();
- *                      return Stream.of(Character.toUppercase(w.charAt(0) + w.substring(1)));
- *                  })
- *                  .collect(Collectors.toList()));
+ *              return String.join(
+ *                  " ", () -> Arrays.stream(s.substring(prefixLen).split("_"))
+ *                      .<CharSequence>flatMap(word -> {
+ *                          word = word.strip();
+ *                          if (word.isEmpty()) return Stream.empty();
+ *                          StringBuilder sb = new StringBuilder(word.length());
+ *                          int firstChar = Character.toUpperCase(word.codePointAt(0));
+ *                          if (!Character.isBmpCodePoint(firstChar)) {
+ *                              sb.appendCodePoint(firstChar).append(sb.substring(2));
+ *                          } else {
+ *                              sb.append((char) firstChar).append(sb.substring(1));
+ *                          }
+ *                          return Stream.of(sb);
+ *                      })
+ *                      .iterator();
+ *              );
  *          }
  *     );
  * }</pre>

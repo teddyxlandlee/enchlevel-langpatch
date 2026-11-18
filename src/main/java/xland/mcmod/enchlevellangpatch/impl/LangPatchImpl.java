@@ -113,7 +113,8 @@ public final class LangPatchImpl {
         POTION_HOOK = new IndependentLangPatchRegistry("potions", DEFAULT_POTION_HOOKS);
 
     static {
-        // preload roman/chinese map
+        // Preload roman/chinese map.
+        // ValueTableHolder will remain unused if cache check is disabled.
         if (Debug.CACHE_CHECK != Debug.CACHE_CHECK_DISABLED) {
             Preconditions.checkState(
                     "I".equals(EnchantmentLevelLangPatch.intToRoman(1)),
