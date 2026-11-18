@@ -9,6 +9,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import xland.mcmod.enchlevellangpatch.mixin.ext.AsmExtension;
+import xland.mcmod.enchlevellangpatch.mixin.ext.BypassNonReplaceablePrefixes;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -20,6 +22,7 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
     // Injects an indy before putField.
     // Fields must be moj-named.
     protected boolean appliesPutFieldGuardCheck;
+    protected boolean bypassesNonReplaceablePrefixes;
     protected String storageFieldName;
     protected String targetMethodName;
 
@@ -99,6 +102,11 @@ abstract class AbstractMixinPlugin implements IMixinConfigPlugin {
                     ));
             AsmTranslationStorage asm = new AsmTranslationStorage(targetClassName, storageFieldName, appliesFallback, appliesUnmodifiableWrap, appliesPutFieldGuardCheck0);
             asm.accept(method);
+
+            AsmExtension.applyWhenMatch(
+                    targetClass,
+                    bypassesNonReplaceablePrefixes, BypassNonReplaceablePrefixes::new
+            );
         } else if (mixinClassName.endsWith(MIXIN_EXTERNAL_LANGUAGE_MAP)) {
             applyExternal(targetClassName, targetClass);
         }

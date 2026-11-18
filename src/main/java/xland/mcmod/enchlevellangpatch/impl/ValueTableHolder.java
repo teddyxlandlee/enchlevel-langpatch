@@ -44,6 +44,15 @@ final class ValueTableHolder {
                 }
             }
         } catch (IOException ex) {
+            if (Debug.CACHE_CHECK == Debug.CACHE_CHECK_DISABLED) {
+                // No NPE/IllegalStateException could be thrown in this branch
+                org.apache.logging.log4j.LogManager.getLogger().error(
+                        "I/O error suppressed while reading ValueTable.txt, given that cache check is disabled. " +
+                        "Nulls are undefined behavior.",
+                        ex
+                );
+                return;
+            }
             throw new ExceptionInInitializerError(ex);
         }
     }
@@ -56,7 +65,7 @@ final class ValueTableHolder {
     }
 
     @VisibleForTesting
-    public static void verifyValues() throws IllegalStateException {
+    public static void verifyValues() throws IllegalStateException, NullPointerException {
         Preconditions.checkState(ROMAN[0].isEmpty(), "!ROMAN[0].isEmpty()");
         for (int x = 1; x < 3999; x++) {
             Preconditions.checkState(

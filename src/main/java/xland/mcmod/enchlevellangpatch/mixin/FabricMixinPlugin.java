@@ -40,6 +40,11 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
      *     Minecraft's new version numbering system</a>
      */
     private static final Supplier<VersionPredicate> V26_ABOVE = parseVersionPredicate(">=26");
+    /**
+     * The version where {@code ClientLanguage.NON_REPLACEABLE_PREFIXES}, the
+     * {@code Set<String>} is introduced.
+     */
+    private static final Supplier<VersionPredicate> V264S9_ABOVE = parseVersionPredicate(">=26.4-alpha.9");
 
     /** SemVer support for <code>&lt;snapshot&gt;[ _][uU]nobfuscated</code> since Fabric Loader 0.18.0 */
     private static final String UNOBFUSCATED_BUILD = "unobfuscated";
@@ -98,6 +103,10 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
         boolean appliesUnmodifiableWrap(Version mcVersion) {
             return !isMojMapped() && UNDER_V116.get().test(mcVersion);
+        }
+
+        boolean bypassesNonReplaceablePrefixes(Version mcVersion) {
+            return isMojMapped() && V264S9_ABOVE.get().test(mcVersion);
         }
 
         boolean isMojMapped() {
@@ -178,9 +187,9 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
         storageFieldName = mappingEnv.getStorageField(resolver);
         targetMethodName = mappingEnv.getTargetMethod(resolver, targetMethodDesc());
         appliesUnmodifiableWrap = mappingEnv.appliesUnmodifiableWrap(mcVersion);
+        bypassesNonReplaceablePrefixes = mappingEnv.bypassesNonReplaceablePrefixes(mcVersion);
 
         printVersion();
-        setSystemProperties(mappingEnv);
     }
 
     public static boolean isMojMapped(Version minecraftVersion) {
@@ -200,18 +209,6 @@ public class FabricMixinPlugin extends AbstractMixinPlugin {
 
         // An alternative option (still unclear of its availability)
         // return "official".equals(FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace());
-    }
-
-    private static void setSystemProperties(MappingEnvironment mappingEnv) {
-        switch (mappingEnv) {
-            case ORNITHES_V1:
-            case ORNITHES_V2:
-                System.setProperty("langpatch.fabricEnv", "ornithes");
-                break;
-            case LEGACY_FABRIC:
-                System.setProperty("langpatch.fabricEnv", "legacy-fabric");
-                break;
-        }
     }
 
     @Override

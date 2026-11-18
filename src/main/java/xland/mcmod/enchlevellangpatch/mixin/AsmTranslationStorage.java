@@ -8,6 +8,7 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import xland.mcmod.enchlevellangpatch.mixin.ext.AsmExtension;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandle;
@@ -15,11 +16,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryOperator<MethodNode> {
+public final class AsmTranslationStorage implements AsmExtension<MethodNode> {
     private final String thisClassName;
     private final transient String storageMapFieldName;
     private static final String HOOK_CLASS = "xland/mcmod/enchlevellangpatch/impl/AsmHook";
@@ -77,12 +76,6 @@ public final class AsmTranslationStorage implements Consumer<MethodNode>, UnaryO
 
         // insert insnList to the head
         m.instructions.insert(insnList);
-    }
-
-    @Override
-    public MethodNode apply(MethodNode methodNode) {
-        this.accept(methodNode);
-        return methodNode;
     }
 
     @Override

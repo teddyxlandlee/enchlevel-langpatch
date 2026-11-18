@@ -93,9 +93,16 @@ final class ForgeVersion {
         return Integer.parseInt(s.split("\\.", 2)[0]);
     }
 
-    static final int V117 = 37, V1194 = 45, V1206 = 50, V121Z /*1.21.11*/ = 61;
-    static final int V1161 = 32;
-    static final int V115 = 29;
-    static final int NEO_11 = ~11;
     static final int V112X = 14;
+    static final int V115 = 29;
+    static final int V1161 = 32;
+    static final int V117 = 37;
+    static final int V1194 = 45;
+    static final int V1206 = 50;
+    static final int V121Z /*1.21.11*/ = 61;
+    static final int V263 = 66;
+
+    static final int NEO_11 = ~11;
+    /** Since NeoForge 26.3 */
+    static final int NEO_12 = ~12;
 }

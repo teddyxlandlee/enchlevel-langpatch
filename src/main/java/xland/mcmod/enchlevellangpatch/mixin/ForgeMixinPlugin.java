@@ -31,6 +31,10 @@ public class ForgeMixinPlugin extends AbstractMixinPlugin {
             if (forgeVersion <= ForgeVersion.NEO_11 || forgeVersion > ForgeVersion.V121Z) {
                 appliesPutFieldGuardCheck = true;
             }
+            if (forgeVersion <= ForgeVersion.NEO_12 || forgeVersion > ForgeVersion.V263) {
+                bypassesNonReplaceablePrefixes = true;
+            }
+
         } else if (forgeVersion < ForgeVersion.V1161) {
             storageFieldName = "field_135032_a";
             targetMethodName = "func_135026_c";
